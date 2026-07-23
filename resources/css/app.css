@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  
+  --shadow-soft: 0 20px 40px -15px rgba(0,0,0,0.05);
+  --shadow-pill: 0 4px 14px -4px rgba(0,0,0,0.05);
+  --shadow-logo: 0 8px 24px -8px rgba(0,0,0,0.15);
+}
+
+@utility scrollbar-none {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Hide all scrollbars globally for a hyper-minimalist look */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
