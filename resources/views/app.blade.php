@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title inertia>{{ config('app.name', 'Madly') }}</title>
+        <link rel="icon" href="/favicon.png" type="image/png">
         
         <!-- Google Fonts: Plus Jakarta Sans for exact reference matching -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

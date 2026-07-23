@@ -79,8 +79,8 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, brands,
         setData('prices', newPrices);
     };
 
-    const labelClass = "block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1";
-    const inputClass = "w-full bg-[#f4f5f5] border border-gray-200 text-gray-900 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all";
+    const labelClass = "block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2 ml-1";
+    const inputClass = "w-full bg-[#f4f5f5] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 focus:bg-white dark:focus:bg-gray-800 transition-all";
 
     if (!isOpen || !mounted) return null;
 
@@ -106,23 +106,23 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, brands,
             ></div>
             
             {/* Panel */}
-            <div className="relative w-full max-w-2xl bg-white shadow-2xl flex flex-col h-full animate-slide-in">
+            <div className="relative w-full max-w-2xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col h-full animate-slide-in">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-5 bg-white border-b border-gray-100 z-10">
+                <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 z-10">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900">{isEdit ? 'Edit Product' : 'Add New Product'}</h2>
-                        <p className="text-xs text-gray-500 mt-1">Configure the product details and pricing packages.</p>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{isEdit ? 'Edit Product' : 'Add New Product'}</h2>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Configure the product details and pricing packages.</p>
                     </div>
                     <button 
                         onClick={onClose} 
-                        className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+                        className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
                     >
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
                 {/* Body */}
-                <div className="flex-1 overflow-y-auto p-6 scrollbar-none bg-[#f8f9fa]">
+                <div className="flex-1 overflow-y-auto p-6 scrollbar-none bg-[#f8f9fa] dark:bg-black">
                     <form id="product-form" onSubmit={handleSubmit} className="flex flex-col gap-8">
                         
                         {/* SECTION 0: Type Selector (Only for New Products) */}
@@ -135,14 +135,14 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, brands,
                                             key={type.id}
                                             type="button"
                                             onClick={() => setData('service_id', type.id)}
-                                            className={`p-5 rounded-2xl border flex flex-col items-start gap-3 transition-all ${isSelected ? 'border-gray-900 bg-gray-900 text-white shadow-md transform scale-[1.02]' : 'border-gray-200 bg-white hover:border-gray-300 text-gray-900 hover:bg-gray-50 hover:scale-[1.01]'}`}
+                                            className={`p-5 rounded-2xl border flex flex-col items-start gap-3 transition-all ${isSelected ? 'border-gray-900 dark:border-white bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-md transform scale-[1.02]' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 hover:scale-[1.01]'}`}
                                         >
-                                            <div className={`p-2 rounded-xl ${isSelected ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                                            <div className={`p-2 rounded-xl ${isSelected ? 'bg-white/10 dark:bg-gray-900/10 text-white dark:text-gray-900' : 'bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400'}`}>
                                                 {renderIcon(type.icon)}
                                             </div>
                                             <div className="text-left">
                                                 <div className="font-bold">{type.label}</div>
-                                                <div className={`text-xs mt-1 leading-relaxed ${isSelected ? 'text-gray-300' : 'text-gray-500'}`}>
+                                                <div className={`text-xs mt-1 leading-relaxed ${isSelected ? 'text-gray-300 dark:text-gray-600' : 'text-gray-500 dark:text-gray-400'}`}>
                                                     {type.description}
                                                 </div>
                                             </div>
@@ -153,20 +153,20 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, brands,
                         )}
 
                         {isEdit && selectedService && (
-                            <div className="bg-white border border-gray-200 rounded-2xl p-4 flex items-center gap-4">
-                                <div className="p-3 bg-gray-100 text-gray-900 rounded-xl">
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 flex items-center gap-4">
+                                <div className="p-3 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-xl">
                                     {renderIcon(selectedService.icon)}
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-bold text-gray-900">Service Type: {selectedService.name}</h3>
-                                    <p className="text-xs text-gray-500">To change the service type, please create a new product.</p>
+                                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">Service Type: {selectedService.name}</h3>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">To change the service type, please create a new product.</p>
                                 </div>
                             </div>
                         )}
                         
                         {/* SECTION 1: General Info */}
-                        <div className="bg-white border border-gray-200 rounded-2xl p-6">
-                            <h3 className="text-sm font-bold text-gray-900 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3">
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
+                            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
                                 <Box className="w-4 h-4 text-gray-400" />
                                 General Information
                             </h3>
@@ -224,8 +224,8 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, brands,
                         </div>
 
                         {/* SECTION 2: Copy Format Overrides */}
-                        <div className="bg-white border border-gray-200 rounded-2xl p-6">
-                            <h3 className="text-sm font-bold text-gray-900 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3">
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
+                            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
                                 <ListPlus className="w-4 h-4 text-gray-400" />
                                 Quotation Format (Copy-Paste)
                             </h3>
@@ -260,7 +260,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, brands,
                                                 <button 
                                                     type="button" 
                                                     onClick={() => removeInclude(idx)}
-                                                    className="w-11 h-11 flex-shrink-0 flex items-center justify-center border border-gray-200 text-gray-400 rounded-xl hover:bg-gray-100 transition-colors"
+                                                    className="w-11 h-11 flex-shrink-0 flex items-center justify-center border border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
@@ -269,7 +269,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, brands,
                                         <button 
                                             type="button"
                                             onClick={addInclude}
-                                            className="w-fit text-xs font-bold text-gray-900 hover:underline flex items-center gap-1 mt-2"
+                                            className="w-fit text-xs font-bold text-gray-900 dark:text-white hover:underline flex items-center gap-1 mt-2"
                                         >
                                             <Plus className="w-3 h-3" /> Add Include Item
                                         </button>
@@ -369,11 +369,11 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, brands,
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-4 bg-white border-t border-gray-100 flex justify-end gap-3 z-10">
+                <div className="px-6 py-4 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3 z-10">
                     <button 
                         type="button" 
                         onClick={onClose} 
-                        className="px-5 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-50"
+                        className="px-5 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                         Cancel
                     </button>
@@ -381,7 +381,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, brands,
                         type="submit" 
                         form="product-form" 
                         disabled={processing} 
-                        className="px-8 py-2.5 bg-gray-900 text-white rounded-xl font-bold text-sm hover:bg-black flex items-center gap-2 shadow-sm disabled:opacity-70"
+                        className="px-8 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm disabled:opacity-70 transition-colors"
                     >
                         <Save className="w-4 h-4" /> 
                         {processing ? 'Saving...' : 'Save Product'}

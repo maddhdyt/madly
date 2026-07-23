@@ -2,26 +2,30 @@ import React, { useState } from 'react';
 import MainLayout from '../../../Layouts/MainLayout';
 import { useForm, router } from '@inertiajs/react';
 import { Plus, Edit2, Trash2, ArrowLeft } from 'lucide-react';
-import ProductFormSlideOver from './ProductFormSlideOver';
+import BrandFormSlideOver from './BrandFormSlideOver';
 
-export default function Index({ products, brands }) {
+export default function Index({ brands }) {
     const { delete: destroy } = useForm();
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [selectedBrand, setSelectedBrand] = useState(null);
 
-    const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this product?')) {
-            destroy(route('admin.products.destroy', id));
+    const handleDelete = (id, count) => {
+        if (count > 0) {
+            alert('Cannot delete this brand because it has associated products.');
+            return;
+        }
+        if (confirm('Are you sure you want to delete this brand?')) {
+            destroy(route('admin.brands.destroy', id));
         }
     };
 
     const openCreateForm = () => {
-        setSelectedProduct(null);
+        setSelectedBrand(null);
         setIsSlideOverOpen(true);
     };
 
-    const openEditForm = (product) => {
-        setSelectedProduct(product);
+    const openEditForm = (brand) => {
+        setSelectedBrand(brand);
         setIsSlideOverOpen(true);
     };
 
@@ -30,8 +34,8 @@ export default function Index({ products, brands }) {
             {/* Header Area */}
             <div className="flex items-center justify-between px-8 py-8 border-b border-gray-100 dark:border-gray-800">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Product Management</h1>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage all your products, packages, and pricing.</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Brand Management</h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage all brands and their associated details.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button 
@@ -46,52 +50,53 @@ export default function Index({ products, brands }) {
                         className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm transition-colors"
                     >
                         <Plus className="w-4 h-4" />
-                        Add Product
+                        Add Brand
                     </button>
                 </div>
             </div>
 
-            {/* Content Area (Flat, Full-width Table) */}
+            {/* Content Area */}
             <div className="flex-1 overflow-x-auto bg-white dark:bg-gray-900">
                 <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300">
                     <thead className="bg-gray-50/50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider font-bold border-b border-gray-200 dark:border-gray-800">
                         <tr>
-                            <th className="px-8 py-4">Brand</th>
-                            <th className="px-8 py-4">Product Name</th>
-                            <th className="px-8 py-4">Category</th>
-                            <th className="px-8 py-4">Packages</th>
+                            <th className="px-8 py-4">Brand Logo</th>
+                            <th className="px-8 py-4">Brand Name</th>
+                            <th className="px-8 py-4">Description</th>
+                            <th className="px-8 py-4">Products Count</th>
                             <th className="px-8 py-4 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
-                        {products.length === 0 ? (
+                        {brands.length === 0 ? (
                             <tr>
                                 <td colSpan="5" className="px-8 py-12 text-center text-gray-500 dark:text-gray-400">
-                                    No products found. Create one to get started.
+                                    No brands found. Create one to get started.
                                 </td>
                             </tr>
                         ) : (
-                            products.map((product) => (
-                                <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
-                                    <td className="px-8 py-4 font-bold text-gray-900 dark:text-white">{product.brand.name}</td>
-                                    <td className="px-8 py-4 font-bold text-gray-900 dark:text-white">{product.name}</td>
+                            brands.map((brand) => (
+                                <tr key={brand.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
                                     <td className="px-8 py-4">
-                                        <span className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide border border-transparent dark:border-gray-700">
-                                            {product.category || '-'}
-                                        </span>
+                                        <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 font-bold overflow-hidden border border-gray-200 dark:border-gray-700">
+                                            {brand.name.charAt(0)}
+                                        </div>
                                     </td>
-                                    <td className="px-8 py-4 font-medium">{product.prices.length} pkgs</td>
+                                    <td className="px-8 py-4 font-bold text-gray-900 dark:text-white">{brand.name}</td>
+                                    <td className="px-8 py-4 text-gray-500 dark:text-gray-400 max-w-xs truncate">{brand.description || '-'}</td>
+                                    <td className="px-8 py-4 font-medium">{brand.products_count || 0} Products</td>
                                     <td className="px-8 py-4 text-right">
                                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button 
-                                                onClick={() => openEditForm(product)}
+                                                onClick={() => openEditForm(brand)}
                                                 className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                                             >
                                                 <Edit2 className="w-4 h-4" />
                                             </button>
                                             <button 
-                                                onClick={() => handleDelete(product.id)}
-                                                className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                                                onClick={() => handleDelete(brand.id, brand.products_count)}
+                                                className={`p-2 rounded-lg transition-colors ${brand.products_count > 0 ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30'}`}
+                                                title={brand.products_count > 0 ? "Cannot delete brand with products" : "Delete Brand"}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -104,11 +109,10 @@ export default function Index({ products, brands }) {
                 </table>
             </div>
 
-            <ProductFormSlideOver 
+            <BrandFormSlideOver 
                 isOpen={isSlideOverOpen}
                 onClose={() => setIsSlideOverOpen(false)}
-                product={selectedProduct}
-                brands={brands}
+                brand={selectedBrand}
             />
         </div>
     );

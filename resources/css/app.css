@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme {
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   
@@ -24,4 +26,19 @@
 * {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Re-enable cursor pointer for interactive elements (Tailwind v4 removes this by default) */
+button, 
+a[href], 
+[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled {
+  cursor: not-allowed;
 }

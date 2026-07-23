@@ -65,8 +65,8 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service }) {
         setData('form_config', { ...data.form_config, [field]: value });
     };
 
-    const labelClass = "block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1";
-    const inputClass = "w-full bg-[#f4f5f5] border border-gray-200 text-gray-900 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all";
+    const labelClass = "block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2 ml-1";
+    const inputClass = "w-full bg-[#f4f5f5] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 focus:bg-white dark:focus:bg-gray-800 transition-all";
 
     if (!isOpen || !mounted) return null;
 
@@ -82,23 +82,23 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service }) {
         <div className="fixed inset-0 z-[100] flex justify-end">
             <div className="absolute inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity animate-fade-in" onClick={onClose}></div>
             
-            <div className="relative w-full max-w-2xl bg-white shadow-2xl flex flex-col h-full animate-slide-in">
-                <div className="flex items-center justify-between px-6 py-5 bg-white border-b border-gray-100 z-10">
+            <div className="relative w-full max-w-2xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col h-full animate-slide-in">
+                <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 z-10">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900">{isEdit ? 'Edit Service Type' : 'Add Service Type'}</h2>
-                        <p className="text-xs text-gray-500 mt-1">Configure service template and form labels.</p>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{isEdit ? 'Edit Service Type' : 'Add Service Type'}</h2>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Configure service template and form labels.</p>
                     </div>
-                    <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors">
+                    <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6 scrollbar-none bg-[#f8f9fa]">
+                <div className="flex-1 overflow-y-auto p-6 scrollbar-none bg-[#f8f9fa] dark:bg-black">
                     <form id="service-form" onSubmit={handleSubmit} className="flex flex-col gap-8">
                         
                         {/* SECTION 1: General Info */}
-                        <div className="bg-white border border-gray-200 rounded-2xl p-6">
-                            <h3 className="text-sm font-bold text-gray-900 mb-5 border-b border-gray-100 pb-3">
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
+                            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 border-b border-gray-100 dark:border-gray-700 pb-3">
                                 General Information
                             </h3>
                             
@@ -135,7 +135,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service }) {
                                                 key={ic.id}
                                                 type="button"
                                                 onClick={() => setData('icon', ic.id)}
-                                                className={`w-14 h-14 rounded-xl flex items-center justify-center border transition-all ${data.icon === ic.id ? 'bg-gray-900 border-gray-900 text-white shadow-md' : 'bg-[#f4f5f5] border-gray-200 text-gray-500 hover:bg-gray-200'}`}
+                                                className={`w-14 h-14 rounded-xl flex items-center justify-center border transition-all ${data.icon === ic.id ? 'bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900 shadow-md' : 'bg-[#f4f5f5] dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                                                 title={ic.label}
                                             >
                                                 {ic.icon}
@@ -147,8 +147,8 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service }) {
                         </div>
 
                         {/* SECTION 2: Form Configurations */}
-                        <div className="bg-white border border-gray-200 rounded-2xl p-6">
-                            <h3 className="text-sm font-bold text-gray-900 mb-5 border-b border-gray-100 pb-3">
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
+                            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 border-b border-gray-100 dark:border-gray-700 pb-3">
                                 Form Configuration (Labels & Placeholders)
                             </h3>
                             
@@ -221,11 +221,11 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service }) {
                     </form>
                 </div>
 
-                <div className="px-6 py-4 bg-white border-t border-gray-100 flex justify-end gap-3 z-10">
-                    <button type="button" onClick={onClose} className="px-5 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-50">
+                <div className="px-6 py-4 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3 z-10">
+                    <button type="button" onClick={onClose} className="px-5 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-700">
                         Cancel
                     </button>
-                    <button type="submit" form="service-form" disabled={processing} className="px-8 py-2.5 bg-gray-900 text-white rounded-xl font-bold text-sm hover:bg-black flex items-center gap-2 shadow-sm disabled:opacity-70">
+                    <button type="submit" form="service-form" disabled={processing} className="px-8 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm disabled:opacity-70 transition-colors">
                         <Save className="w-4 h-4" /> 
                         {processing ? 'Saving...' : 'Save Service Type'}
                     </button>

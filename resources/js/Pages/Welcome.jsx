@@ -183,9 +183,9 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
                 </div>
 
                 {/* Metrics 1: Products */}
-                <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 flex flex-col justify-between group hover:border-gray-300 transition-colors">
+                <div className="bg-white dark:bg-gray-900 rounded-[32px] p-6 shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col justify-between group hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
                     <div className="flex items-center justify-between">
-                        <div className="w-10 h-10 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-900 group-hover:scale-110 transition-transform">
+                        <div className="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-900 dark:text-gray-300 group-hover:scale-110 transition-transform">
                             <Box className="w-5 h-5" strokeWidth={2} />
                         </div>
                         <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Database</span>
@@ -200,9 +200,9 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
                 </div>
 
                 {/* Metrics 2: Snippets & Activity */}
-                <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 flex flex-col justify-between group hover:border-gray-300 transition-colors">
+                <div className="bg-white dark:bg-gray-900 rounded-[32px] p-6 shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col justify-between group hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
                     <div className="flex items-center justify-between">
-                        <div className="w-10 h-10 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-900 group-hover:scale-110 transition-transform">
+                        <div className="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-900 dark:text-gray-300 group-hover:scale-110 transition-transform">
                             <MessageSquare className="w-5 h-5" strokeWidth={2} />
                         </div>
                         <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Snippets</span>
@@ -221,9 +221,9 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
             <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
                 
                 {/* LEFT TALL: Chat Snippets (Col Span 5) */}
-                <div className="lg:col-span-5 bg-white rounded-[32px] shadow-soft border border-gray-100 flex flex-col overflow-hidden relative">
-                    <div className="px-7 pt-7 pb-4 sticky top-0 bg-white/80 backdrop-blur-md z-10 border-b border-gray-50">
-                        <h2 className="text-lg font-bold text-gray-900 tracking-tight">Quick Replies</h2>
+                <div className="lg:col-span-5 bg-white dark:bg-gray-900 rounded-[32px] shadow-soft border border-gray-100 dark:border-gray-800 flex flex-col overflow-hidden relative">
+                    <div className="px-7 pt-7 pb-4 sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-10 border-b border-gray-50 dark:border-gray-800">
+                        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">Quick Replies</h2>
                         <p className="text-xs font-medium text-gray-400 mt-0.5">Click any card to copy</p>
                     </div>
                     
@@ -247,19 +247,19 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
                                     }}
                                     className={`group relative p-4 rounded-2xl transition-all duration-200 border cursor-pointer hover:shadow-sm ${
                                         isCopied 
-                                        ? 'bg-gray-900 border-gray-900 text-white' 
-                                        : 'bg-[#f9f9f8] hover:bg-gray-50 border-transparent hover:border-gray-200'
+                                        ? 'bg-gray-900 border-gray-900 text-white dark:bg-white dark:border-white dark:text-gray-900' 
+                                        : 'bg-[#f9f9f8] hover:bg-gray-50 border-transparent hover:border-gray-200 dark:bg-gray-800/40 dark:hover:bg-gray-800/80 dark:hover:border-gray-700'
                                     }`}
                                 >
                                     <div className="flex items-center justify-between mb-2">
-                                        <h3 className={`text-sm font-bold ${isCopied ? 'text-white' : 'text-gray-900'}`}>{snippet.title}</h3>
-                                        <code className={`bg-white border text-[10px] font-mono font-bold px-2 py-0.5 rounded-md shadow-sm transition-colors ${
-                                            isCopied ? 'border-gray-700 text-gray-900' : 'border-gray-200 text-gray-500'
+                                        <h3 className={`text-sm font-bold ${isCopied ? 'text-white dark:text-gray-900' : 'text-gray-900 dark:text-gray-200'}`}>{snippet.title}</h3>
+                                        <code className={`bg-white dark:bg-gray-900 border text-[10px] font-mono font-bold px-2 py-0.5 rounded-md shadow-sm transition-colors ${
+                                            isCopied ? 'border-gray-700 text-gray-900 dark:border-gray-300 dark:text-white' : 'border-gray-200 text-gray-500 dark:border-gray-800 dark:text-gray-400'
                                         }`}>
                                             {snippet.shortcut}
                                         </code>
                                     </div>
-                                    <p className={`text-xs whitespace-pre-wrap leading-relaxed pr-8 line-clamp-3 group-hover:line-clamp-none transition-all ${isCopied ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    <p className={`text-xs whitespace-pre-wrap leading-relaxed pr-8 line-clamp-3 group-hover:line-clamp-none transition-all ${isCopied ? 'text-gray-300 dark:text-gray-700' : 'text-gray-600 dark:text-gray-400'}`}>
                                         {snippet.content_text}
                                     </p>
                                     <div className={`absolute bottom-4 right-4 transition-all duration-300 ${
@@ -267,8 +267,8 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
                                     }`}>
                                         <div className={`w-6 h-6 rounded-full shadow-sm border flex items-center justify-center transition-colors ${
                                             isCopied 
-                                            ? 'bg-white border-white text-gray-900' 
-                                            : 'bg-white border-gray-200 text-gray-400'
+                                            ? 'bg-white border-white text-gray-900 dark:bg-gray-900 dark:border-gray-900 dark:text-white' 
+                                            : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400'
                                         }`}>
                                             {isCopied ? <Check className="w-3 h-3" strokeWidth={3} /> : <Copy className="w-3 h-3" />}
                                         </div>
@@ -280,9 +280,9 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
                 </div>
 
                 {/* MIDDLE TALL: Pricelist (Col Span 4) */}
-                <div className="lg:col-span-4 bg-white rounded-[32px] shadow-soft border border-gray-100 flex flex-col overflow-hidden">
-                    <div className="px-7 pt-7 pb-4 sticky top-0 bg-white/80 backdrop-blur-md z-10 border-b border-gray-50">
-                        <h2 className="text-lg font-bold text-gray-900 tracking-tight">Product Catalog</h2>
+                <div className="lg:col-span-4 bg-white dark:bg-gray-900 rounded-[32px] shadow-soft border border-gray-100 dark:border-gray-800 flex flex-col overflow-hidden">
+                    <div className="px-7 pt-7 pb-4 sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-10 border-b border-gray-50 dark:border-gray-800">
+                        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">Product Catalog</h2>
                         <p className="text-xs font-medium text-gray-400 mt-0.5">Select items to create quote</p>
                     </div>
 
@@ -318,16 +318,16 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
                                                         key={`${pIndex}-${priceIndex}`}
                                                         className={`group relative flex items-start gap-3 p-3 rounded-2xl transition-all duration-200 border cursor-pointer ${
                                                             selected 
-                                                            ? 'bg-gray-100/80 border-gray-300 shadow-inner' 
-                                                            : 'bg-white hover:bg-gray-50 border-gray-100'
+                                                            ? 'bg-gray-100/80 dark:bg-gray-800/80 border-gray-300 dark:border-gray-600 shadow-inner' 
+                                                            : 'bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-800 border-gray-100 dark:border-gray-800'
                                                         }`}
                                                     >
                                                         <button 
                                                             onClick={(e) => { e.stopPropagation(); toggleItem(brand.name, product, price); }}
                                                             className={`mt-1 w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-all ${
                                                                 selected 
-                                                                ? 'bg-gray-900 border-gray-900 text-white shadow-sm scale-110' 
-                                                                : 'bg-white border-gray-300 text-transparent hover:border-gray-400'
+                                                                ? 'bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900 shadow-sm scale-110' 
+                                                                : 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-transparent hover:border-gray-400 dark:hover:border-gray-500'
                                                             }`}
                                                         >
                                                             <Check className="w-2.5 h-2.5" strokeWidth={4} />
@@ -336,10 +336,10 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
                                                         <div className="flex-1 min-w-0" onClick={() => handleCopy(copyText, 'Price')}>
                                                             <div className="flex flex-col gap-0.5">
                                                                 <div className="flex items-center justify-between">
-                                                                    <h3 className={`text-[13px] font-bold truncate pr-2 ${selected ? 'text-gray-900' : 'text-gray-900'}`}>
+                                                                    <h3 className={`text-[13px] font-bold truncate pr-2 ${selected ? 'text-gray-900 dark:text-white' : 'text-gray-900 dark:text-gray-200'}`}>
                                                                         {product.name}
                                                                     </h3>
-                                                                    <span className="text-[13px] font-bold text-gray-900 flex-shrink-0">
+                                                                    <span className="text-[13px] font-bold text-gray-900 dark:text-gray-100 flex-shrink-0">
                                                                         Rp{price.promo_price ? price.promo_price.toLocaleString('id-ID') : price.normal_price.toLocaleString('id-ID')}
                                                                     </span>
                                                                 </div>
@@ -389,9 +389,9 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
                     </div>
 
                     {/* Activity Log */}
-                    <div className="bg-white rounded-[32px] shadow-soft border border-gray-100 p-6 flex-1 flex flex-col min-h-0 overflow-hidden">
+                    <div className="bg-white dark:bg-gray-900 rounded-[32px] shadow-soft border border-gray-100 dark:border-gray-800 p-6 flex-1 flex flex-col min-h-0 overflow-hidden">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-sm font-bold text-gray-900 tracking-tight">Recent Activity</h2>
+                            <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100 tracking-tight">Recent Activity</h2>
                             <History className="w-4 h-4 text-gray-400" />
                         </div>
                         
@@ -402,14 +402,14 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
                                 </div>
                             ) : (
                                 recentCopies.map((log) => (
-                                    <div key={log.id} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100/50">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-gray-900 mt-1.5 flex-shrink-0"></div>
+                                    <div key={log.id} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100/50 dark:border-gray-800/50">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-gray-900 dark:bg-gray-400 mt-1.5 flex-shrink-0"></div>
                                         <div className="min-w-0">
                                             <div className="flex items-center justify-between gap-2 mb-0.5">
                                                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{log.type}</span>
                                                 <span className="text-[10px] font-medium text-gray-400">{log.time}</span>
                                             </div>
-                                            <p className="text-xs font-medium text-gray-700 truncate">{log.text.split('\n')[0]}</p>
+                                            <p className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{log.text.split('\n')[0]}</p>
                                         </div>
                                     </div>
                                 ))
