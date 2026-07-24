@@ -31,6 +31,11 @@ class ServiceController extends Controller
             'form_config.promo_header_placeholder' => 'required|string',
             'form_config.footer_text_label' => 'required|string',
             'form_config.footer_text_placeholder' => 'required|string',
+            'product_schema' => 'nullable|array',
+            'product_schema.*.name' => 'required|string',
+            'product_schema.*.label' => 'required|string',
+            'product_schema.*.type' => 'required|string|in:text,number,textarea,url,tags',
+            'product_schema.*.placeholder' => 'nullable|string',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -53,6 +58,11 @@ class ServiceController extends Controller
             'form_config.promo_header_placeholder' => 'required|string',
             'form_config.footer_text_label' => 'required|string',
             'form_config.footer_text_placeholder' => 'required|string',
+            'product_schema' => 'nullable|array',
+            'product_schema.*.name' => 'required|string',
+            'product_schema.*.label' => 'required|string',
+            'product_schema.*.type' => 'required|string|in:text,number,textarea,url,tags',
+            'product_schema.*.placeholder' => 'nullable|string',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);

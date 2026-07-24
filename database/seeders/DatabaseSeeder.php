@@ -19,50 +19,34 @@ class DatabaseSeeder extends Seeder
         $brandA = \App\Models\Brand::create(['name' => 'Brand A', 'slug' => 'brand-a']);
         $brandB = \App\Models\Brand::create(['name' => 'Brand B', 'slug' => 'brand-b']);
 
-        // 2. Create Products and Prices
-        $productSinta = \App\Models\Product::create([
-            'brand_id' => $brandA->id,
-            'name' => '🔥SINTA 3🔥',
-            'description_snippet' => 'Paket publikasi jurnal nasional Sinta 3.',
-            'category' => 'Hukum',
-            'promo_header' => 'Pricelist Spesial Promo Sinta :',
-            'footer_text' => "Terimakasih \n✨Nusa Education✨",
-            'includes' => json_encode([
-                'Editing Penyesuaian Template Jurnal',
-                'Editing Mendeley',
-                'Plagiarisme Checker (Turnitin)',
-                'Editing Proofreading',
-                'Screening Substansi',
-                'Translating Naskah',
-                'Bukti Submit',
-                'Revisi minor',
-                'Revisi Mayor',
-                'Full Review & Hasil Review',
-                'LoA Resmi dari Pihak Jurnal',
-                'Korespondensi Resmi',
-                'APC Jurnal',
-                'Transparansi Alur Jurnal',
-                'Jaminan Publish',
-                'MoU Perjanjian',
-                'DOI Aktif',
-                'Akses Langsung Jurnal',
-                'Link Publish'
-            ])
+        // 2. Create Services with their Product Schemas
+        \App\Models\Service::create([
+            'name' => 'Jurnal Akademik',
+            'slug' => 'jurnal',
+            'description' => 'Publikasi Jurnal Nasional & Internasional',
+            'icon' => 'book',
+            'product_schema' => [
+                ['name' => 'focus_scope', 'label' => 'Focus & Scope', 'type' => 'text', 'placeholder' => 'Hukum Pidana, Perdata, dll'],
+                ['name' => 'link', 'label' => 'Link Jurnal', 'type' => 'text', 'placeholder' => 'https://...'],
+                ['name' => 'publication_months', 'label' => 'Bulan Terbit', 'type' => 'text', 'placeholder' => 'Jan, Mar, May'],
+                ['name' => 'estimated_time', 'label' => 'Estimasi Waktu', 'type' => 'text', 'placeholder' => 'Internal LoA 1-2 hari'],
+                ['name' => 'accreditation_type', 'label' => 'Akreditasi', 'type' => 'text', 'placeholder' => 'SINTA 4 / Scopus Q3'],
+                ['name' => 'available_slots', 'label' => 'Slot Tersedia', 'type' => 'text', 'placeholder' => 'Vol 4 No 2 Juli: 1 slot'],
+                ['name' => 'notes', 'label' => 'Keterangan Tambahan', 'type' => 'textarea', 'placeholder' => 'FT LoA & Publish'],
+            ]
         ]);
 
-        \App\Models\ProductPrice::create([
-            'product_id' => $productSinta->id,
-            'package_name' => 'Paket ALL IN',
-            'normal_price' => 6000000,
-            'promo_price' => 3000000,
-        ]);
-
-        \App\Models\ProductPrice::create([
-            'product_id' => $productSinta->id,
-            'package_name' => 'Paket REGULER',
-            'normal_price' => 5399000,
-            'promo_price' => 2800000,
-            'notes' => 'Tidak termasuk revisi mayor dan minor'
+        \App\Models\Service::create([
+            'name' => 'Pembuatan Website',
+            'slug' => 'website',
+            'description' => 'Jasa Pembuatan Website Company Profile / Toko Online',
+            'icon' => 'monitor',
+            'product_schema' => [
+                ['name' => 'tech_stack', 'label' => 'Tech Stack / CMS', 'type' => 'text', 'placeholder' => 'WordPress / Laravel / React'],
+                ['name' => 'hosting_capacity', 'label' => 'Kapasitas Hosting', 'type' => 'text', 'placeholder' => 'Unlimited / 5GB'],
+                ['name' => 'free_domain', 'label' => 'Free Domain', 'type' => 'text', 'placeholder' => '.com / .co.id'],
+                ['name' => 'maintenance', 'label' => 'Masa Maintenance', 'type' => 'text', 'placeholder' => '1 Bulan / 1 Tahun'],
+            ]
         ]);
 
         // 3. Create Chat Snippets

@@ -10,6 +10,7 @@ class Service extends Model
 
     protected $casts = [
         'form_config' => 'array',
+        'product_schema' => 'array',
     ];
 
     public function products()

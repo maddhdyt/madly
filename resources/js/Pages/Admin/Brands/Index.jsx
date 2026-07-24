@@ -1,22 +1,33 @@
 import React, { useState } from 'react';
 import MainLayout from '../../../Layouts/MainLayout';
 import { useForm, router } from '@inertiajs/react';
-import { Plus, Edit2, Trash2, ArrowLeft } from 'lucide-react';
+import { Plus, Edit2, Trash2, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import BrandFormSlideOver from './BrandFormSlideOver';
 
-export default function Index({ brands }) {
+export default function Index({ brands, showToast }) {
     const { delete: destroy } = useForm();
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
     const [selectedBrand, setSelectedBrand] = useState(null);
+    const [deleteModal, setDeleteModal] = useState({ isOpen: false, brandId: null, count: 0, brandName: '' });
+    const [deleteInput, setDeleteInput] = useState('');
 
-    const handleDelete = (id, count) => {
-        if (count > 0) {
-            alert('Cannot delete this brand because it has associated products.');
-            return;
-        }
-        if (confirm('Are you sure you want to delete this brand?')) {
-            destroy(route('admin.brands.destroy', id));
-        }
+    const handleDeleteClick = (brand) => {
+        setDeleteModal({ isOpen: true, brandId: brand.id, brandName: brand.name });
+        setDeleteInput('');
+    };
+
+    const confirmDelete = () => {
+        destroy(route('admin.brands.destroy', deleteModal.brandId), {
+            onSuccess: () => {
+                setDeleteModal({ isOpen: false, brandId: null, brandName: '' });
+                if (showToast) showToast('Brand successfully deleted.');
+            },
+            onError: () => {
+                if (showToast) showToast('Failed to delete brand.');
+            },
+            preserveScroll: true
+        });
     };
 
     const openCreateForm = () => {
@@ -30,7 +41,7 @@ export default function Index({ brands }) {
     };
 
     return (
-        <div className="flex flex-col h-full w-full bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden transition-colors duration-300">
+        <div className="flex flex-col h-full w-full bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden transition-colors duration-300 relative">
             {/* Header Area */}
             <div className="flex items-center justify-between px-8 py-8 border-b border-gray-100 dark:border-gray-800">
                 <div>
@@ -63,7 +74,6 @@ export default function Index({ brands }) {
                             <th className="px-8 py-4">Brand Logo</th>
                             <th className="px-8 py-4">Brand Name</th>
                             <th className="px-8 py-4">Description</th>
-                            <th className="px-8 py-4">Products Count</th>
                             <th className="px-8 py-4 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -78,13 +88,16 @@ export default function Index({ brands }) {
                             brands.map((brand) => (
                                 <tr key={brand.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
                                     <td className="px-8 py-4">
-                                        <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 font-bold overflow-hidden border border-gray-200 dark:border-gray-700">
-                                            {brand.name.charAt(0)}
+                                        <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 font-bold overflow-hidden border border-gray-200 dark:border-gray-700 shrink-0">
+                                            {brand.logo ? (
+                                                <img src={brand.logo} alt={brand.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                brand.name.charAt(0)
+                                            )}
                                         </div>
                                     </td>
                                     <td className="px-8 py-4 font-bold text-gray-900 dark:text-white">{brand.name}</td>
                                     <td className="px-8 py-4 text-gray-500 dark:text-gray-400 max-w-xs truncate">{brand.description || '-'}</td>
-                                    <td className="px-8 py-4 font-medium">{brand.products_count || 0} Products</td>
                                     <td className="px-8 py-4 text-right">
                                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button 
@@ -94,9 +107,9 @@ export default function Index({ brands }) {
                                                 <Edit2 className="w-4 h-4" />
                                             </button>
                                             <button 
-                                                onClick={() => handleDelete(brand.id, brand.products_count)}
-                                                className={`p-2 rounded-lg transition-colors ${brand.products_count > 0 ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30'}`}
-                                                title={brand.products_count > 0 ? "Cannot delete brand with products" : "Delete Brand"}
+                                                onClick={() => handleDeleteClick(brand)}
+                                                className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                                                title="Delete Brand"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -113,7 +126,60 @@ export default function Index({ brands }) {
                 isOpen={isSlideOverOpen}
                 onClose={() => setIsSlideOverOpen(false)}
                 brand={selectedBrand}
+                showToast={showToast}
             />
+
+            {/* Custom Delete Modal using createPortal to cover entire screen */}
+            {deleteModal.isOpen && createPortal(
+                <div className="fixed inset-0 z-[100] flex items-center justify-center">
+                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity animate-fade-in" onClick={() => setDeleteModal({ isOpen: false, brandId: null, count: 0, brandName: '' })}></div>
+                    <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-8 animate-slide-up mx-4">
+                        <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-6 mx-auto">
+                            {deleteModal.isOpen ? (
+                                <Trash2 className="w-8 h-8 text-red-600 dark:text-red-400" />
+                            ) : null}
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">Delete Brand?</h2>
+                        
+                        <p className="text-gray-500 dark:text-gray-400 text-center mb-8 text-sm leading-relaxed">
+                            Are you sure you want to delete <strong className="text-gray-900 dark:text-white">{deleteModal.brandName}</strong>? This action cannot be undone.
+                        </p>
+                        
+                        <div className="flex gap-3">
+                            <button 
+                                onClick={() => setDeleteModal({ isOpen: false, brandId: null, count: 0, brandName: '' })}
+                                className="flex-1 px-5 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={confirmDelete}
+                                className="flex-1 px-5 py-3 bg-red-600 text-white rounded-xl font-bold text-sm hover:bg-red-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Yes, Delete
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <style>{`
+                        @keyframes slideUp {
+                            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+                            to { opacity: 1; transform: translateY(0) scale(1); }
+                        }
+                        @keyframes fadeIn {
+                            from { opacity: 0; }
+                            to { opacity: 1; }
+                        }
+                        .animate-slide-up {
+                            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                        }
+                        .animate-fade-in {
+                            animation: fadeIn 0.2s ease-out forwards;
+                        }
+                    `}</style>
+                </div>,
+                document.body
+            )}
         </div>
     );
 }

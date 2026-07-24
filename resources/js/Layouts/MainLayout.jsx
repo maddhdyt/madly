@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Box, Briefcase, ChevronUp, ChevronDown, Users, ShoppingBag, TrendingUp, Megaphone, Search, CheckCircle2, MessageSquare, Moon, Sun, Bell, PanelLeftClose, PanelLeftOpen, HelpCircle, FolderOpen, Calculator, Zap, BookOpen, Settings } from 'lucide-react';
+import { LayoutGrid, Box, Briefcase, ChevronUp, ChevronDown, Users, ShoppingBag, TrendingUp, Megaphone, Search, CheckCircle2, MessageSquare, Moon, Sun, Bell, PanelLeftClose, PanelLeftOpen, HelpCircle, FolderOpen, Calculator, Zap, BookOpen, Settings, Tag } from 'lucide-react';
 import { Head } from '@inertiajs/react';
 
 export default function MainLayout({ children, title = "Dashboard" }) {
-    const { url } = usePage();
+    const { url, props } = usePage();
     const [toast, setToast] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
@@ -25,13 +25,31 @@ export default function MainLayout({ children, title = "Dashboard" }) {
             }
         };
         document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
+
+        const handleThemeEvent = (e) => {
+            setIsDarkMode(e.detail.isDark);
+        };
+        window.addEventListener('theme-toggle', handleThemeEvent);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('theme-toggle', handleThemeEvent);
+        };
     }, []);
+
+    const showToast = (message) => {
+        setToast(message);
+        setTimeout(() => setToast(null), 3000);
+    };
+
+    useEffect(() => {
+        if (props.flash?.success) showToast(props.flash.success);
+        if (props.flash?.error) showToast(props.flash.error);
+    }, [props.flash]);
 
     const copyToClipboard = (text) => {
         navigator.clipboard.writeText(text).then(() => {
-            setToast('Tersalin!');
-            setTimeout(() => setToast(null), 2000);
+            showToast('Tersalin!');
         }).catch(err => console.error('Failed to copy text: ', err));
     };
 
@@ -80,10 +98,10 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                         Dashboard
                     </Link>
 
-                    <a href="#" className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/calculator') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
+                    <Link href={route('admin.calculator.index')} className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/calculator') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
                         <Calculator className={`w-5 h-5 ${url.startsWith('/admin/calculator') ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url.startsWith('/admin/calculator') ? 2 : 1.5} />
                         Quick Quotation
-                    </a>
+                    </Link>
 
                     <Link href={route('admin.chat-snippets.index')} className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/chat-snippets') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
                         <MessageSquare className={`w-5 h-5 ${url.startsWith('/admin/chat-snippets') ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url.startsWith('/admin/chat-snippets') ? 2 : 1.5} />
@@ -105,8 +123,13 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                         Pricelists
                     </Link>
 
+                    <Link href={route('admin.brochures.index')} className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/brochures') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
+                        <FolderOpen className={`w-5 h-5 ${url.startsWith('/admin/brochures') ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url.startsWith('/admin/brochures') ? 2 : 1.5} />
+                        Brochures
+                    </Link>
+
                     <Link href={route('admin.brands.index')} className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/brands') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
-                        <FolderOpen className={`w-5 h-5 ${url.startsWith('/admin/brands') ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url.startsWith('/admin/brands') ? 2 : 1.5} />
+                        <Tag className={`w-5 h-5 ${url.startsWith('/admin/brands') ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url.startsWith('/admin/brands') ? 2 : 1.5} />
                         Brands
                     </Link>
 
@@ -120,10 +143,10 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                         <p className="px-4 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase">System</p>
                     </div>
 
-                    <a href="#" className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/settings') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
+                    <Link href={route('admin.settings.index')} className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/settings') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
                         <Settings className={`w-5 h-5 ${url.startsWith('/admin/settings') ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url.startsWith('/admin/settings') ? 2 : 1.5} />
                         Settings
-                    </a>
+                    </Link>
                 </nav>
 
                     {/* Bottom Left Floating Settings Pill */}
@@ -236,7 +259,7 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                     {/* Render children and pass down the copy function and search query */}
                     {React.Children.map(children, child => {
                         if (React.isValidElement(child)) {
-                            return React.cloneElement(child, { copyToClipboard, searchQuery });
+                            return React.cloneElement(child, { copyToClipboard, showToast, searchQuery });
                         }
                         return child;
                     })}

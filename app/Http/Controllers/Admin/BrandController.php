@@ -7,12 +7,13 @@ use App\Models\Brand;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class BrandController extends Controller
 {
     public function index()
     {
-        $brands = Brand::withCount('products')->latest()->get();
+        $brands = Brand::latest()->get();
 
         return Inertia::render('Admin/Brands/Index', [
             'brands' => $brands,
@@ -23,13 +24,19 @@ class BrandController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'logo' => 'nullable|image|max:2048',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
 
-        // Check if slug already exists to prevent duplicate key errors
         if (Brand::where('slug', $validated['slug'])->exists()) {
             return redirect()->back()->withErrors(['name' => 'Brand with this name already exists.'])->withInput();
+        }
+
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('brands', 'public');
+            $validated['logo'] = '/storage/' . $path;
         }
 
         Brand::create($validated);
@@ -41,12 +48,25 @@ class BrandController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'logo' => 'nullable|image|max:2048',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
 
         if (Brand::where('slug', $validated['slug'])->where('id', '!=', $brand->id)->exists()) {
             return redirect()->back()->withErrors(['name' => 'Brand with this name already exists.'])->withInput();
+        }
+
+        if ($request->hasFile('logo')) {
+            if ($brand->logo) {
+                $oldPath = str_replace('/storage/', '', $brand->logo);
+                Storage::disk('public')->delete($oldPath);
+            }
+            $path = $request->file('logo')->store('brands', 'public');
+            $validated['logo'] = '/storage/' . $path;
+        } else {
+            unset($validated['logo']);
         }
 
         $brand->update($validated);
@@ -56,8 +76,10 @@ class BrandController extends Controller
 
     public function destroy(Brand $brand)
     {
-        if ($brand->products()->count() > 0) {
-            return redirect()->back()->withErrors(['error' => 'Cannot delete brand with associated products.']);
+        
+        if ($brand->logo) {
+            $oldPath = str_replace('/storage/', '', $brand->logo);
+            Storage::disk('public')->delete($oldPath);
         }
         
         $brand->delete();

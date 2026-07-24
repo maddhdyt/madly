@@ -9,14 +9,9 @@ class Product extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'includes' => 'array',
-        'metadata' => 'array',
+        'hpp' => 'decimal:2',
+        'attributes' => 'array'
     ];
-
-    public function brand()
-    {
-        return $this->belongsTo(Brand::class);
-    }
 
     public function service()
     {

@@ -2,19 +2,19 @@ import React, { useState, useEffect } from 'react';
 import MainLayout from '../Layouts/MainLayout';
 import { Copy, Calculator, Check, Box, MessageSquare, History, Command, Zap, Search, Plus, Minus } from 'lucide-react';
 
-export default function Welcome({ copyToClipboard, searchQuery = "", brands = [], snippets = [] }) {
+export default function Welcome({ copyToClipboard, searchQuery = "", pricelists = [], snippets = [] }) {
     
     // 1. DATA PROCESSING (Metrics)
     const query = searchQuery.toLowerCase();
     
-    const filteredBrands = brands.map(brand => {
-        const filteredProducts = brand.products.filter(product => {
-            const matchProduct = product.name.toLowerCase().includes(query) || (product.description_snippet && product.description_snippet.toLowerCase().includes(query));
-            const matchPrices = product.prices.some(price => price.package_name.toLowerCase().includes(query) || price.normal_price.toString().includes(query));
+    const filteredPricelists = pricelists.map(pricelist => {
+        const filteredPrices = pricelist.prices.filter(price => {
+            const matchProduct = price.product.name.toLowerCase().includes(query) || (price.product.focus_scope && price.product.focus_scope.toLowerCase().includes(query));
+            const matchPrices = price.package_name.toLowerCase().includes(query) || price.normal_price.toString().includes(query);
             return matchProduct || matchPrices;
         });
-        return { ...brand, products: filteredProducts };
-    }).filter(brand => brand.products.length > 0 || brand.name.toLowerCase().includes(query));
+        return { ...pricelist, prices: filteredPrices };
+    }).filter(pricelist => pricelist.prices.length > 0 || pricelist.name.toLowerCase().includes(query));
 
     const filteredSnippets = snippets.filter(snippet => 
         snippet.title.toLowerCase().includes(query) || 
@@ -23,27 +23,23 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
     );
 
     // Calculate Totals for Metrics Card
-    const totalBrands = brands.length;
-    let totalProducts = 0;
+    const totalPricelists = pricelists.length;
     let totalPackages = 0;
-    brands.forEach(b => {
-        totalProducts += b.products.length;
-        b.products.forEach(p => {
-            totalPackages += p.prices.length;
-        });
+    pricelists.forEach(p => {
+        totalPackages += p.prices.length;
     });
     const totalSnippets = snippets.length;
 
     // 2. STATE (Quoter & Activity Log & Scalability)
     const [selectedItems, setSelectedItems] = useState([]);
     const [recentCopies, setRecentCopies] = useState([]); // [{ id, text, time, type }]
-    const [collapsedBrands, setCollapsedBrands] = useState({});
+    const [collapsedPricelists, setCollapsedPricelists] = useState({});
     const [copiedSnippetIndex, setCopiedSnippetIndex] = useState(null);
 
-    const toggleBrand = (brandName) => {
-        setCollapsedBrands(prev => ({
+    const togglePricelist = (pricelistName) => {
+        setCollapsedPricelists(prev => ({
             ...prev,
-            [brandName]: !prev[brandName]
+            [pricelistName]: !prev[pricelistName]
         }));
     };
 
@@ -63,8 +59,8 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
     };
 
     // Quoter Logic
-    const toggleItem = (brandName, product, priceItem) => {
-        const itemId = `${brandName}-${product.name}-${priceItem.id}`;
+    const toggleItem = (pricelist, product, priceItem) => {
+        const itemId = `${pricelist.name}-${product.name}-${priceItem.id}`;
         setSelectedItems(prev => {
             const exists = prev.find(item => item.id === itemId);
             if (exists) {
@@ -72,12 +68,12 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
             } else {
                 return [...prev, {
                     id: itemId,
-                    brandName,
+                    pricelistName: pricelist.name,
                     productName: product.name,
                     category: product.category,
-                    promoHeader: product.promo_header,
-                    footerText: product.footer_text,
-                    includes: product.includes ? JSON.parse(product.includes) : [],
+                    promoHeader: pricelist.promo_header,
+                    footerText: pricelist.footer_text,
+                    includes: pricelist.includes || [],
                     packageName: priceItem.package_name,
                     normalPrice: priceItem.normal_price,
                     promoPrice: priceItem.promo_price,
@@ -87,8 +83,8 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
         });
     };
 
-    const isItemSelected = (brandName, productName, priceId) => {
-        return selectedItems.some(item => item.id === `${brandName}-${productName}-${priceId}`);
+    const isItemSelected = (pricelistName, productName, priceId) => {
+        return selectedItems.some(item => item.id === `${pricelistName}-${productName}-${priceId}`);
     };
 
     const totalCalculatorPrice = selectedItems.reduce((total, item) => total + (item.promoPrice ? item.promoPrice : item.normalPrice), 0);
@@ -143,7 +139,7 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
             if (prod.includes && prod.includes.length > 0) {
                 text += "\nInclude: \n";
                 prod.includes.forEach(inc => {
-                    text += `✅${inc}\n`;
+                    text += `✅ ${inc}\n`;
                 });
             }
             
@@ -195,7 +191,7 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
                             <h3 className="text-3xl font-black text-gray-900 tracking-tighter">{totalPackages}</h3>
                             <span className="text-sm font-semibold text-gray-500">Packages</span>
                         </div>
-                        <p className="text-xs font-medium text-gray-400 mt-1">Across {totalBrands} brands & {totalProducts} products</p>
+                        <p className="text-xs font-medium text-gray-400 mt-1">Across {totalPricelists} Catalogs</p>
                     </div>
                 </div>
 
@@ -287,73 +283,72 @@ export default function Welcome({ copyToClipboard, searchQuery = "", brands = []
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-7 pt-4 space-y-6">
-                        {filteredBrands.length === 0 && (
+                        {filteredPricelists.length === 0 && (
                             <div className="h-full flex flex-col items-center justify-center text-gray-400 opacity-50">
                                 <Search className="w-8 h-8 mb-2" />
-                                <p className="text-sm font-medium">No products found</p>
+                                <p className="text-sm font-medium">No catalogs found</p>
                             </div>
                         )}
                         
-                        {filteredBrands.map((brand, brandIndex) => (
-                            <div key={brandIndex} className="flex flex-col gap-3">
+                        {filteredPricelists.map((pricelist, plIndex) => (
+                            <div key={plIndex} className="flex flex-col gap-3">
                                 <div 
-                                    className="flex items-center justify-between cursor-pointer group/brand px-1"
-                                    onClick={() => toggleBrand(brand.name)}
+                                    className="flex items-center justify-between cursor-pointer group/pricelist px-1"
+                                    onClick={() => togglePricelist(pricelist.name)}
                                 >
-                                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{brand.name}</h3>
-                                    <div className="w-5 h-5 rounded flex items-center justify-center text-gray-300 group-hover/brand:bg-gray-100 group-hover/brand:text-gray-600 transition-colors">
-                                        {collapsedBrands[brand.name] ? <Plus className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
+                                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{pricelist.name}</h3>
+                                    <div className="w-5 h-5 rounded flex items-center justify-center text-gray-300 group-hover/pricelist:bg-gray-100 group-hover/pricelist:text-gray-600 transition-colors">
+                                        {collapsedPricelists[pricelist.name] ? <Plus className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
                                     </div>
                                 </div>
                                 
-                                {!collapsedBrands[brand.name] && (
+                                {!collapsedPricelists[pricelist.name] && (
                                     <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                                        {brand.products.map((product, pIndex) => (
-                                            product.prices.map((price, priceIndex) => {
-                                                const selected = isItemSelected(brand.name, product.name, price.id);
-                                                const copyText = `${brand.name} - ${product.name} - ${price.package_name} - Rp${price.normal_price.toLocaleString('id-ID')}`;
-                                                
-                                                return (
-                                                    <div 
-                                                        key={`${pIndex}-${priceIndex}`}
-                                                        className={`group relative flex items-start gap-3 p-3 rounded-2xl transition-all duration-200 border cursor-pointer ${
+                                        {pricelist.prices.map((price, priceIndex) => {
+                                            const product = price.product;
+                                            const selected = isItemSelected(pricelist.name, product.name, price.id);
+                                            const copyText = `${pricelist.name} - ${product.name} - ${price.package_name} - Rp${price.normal_price.toLocaleString('id-ID')}`;
+                                            
+                                            return (
+                                                <div 
+                                                    key={`${plIndex}-${priceIndex}`}
+                                                    className={`group relative flex items-start gap-3 p-3 rounded-2xl transition-all duration-200 border cursor-pointer ${
+                                                        selected 
+                                                        ? 'bg-gray-100/80 dark:bg-gray-800/80 border-gray-300 dark:border-gray-600 shadow-inner' 
+                                                        : 'bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-800 border-gray-100 dark:border-gray-800'
+                                                    }`}
+                                                >
+                                                    <button 
+                                                        onClick={(e) => { e.stopPropagation(); toggleItem(pricelist, product, price); }}
+                                                        className={`mt-1 w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-all ${
                                                             selected 
-                                                            ? 'bg-gray-100/80 dark:bg-gray-800/80 border-gray-300 dark:border-gray-600 shadow-inner' 
-                                                            : 'bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-800 border-gray-100 dark:border-gray-800'
+                                                            ? 'bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900 shadow-sm scale-110' 
+                                                            : 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-transparent hover:border-gray-400 dark:hover:border-gray-500'
                                                         }`}
                                                     >
-                                                        <button 
-                                                            onClick={(e) => { e.stopPropagation(); toggleItem(brand.name, product, price); }}
-                                                            className={`mt-1 w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-all ${
-                                                                selected 
-                                                                ? 'bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900 shadow-sm scale-110' 
-                                                                : 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-transparent hover:border-gray-400 dark:hover:border-gray-500'
-                                                            }`}
-                                                        >
-                                                            <Check className="w-2.5 h-2.5" strokeWidth={4} />
-                                                        </button>
-                                                        
-                                                        <div className="flex-1 min-w-0" onClick={() => handleCopy(copyText, 'Price')}>
-                                                            <div className="flex flex-col gap-0.5">
-                                                                <div className="flex items-center justify-between">
-                                                                    <h3 className={`text-[13px] font-bold truncate pr-2 ${selected ? 'text-gray-900 dark:text-white' : 'text-gray-900 dark:text-gray-200'}`}>
-                                                                        {product.name}
-                                                                    </h3>
-                                                                    <span className="text-[13px] font-bold text-gray-900 dark:text-gray-100 flex-shrink-0">
-                                                                        Rp{price.promo_price ? price.promo_price.toLocaleString('id-ID') : price.normal_price.toLocaleString('id-ID')}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="flex items-center">
-                                                                    <span className="text-gray-500 text-[11px] font-semibold uppercase tracking-wide">
-                                                                        {price.package_name}
-                                                                    </span>
-                                                                </div>
+                                                        <Check className="w-2.5 h-2.5" strokeWidth={4} />
+                                                    </button>
+                                                    
+                                                    <div className="flex-1 min-w-0" onClick={() => handleCopy(copyText, 'Price')}>
+                                                        <div className="flex flex-col gap-0.5">
+                                                            <div className="flex items-center justify-between">
+                                                                <h3 className={`text-[13px] font-bold truncate pr-2 ${selected ? 'text-gray-900 dark:text-white' : 'text-gray-900 dark:text-gray-200'}`}>
+                                                                    {product.name}
+                                                                </h3>
+                                                                <span className="text-[13px] font-bold text-gray-900 dark:text-gray-100 flex-shrink-0">
+                                                                    Rp{price.promo_price ? price.promo_price.toLocaleString('id-ID') : price.normal_price.toLocaleString('id-ID')}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center">
+                                                                <span className="text-gray-500 text-[11px] font-semibold uppercase tracking-wide">
+                                                                    {price.package_name}
+                                                                </span>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                );
-                                            })
-                                        ))}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MainLayout from '../../../Layouts/MainLayout';
 import { useForm, router, Head } from '@inertiajs/react';
-import { Plus, Edit2, Trash2, Box, Book, Monitor, Server, TrendingUp } from 'lucide-react';
+import { Plus, Edit2, Trash2, Box, Book, Monitor, Server, TrendingUp, Briefcase, Code, PenTool, Award, Shield, Globe, Camera, Palette, Database, Layers } from 'lucide-react';
 import ServiceFormSlideOver from './ServiceFormSlideOver';
 
 export default function Index({ services }) {
@@ -29,7 +29,17 @@ export default function Index({ services }) {
             'book': <Book className="w-5 h-5" />,
             'monitor': <Monitor className="w-5 h-5" />,
             'server': <Server className="w-5 h-5" />,
-            'trending-up': <TrendingUp className="w-5 h-5" />
+            'trending-up': <TrendingUp className="w-5 h-5" />,
+            'briefcase': <Briefcase className="w-5 h-5" />,
+            'code': <Code className="w-5 h-5" />,
+            'pen-tool': <PenTool className="w-5 h-5" />,
+            'award': <Award className="w-5 h-5" />,
+            'shield': <Shield className="w-5 h-5" />,
+            'globe': <Globe className="w-5 h-5" />,
+            'camera': <Camera className="w-5 h-5" />,
+            'palette': <Palette className="w-5 h-5" />,
+            'database': <Database className="w-5 h-5" />,
+            'layers': <Layers className="w-5 h-5" />
         };
         return icons[iconName] || <Box className="w-5 h-5" />;
     };
@@ -57,37 +67,41 @@ export default function Index({ services }) {
                 </div>
 
                 {/* Body Area */}
-                <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-900 p-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {services.map((service) => (
-                            <div key={service.id} className="border border-gray-200 dark:border-gray-800 rounded-2xl p-6 flex flex-col hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-md transition-all group bg-white dark:bg-gray-800/50">
-                                <div className="flex items-start justify-between mb-4">
-                                    <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center border border-transparent dark:border-gray-700">
+                <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-900">
+                    <div className="flex flex-col">
+                        {services.map((service, idx) => (
+                            <div 
+                                key={service.id} 
+                                className={`flex items-center justify-between p-6 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all group ${idx !== services.length - 1 ? 'border-b border-gray-100 dark:border-gray-800' : ''}`}
+                            >
+                                <div className="flex items-center gap-5 flex-1 min-w-0">
+                                    <div className="w-12 h-12 flex-shrink-0 rounded-2xl bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 flex items-center justify-center border border-gray-200/50 dark:border-gray-800">
                                         {renderIcon(service.icon)}
                                     </div>
-                                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button 
-                                            onClick={() => handleEditService(service)}
-                                            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 transition-colors"
-                                        >
-                                            <Edit2 className="w-4 h-4" />
-                                        </button>
-                                        <button 
-                                            onClick={() => handleDelete(service.id)}
-                                            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 dark:text-red-400 transition-colors"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-3 mb-1">
+                                            <h3 className="text-[15px] font-bold text-gray-900 dark:text-white truncate">{service.name}</h3>
+                                        </div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate pr-4">
+                                            {service.description || 'No description provided.'}
+                                        </p>
                                     </div>
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{service.name}</h3>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6 flex-1">
-                                    {service.description || 'No description provided.'}
-                                </p>
-                                <div className="pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center gap-2 text-xs font-bold text-gray-400 dark:text-gray-500">
-                                    <span className="bg-gray-100 dark:bg-gray-900 px-2.5 py-1 rounded-md text-gray-600 dark:text-gray-400">ID: {service.id}</span>
-                                    <span>•</span>
-                                    <span>{service.slug}</span>
+                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0 ml-4">
+                                    <button 
+                                        onClick={() => handleEditService(service)}
+                                        className="p-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-gray-400 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300 transition-colors shadow-sm"
+                                        title="Edit Service"
+                                    >
+                                        <Edit2 className="w-4 h-4" />
+                                    </button>
+                                    <button 
+                                        onClick={() => handleDelete(service.id)}
+                                        className="p-2.5 bg-white dark:bg-gray-800 border border-red-100 dark:border-red-900/50 rounded-xl hover:border-red-300 dark:hover:border-red-700 text-red-500 dark:text-red-400 transition-colors shadow-sm"
+                                        title="Delete Service"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
                                 </div>
                             </div>
                         ))}

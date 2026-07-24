@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Brand;
+use App\Models\Pricelist;
 use App\Models\ChatSnippet;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,11 +11,11 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $brands = Brand::with('products.prices')->get();
+        $pricelists = Pricelist::with('prices.product')->get();
         $snippets = ChatSnippet::all();
 
         return Inertia::render('Welcome', [
-            'brands' => $brands,
+            'pricelists' => $pricelists,
             'snippets' => $snippets
         ]);
     }

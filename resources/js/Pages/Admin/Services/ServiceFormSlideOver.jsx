@@ -1,7 +1,99 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useForm } from '@inertiajs/react';
-import { X, Save, Box, Book, Monitor, Server, TrendingUp } from 'lucide-react';
+import { X, Save, Box, Book, Monitor, Server, TrendingUp, Plus, Trash2, GripVertical, Settings, Briefcase, Code, PenTool, Award, Shield, Globe, Camera, Palette, Database, Layers } from 'lucide-react';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+function SortableField({ field, updateSchemaField, removeSchemaField }) {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: field.id });
+    
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 10 : 1,
+        opacity: isDragging ? 0.9 : 1,
+        boxShadow: isDragging ? '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' : 'none',
+    };
+
+    return (
+        <div 
+            ref={setNodeRef} 
+            style={style}
+            className="flex items-start gap-3 bg-[#f8f9fa] dark:bg-gray-900/50 p-4 rounded-xl border border-gray-100 dark:border-gray-800 relative group"
+        >
+            <div 
+                {...attributes} 
+                {...listeners}
+                className="mt-3 cursor-grab text-gray-300 dark:text-gray-600 hover:text-gray-500 active:cursor-grabbing"
+            >
+                <GripVertical className="w-4 h-4" />
+            </div>
+            
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div className="md:col-span-2">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Field Label (Display)</label>
+                    <input 
+                        type="text" 
+                        className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-gray-900 dark:focus:ring-gray-500 outline-none"
+                        placeholder="e.g., Kapasitas Hosting"
+                        value={field.label}
+                        onChange={(e) => updateSchemaField(field.id, 'label', e.target.value)}
+                        required
+                    />
+                </div>
+                
+                <div className="md:col-span-1">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Input Type</label>
+                    <select 
+                        className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-gray-900 dark:focus:ring-gray-500 outline-none"
+                        value={field.type}
+                        onChange={(e) => updateSchemaField(field.id, 'type', e.target.value)}
+                    >
+                        <option value="text">Short Text</option>
+                        <option value="textarea">Long Text</option>
+                        <option value="number">Number</option>
+                        <option value="url">URL / Link</option>
+                        <option value="tags">Tags (Comma Separated)</option>
+                    </select>
+                </div>
+                
+                <div className="md:col-span-1">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Field Name (System)</label>
+                    <input 
+                        type="text" 
+                        className="w-full bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-xs font-mono text-gray-600 dark:text-gray-400 focus:ring-1 focus:ring-gray-900 outline-none"
+                        placeholder="e.g., kapasitas_hosting"
+                        value={field.name}
+                        onChange={(e) => updateSchemaField(field.id, 'name', e.target.value)}
+                        required
+                    />
+                </div>
+
+                <div className="md:col-span-4">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Placeholder (Example value)</label>
+                    <input 
+                        type="text" 
+                        className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-gray-900 dark:focus:ring-gray-500 outline-none"
+                        placeholder="e.g., 5GB / Unlimited"
+                        value={field.placeholder || ''}
+                        onChange={(e) => updateSchemaField(field.id, 'placeholder', e.target.value)}
+                    />
+                </div>
+            </div>
+
+            <button 
+                type="button" 
+                onClick={() => removeSchemaField(field.id)}
+                className="mt-2 p-2 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                title="Remove field"
+            >
+                <Trash2 className="w-4 h-4" />
+            </button>
+        </div>
+    );
+}
 
 export default function ServiceFormSlideOver({ isOpen, onClose, service }) {
     const isEdit = !!service;
@@ -16,34 +108,56 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service }) {
         description: '',
         icon: 'box',
         form_config: {
-            includes_label: 'Includes / Fasilitas (✅)',
+            includes_label: 'Included Features (✅)',
             includes_placeholder: 'e.g., Editing Mendeley',
             promo_header_label: 'Promo Header Text',
             promo_header_placeholder: 'e.g., Pricelist Spesial Promo :',
             footer_text_label: 'Footer Text',
-            footer_text_placeholder: 'e.g., Harga belum termasuk PPN',
-        }
+            footer_text_placeholder: 'e.g., Price excludes VAT',
+        },
+        product_schema: []
     });
+
+    const generateId = () => Math.random().toString(36).substring(2, 9);
 
     useEffect(() => {
         if (isOpen) {
             clearErrors();
             if (service) {
+                const schemaWithIds = (service.product_schema || []).map(item => ({
+                    ...item,
+                    id: item.id || generateId()
+                }));
+                
                 setData({
                     name: service.name || '',
                     description: service.description || '',
                     icon: service.icon || 'box',
                     form_config: service.form_config || {
-                        includes_label: 'Includes / Fasilitas (✅)',
+                        includes_label: 'Included Features (✅)',
                         includes_placeholder: 'e.g., Editing Mendeley',
                         promo_header_label: 'Promo Header Text',
                         promo_header_placeholder: 'e.g., Pricelist Spesial Promo :',
                         footer_text_label: 'Footer Text',
-                        footer_text_placeholder: 'e.g., Harga belum termasuk PPN',
-                    }
+                        footer_text_placeholder: 'e.g., Price excludes VAT',
+                    },
+                    product_schema: schemaWithIds
                 });
             } else {
-                reset();
+                setData({
+                    name: '',
+                    description: '',
+                    icon: 'box',
+                    form_config: {
+                        includes_label: 'Included Features (✅)',
+                        includes_placeholder: 'e.g., Editing Mendeley',
+                        promo_header_label: 'Promo Header Text',
+                        promo_header_placeholder: 'e.g., Pricelist Spesial Promo :',
+                        footer_text_label: 'Footer Text',
+                        footer_text_placeholder: 'e.g., Price excludes VAT',
+                    },
+                    product_schema: []
+                });
             }
         }
     }, [isOpen, service]);
@@ -65,6 +179,57 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service }) {
         setData('form_config', { ...data.form_config, [field]: value });
     };
 
+    // FORM BUILDER LOGIC
+    const addSchemaField = () => {
+        setData('product_schema', [
+            ...data.product_schema,
+            { id: generateId(), name: '', label: '', type: 'text', placeholder: '' }
+        ]);
+    };
+
+    const updateSchemaField = (id, key, value) => {
+        const index = data.product_schema.findIndex(f => f.id === id);
+        if (index === -1) return;
+        
+        const newSchema = [...data.product_schema];
+        newSchema[index][key] = value;
+        
+        // Auto-generate name from label if label is being typed and name is empty/matches old label format
+        if (key === 'label') {
+            const oldGeneratedName = newSchema[index].name;
+            const expectedOldName = newSchema[index].name === '' ? '' : oldGeneratedName;
+            
+            if (!newSchema[index].name || newSchema[index].name.toLowerCase().replace(/[^a-z0-9]/g, '_') === expectedOldName) {
+                newSchema[index].name = value.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            }
+        }
+        
+        setData('product_schema', newSchema);
+    };
+
+    const removeSchemaField = (id) => {
+        const newSchema = data.product_schema.filter(f => f.id !== id);
+        setData('product_schema', newSchema);
+    };
+
+    // dnd-kit logic
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const handleDragEnd = (event) => {
+        const { active, over } = event;
+
+        if (active.id !== over.id) {
+            const oldIndex = data.product_schema.findIndex(f => f.id === active.id);
+            const newIndex = data.product_schema.findIndex(f => f.id === over.id);
+            setData('product_schema', arrayMove(data.product_schema, oldIndex, newIndex));
+        }
+    };
+
     const labelClass = "block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2 ml-1";
     const inputClass = "w-full bg-[#f4f5f5] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 focus:bg-white dark:focus:bg-gray-800 transition-all";
 
@@ -76,17 +241,27 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service }) {
         { id: 'monitor', icon: <Monitor className="w-5 h-5" />, label: 'Monitor' },
         { id: 'server', icon: <Server className="w-5 h-5" />, label: 'Server' },
         { id: 'trending-up', icon: <TrendingUp className="w-5 h-5" />, label: 'Trending' },
+        { id: 'briefcase', icon: <Briefcase className="w-5 h-5" />, label: 'Briefcase' },
+        { id: 'code', icon: <Code className="w-5 h-5" />, label: 'Code' },
+        { id: 'pen-tool', icon: <PenTool className="w-5 h-5" />, label: 'Pen Tool' },
+        { id: 'award', icon: <Award className="w-5 h-5" />, label: 'Award' },
+        { id: 'shield', icon: <Shield className="w-5 h-5" />, label: 'Shield' },
+        { id: 'globe', icon: <Globe className="w-5 h-5" />, label: 'Globe' },
+        { id: 'camera', icon: <Camera className="w-5 h-5" />, label: 'Camera' },
+        { id: 'palette', icon: <Palette className="w-5 h-5" />, label: 'Palette' },
+        { id: 'database', icon: <Database className="w-5 h-5" />, label: 'Database' },
+        { id: 'layers', icon: <Layers className="w-5 h-5" />, label: 'Layers' },
     ];
 
     return createPortal(
         <div className="fixed inset-0 z-[100] flex justify-end">
             <div className="absolute inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity animate-fade-in" onClick={onClose}></div>
             
-            <div className="relative w-full max-w-2xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col h-full animate-slide-in">
+            <div className="relative w-full max-w-3xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col h-full animate-slide-in">
                 <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 z-10">
                     <div>
                         <h2 className="text-xl font-bold text-gray-900 dark:text-white">{isEdit ? 'Edit Service Type' : 'Add Service Type'}</h2>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Configure service template and form labels.</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Configure service template, quotation labels, and product form schema.</p>
                     </div>
                     <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
                         <X className="w-5 h-5" />
@@ -98,7 +273,8 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service }) {
                         
                         {/* SECTION 1: General Info */}
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
-                            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 border-b border-gray-100 dark:border-gray-700 pb-3">
+                            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 border-b border-gray-100 dark:border-gray-700 pb-3 flex items-center gap-2">
+                                <Box className="w-4 h-4 text-gray-400" />
                                 General Information
                             </h3>
                             
@@ -146,10 +322,59 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service }) {
                             </div>
                         </div>
 
-                        {/* SECTION 2: Form Configurations */}
+                        {/* SECTION 2: Form Builder (Product Schema) */}
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
-                            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 border-b border-gray-100 dark:border-gray-700 pb-3">
-                                Form Configuration (Labels & Placeholders)
+                            <div className="flex items-center justify-between mb-5 border-b border-gray-100 dark:border-gray-700 pb-3">
+                                <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <Settings className="w-4 h-4 text-gray-400" />
+                                    Product Form Builder
+                                </h3>
+                                <button 
+                                    type="button" 
+                                    onClick={addSchemaField}
+                                    className="text-xs font-bold bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                >
+                                    <Plus className="w-3 h-3" /> Add Field
+                                </button>
+                            </div>
+                            
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Define the custom fields that will appear when creating a new product under this service.</p>
+
+                            <div className="space-y-4">
+                                {data.product_schema.length === 0 ? (
+                                    <div className="text-center py-8 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">No custom fields defined yet.</p>
+                                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Products in this service will only have basic fields (Name, HPP).</p>
+                                    </div>
+                                ) : (
+                                    <DndContext 
+                                        sensors={sensors}
+                                        collisionDetection={closestCenter}
+                                        onDragEnd={handleDragEnd}
+                                    >
+                                        <SortableContext 
+                                            items={data.product_schema.map(f => f.id)}
+                                            strategy={verticalListSortingStrategy}
+                                        >
+                                            {data.product_schema.map((field) => (
+                                                <SortableField 
+                                                    key={field.id}
+                                                    field={field} 
+                                                    updateSchemaField={updateSchemaField} 
+                                                    removeSchemaField={removeSchemaField} 
+                                                />
+                                            ))}
+                                        </SortableContext>
+                                    </DndContext>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* SECTION 3: Quotation Labels */}
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
+                            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 border-b border-gray-100 dark:border-gray-700 pb-3 flex items-center gap-2">
+                                <Book className="w-4 h-4 text-gray-400" />
+                                Quotation Configuration
                             </h3>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
