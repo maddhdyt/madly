@@ -15,18 +15,28 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // 0. Create Default Admin
+        \App\Models\User::firstOrCreate(
+            ['email' => 'admin@madly.com'],
+            [
+                'name' => 'Super Admin',
+                'password' => bcrypt('password'),
+                'role' => 'admin'
+            ]
+        );
+
         // 1. Create Brands
         $brandA = \App\Models\Brand::create(['name' => 'Brand A', 'slug' => 'brand-a']);
         $brandB = \App\Models\Brand::create(['name' => 'Brand B', 'slug' => 'brand-b']);
 
         // 2. Create Services with their Product Schemas
         \App\Models\Service::create([
-            'name' => 'Jurnal Akademik',
+            'name' => 'Journal Publication',
             'slug' => 'jurnal',
-            'description' => 'Publikasi Jurnal Nasional & Internasional',
+            'description' => 'National & International Journal Publications',
             'icon' => 'book',
             'product_schema' => [
-                ['name' => 'focus_scope', 'label' => 'Focus & Scope', 'type' => 'text', 'placeholder' => 'Hukum Pidana, Perdata, dll'],
+                ['name' => 'focus_scope', 'label' => 'Focus & Scope', 'type' => 'tags', 'placeholder' => 'Hukum Pidana, Perdata, dll'],
                 ['name' => 'link', 'label' => 'Link Jurnal', 'type' => 'text', 'placeholder' => 'https://...'],
                 ['name' => 'publication_months', 'label' => 'Bulan Terbit', 'type' => 'text', 'placeholder' => 'Jan, Mar, May'],
                 ['name' => 'estimated_time', 'label' => 'Estimasi Waktu', 'type' => 'text', 'placeholder' => 'Internal LoA 1-2 hari'],
@@ -61,5 +71,8 @@ class DatabaseSeeder extends Seeder
             'shortcut' => '/order',
             'content_text' => "Silakan isi format berikut:\nNama:\nAlamat:\nPesanan:\nMetode Pembayaran:"
         ]);
+
+        // 4. Seed Journal Products
+        $this->call(JournalProductSeeder::class);
     }
 }

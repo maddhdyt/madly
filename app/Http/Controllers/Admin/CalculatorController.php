@@ -16,8 +16,7 @@ class CalculatorController extends Controller
 {
     public function index()
     {
-        // Load all data needed for the calculator
-        $products = Product::with(['brand', 'service', 'prices'])->orderBy('name')->get();
+        $products = Product::with(['service', 'prices.brand'])->orderBy('name')->get();
         $brands = Brand::orderBy('name')->get();
         $services = Service::orderBy('name')->get();
 

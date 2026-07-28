@@ -3,19 +3,31 @@ import MainLayout from '../../../Layouts/MainLayout';
 import { useForm, router } from '@inertiajs/react';
 import { Plus, Edit2, Trash2, ArrowLeft } from 'lucide-react';
 import PricelistFormSlideOver from './PricelistFormSlideOver';
+import ConfirmModal from '../../../Components/ConfirmModal';
+import Pagination from '../../../Components/Pagination';
 
 export default function Index({ pricelists, products, services, showToast }) {
     const { delete: destroy } = useForm();
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
     const [selectedPricelist, setSelectedPricelist] = useState(null);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [pricelistToDelete, setPricelistToDelete] = useState(null);
 
     const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this pricelist?')) {
-            destroy(route('admin.pricelists.destroy', id), {
+        setPricelistToDelete(id);
+        setIsConfirmModalOpen(true);
+    };
+
+    const confirmDelete = () => {
+        if (pricelistToDelete) {
+            destroy(route('admin.pricelists.destroy', pricelistToDelete), {
                 onSuccess: () => {
+                    setIsConfirmModalOpen(false);
+                    setPricelistToDelete(null);
                     if (showToast) showToast('Pricelist deleted successfully');
                 },
                 onError: () => {
+                    setIsConfirmModalOpen(false);
                     if (showToast) showToast('Failed to delete pricelist', 'error');
                 }
             });
@@ -43,14 +55,14 @@ export default function Index({ pricelists, products, services, showToast }) {
                 <div className="flex items-center gap-3">
                     <button 
                         onClick={() => router.visit(route('home'))}
-                        className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors"
+                        className="px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back to Dashboard
                     </button>
                     <button 
                         onClick={openCreateForm}
-                        className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm transition-colors"
+                        className="px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm transition-colors"
                     >
                         <Plus className="w-4 h-4" />
                         Create Pricelist
@@ -70,14 +82,14 @@ export default function Index({ pricelists, products, services, showToast }) {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
-                        {pricelists.length === 0 ? (
+                        {pricelists.data.length === 0 ? (
                             <tr>
                                 <td colSpan="4" className="px-8 py-12 text-center text-gray-500 dark:text-gray-400">
                                     No pricelists found. Create one to get started.
                                 </td>
                             </tr>
                         ) : (
-                            pricelists.map((pricelist) => (
+                            pricelists.data.map((pricelist) => (
                                 <tr key={pricelist.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
                                     <td className="px-8 py-4">
                                         <span className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide border border-transparent dark:border-gray-700">
@@ -107,6 +119,7 @@ export default function Index({ pricelists, products, services, showToast }) {
                         )}
                     </tbody>
                 </table>
+                <Pagination links={pricelists.links} />
             </div>
 
             <PricelistFormSlideOver 
@@ -116,6 +129,15 @@ export default function Index({ pricelists, products, services, showToast }) {
                 products={products}
                 services={services}
                 showToast={showToast}
+            />
+
+            <ConfirmModal 
+                isOpen={isConfirmModalOpen} 
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Pricelist"
+                message="Are you sure you want to delete this pricelist?"
+                confirmText="Delete"
             />
         </div>
     );

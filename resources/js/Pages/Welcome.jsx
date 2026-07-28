@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import MainLayout from '../Layouts/MainLayout';
-import { Copy, Calculator, Check, Box, MessageSquare, History, Command, Zap, Search, Plus, Minus } from 'lucide-react';
+import { Copy, Calculator, Check, Box, MessageSquare, History, Command, Zap, Search, Plus, Minus, FileText } from 'lucide-react';
+import QuotationModal from './QuotationModal';
 
-export default function Welcome({ copyToClipboard, searchQuery = "", pricelists = [], snippets = [] }) {
+export default function Welcome({ copyToClipboard, searchQuery = "", pricelists = [], snippets = [], stats = {}, recentProducts = [] }) {
     
     // 1. DATA PROCESSING (Metrics)
     const query = searchQuery.toLowerCase();
@@ -22,16 +23,9 @@ export default function Welcome({ copyToClipboard, searchQuery = "", pricelists 
         snippet.content_text.toLowerCase().includes(query)
     );
 
-    // Calculate Totals for Metrics Card
-    const totalPricelists = pricelists.length;
-    let totalPackages = 0;
-    pricelists.forEach(p => {
-        totalPackages += p.prices.length;
-    });
-    const totalSnippets = snippets.length;
-
     // 2. STATE (Quoter & Activity Log & Scalability)
     const [selectedItems, setSelectedItems] = useState([]);
+    const [isQuotationModalOpen, setIsQuotationModalOpen] = useState(false);
     const [recentCopies, setRecentCopies] = useState([]); // [{ id, text, time, type }]
     const [collapsedPricelists, setCollapsedPricelists] = useState({});
     const [copiedSnippetIndex, setCopiedSnippetIndex] = useState(null);
@@ -68,6 +62,8 @@ export default function Welcome({ copyToClipboard, searchQuery = "", pricelists 
             } else {
                 return [...prev, {
                     id: itemId,
+                    product_id: product.id,
+                    price_id: priceItem.id,
                     pricelistName: pricelist.name,
                     productName: product.name,
                     category: product.category,
@@ -188,10 +184,10 @@ export default function Welcome({ copyToClipboard, searchQuery = "", pricelists 
                     </div>
                     <div>
                         <div className="flex items-baseline gap-2">
-                            <h3 className="text-3xl font-black text-gray-900 tracking-tighter">{totalPackages}</h3>
-                            <span className="text-sm font-semibold text-gray-500">Packages</span>
+                            <h3 className="text-3xl font-black text-gray-900 tracking-tighter">{stats.total_products || 0}</h3>
+                            <span className="text-sm font-semibold text-gray-500">Products</span>
                         </div>
-                        <p className="text-xs font-medium text-gray-400 mt-1">Across {totalPricelists} Catalogs</p>
+                        <p className="text-xs font-medium text-gray-400 mt-1">Across {stats.total_brands || 0} Brands</p>
                     </div>
                 </div>
 
@@ -205,7 +201,7 @@ export default function Welcome({ copyToClipboard, searchQuery = "", pricelists 
                     </div>
                     <div>
                         <div className="flex items-baseline gap-2">
-                            <h3 className="text-3xl font-black text-gray-900 tracking-tighter">{totalSnippets}</h3>
+                            <h3 className="text-3xl font-black text-gray-900 tracking-tighter">{stats.total_snippets || 0}</h3>
                             <span className="text-sm font-semibold text-gray-500">Active</span>
                         </div>
                         <p className="text-xs font-medium text-gray-400 mt-1">Ready for quick replies</p>
@@ -369,18 +365,32 @@ export default function Welcome({ copyToClipboard, searchQuery = "", pricelists 
                             <span className="text-xs font-medium text-gray-400 block mb-1">Total ({selectedItems.length} items)</span>
                             <span className="text-2xl font-black tracking-tighter">Rp{totalCalculatorPrice.toLocaleString('id-ID')}</span>
                         </div>
-                        <button 
-                            onClick={copyQuotation}
-                            disabled={selectedItems.length === 0}
-                            className={`w-full py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${
-                                selectedItems.length > 0 
-                                ? 'bg-white text-gray-900 shadow-sm hover:scale-[1.02]' 
-                                : 'bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed opacity-70'
-                            }`}
-                        >
-                            <Copy className="w-4 h-4" />
-                            Copy Format
-                        </button>
+                        <div className="flex flex-col gap-2 mt-4">
+                            <button 
+                                onClick={() => setIsQuotationModalOpen(true)}
+                                disabled={selectedItems.length === 0}
+                                className={`w-full py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${
+                                    selectedItems.length > 0 
+                                    ? 'bg-white text-gray-900 shadow-sm hover:scale-[1.02] hover:bg-gray-50' 
+                                    : 'bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed opacity-70'
+                                }`}
+                            >
+                                <FileText className="w-4 h-4" />
+                                Generate PDF
+                            </button>
+                            <button 
+                                onClick={copyQuotation}
+                                disabled={selectedItems.length === 0}
+                                className={`w-full py-2.5 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+                                    selectedItems.length > 0 
+                                    ? 'bg-transparent text-gray-400 hover:text-white hover:bg-gray-800/50' 
+                                    : 'bg-transparent text-gray-600 cursor-not-allowed opacity-70'
+                                }`}
+                            >
+                                <Copy className="w-3.5 h-3.5" />
+                                Copy to Clipboard
+                            </button>
+                        </div>
                     </div>
 
                     {/* Activity Log */}
@@ -415,6 +425,12 @@ export default function Welcome({ copyToClipboard, searchQuery = "", pricelists 
 
             </div>
 
+            <QuotationModal 
+                isOpen={isQuotationModalOpen} 
+                onClose={() => setIsQuotationModalOpen(false)} 
+                selectedItems={selectedItems}
+                totalItemsAmount={totalCalculatorPrice}
+            />
         </div>
     );
 }

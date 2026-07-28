@@ -3,10 +3,15 @@ import MainLayout from '../../../Layouts/MainLayout';
 import { useForm, router, Head } from '@inertiajs/react';
 import { Plus, Edit2, Trash2, FileText, Image as ImageIcon, ExternalLink, Download } from 'lucide-react';
 import BrochureFormSlideOver from './BrochureFormSlideOver';
+import ConfirmModal from '../../../Components/ConfirmModal';
+import Pagination from '../../../Components/Pagination';
+import useCopyToClipboard from '../../../Hooks/useCopyToClipboard';
 
-export default function Index({ brochures, brands }) {
+export default function Index({ brochures, brands, showToast }) {
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
     const [selectedBrochure, setSelectedBrochure] = useState(null);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [brochureToDelete, setBrochureToDelete] = useState(null);
 
     const handleAddBrochure = () => {
         setSelectedBrochure(null);
@@ -19,15 +24,27 @@ export default function Index({ brochures, brands }) {
     };
 
     const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this brochure? The file will be permanently removed.')) {
-            router.delete(route('admin.brochures.destroy', id));
+        setBrochureToDelete(id);
+        setIsConfirmModalOpen(true);
+    };
+
+    const confirmDelete = () => {
+        if (brochureToDelete) {
+            router.delete(route('admin.brochures.destroy', brochureToDelete), {
+                onSuccess: () => {
+                    setIsConfirmModalOpen(false);
+                    setBrochureToDelete(null);
+                    if (showToast) showToast('Brochure deleted successfully');
+                },
+                onError: () => {
+                    setIsConfirmModalOpen(false);
+                    if (showToast) showToast('Failed to delete brochure', 'error');
+                }
+            });
         }
     };
 
-    const copyToClipboard = (text) => {
-        navigator.clipboard.writeText(text);
-        alert("Link copied!");
-    };
+    const [copiedText, copyToClipboard] = useCopyToClipboard(showToast);
 
     return (
         <MainLayout title="Brochures / Pricelists">
@@ -44,7 +61,7 @@ export default function Index({ brochures, brands }) {
                     
                     <button 
                         onClick={handleAddBrochure}
-                        className="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-full font-bold text-sm transition-colors flex items-center gap-2 shadow-sm"
+                        className="bg-gray-900 hover:bg-black text-white px-4 py-2.5 rounded-xl font-bold text-sm transition-colors flex items-center gap-2 shadow-sm"
                     >
                         <Plus className="w-4 h-4" />
                         Upload File
@@ -54,7 +71,7 @@ export default function Index({ brochures, brands }) {
                 {/* Body Area */}
                 <div className="flex-1 overflow-y-auto bg-white p-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {brochures.map((item) => (
+                        {brochures.data.map((item) => (
                             <div key={item.id} className="border border-gray-200 rounded-2xl p-5 flex flex-col hover:border-gray-300 hover:shadow-md transition-all group bg-white">
                                 <div className="w-full h-32 bg-gray-100 rounded-xl mb-4 flex items-center justify-center text-gray-400 overflow-hidden relative">
                                     {item.file_type === 'image' ? (
@@ -97,13 +114,14 @@ export default function Index({ brochures, brands }) {
                             </div>
                         ))}
                     </div>
-                    {brochures.length === 0 && (
+                    {brochures.data.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-20 text-center">
                             <FileText className="w-16 h-16 text-gray-200 mb-4" />
                             <h3 className="text-lg font-bold text-gray-900">No brochures uploaded</h3>
                             <p className="text-gray-500 mt-2">Upload your first PDF or image pricelist.</p>
                         </div>
                     )}
+                    <Pagination links={brochures.links} />
                 </div>
             </div>
 
@@ -112,6 +130,16 @@ export default function Index({ brochures, brands }) {
                 onClose={() => setIsSlideOverOpen(false)} 
                 brochure={selectedBrochure}
                 brands={brands}
+                showToast={showToast}
+            />
+
+            <ConfirmModal 
+                isOpen={isConfirmModalOpen} 
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Brochure"
+                message="Are you sure you want to delete this brochure? The file will be permanently removed."
+                confirmText="Delete"
             />
         </MainLayout>
     );

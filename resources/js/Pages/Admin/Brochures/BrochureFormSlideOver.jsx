@@ -2,8 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useForm } from '@inertiajs/react';
 import { X, Save, UploadCloud } from 'lucide-react';
+import CustomSelect from '../../../Components/CustomSelect';
 
-export default function BrochureFormSlideOver({ isOpen, onClose, brochure, brands = [] }) {
+export default function BrochureFormSlideOver({ isOpen, onClose, brochure, brands = [], showToast }) {
     const isEdit = !!brochure;
     const [mounted, setMounted] = useState(false);
     const fileInputRef = useRef(null);
@@ -43,18 +44,32 @@ export default function BrochureFormSlideOver({ isOpen, onClose, brochure, brand
         if (isEdit) {
             post(route('admin.brochures.update', brochure.id), {
                 forceFormData: true,
-                onSuccess: () => onClose()
+                onSuccess: () => {
+                    onClose();
+                    if (showToast) showToast('Brochure updated successfully');
+                },
+                onError: (err) => {
+                    const firstError = Object.values(err)[0];
+                    if (showToast) showToast(firstError || 'Failed to update brochure', 'error');
+                }
             });
         } else {
             post(route('admin.brochures.store'), {
                 forceFormData: true,
-                onSuccess: () => onClose()
+                onSuccess: () => {
+                    onClose();
+                    if (showToast) showToast('Brochure uploaded successfully');
+                },
+                onError: (err) => {
+                    const firstError = Object.values(err)[0];
+                    if (showToast) showToast(firstError || 'Failed to upload brochure', 'error');
+                }
             });
         }
     };
 
     const labelClass = "block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1";
-    const inputClass = "w-full bg-[#f4f5f5] border border-gray-200 text-gray-900 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all";
+    const inputClass = "w-full bg-[#f4f5f5] border border-gray-200 text-gray-900 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all";
 
     if (!isOpen || !mounted) return null;
 
@@ -121,16 +136,15 @@ export default function BrochureFormSlideOver({ isOpen, onClose, brochure, brand
 
                                 <div>
                                     <label className={labelClass}>Associated Brand (Optional)</label>
-                                    <select 
-                                        className={inputClass}
+                                    <CustomSelect 
+                                        className="py-3 px-4 bg-[#f4f5f5] dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-sm font-medium"
                                         value={data.brand_id}
                                         onChange={e => setData('brand_id', e.target.value)}
-                                    >
-                                        <option value="">General (No Brand)</option>
-                                        {brands.map(b => (
-                                            <option key={b.id} value={b.id}>{b.name}</option>
-                                        ))}
-                                    </select>
+                                        options={[
+                                            { value: '', label: 'General (No Brand)' },
+                                            ...brands.map(b => ({ value: b.id, label: b.name }))
+                                        ]}
+                                    />
                                     {errors.brand_id && <p className="text-red-500 text-xs mt-1">{errors.brand_id}</p>}
                                 </div>
                                 

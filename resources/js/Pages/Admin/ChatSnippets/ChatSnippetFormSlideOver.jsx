@@ -49,12 +49,26 @@ export default function ChatSnippetFormSlideOver({ isOpen, onClose, snippet }) {
 
         if (isEditing) {
             put(route('admin.chat-snippets.update', snippet.id), {
-                onSuccess: () => onClose(),
+                onSuccess: () => {
+                    onClose();
+                    if (showToast) showToast('Snippet updated successfully');
+                },
+                onError: (err) => {
+                    const firstError = Object.values(err)[0];
+                    if (showToast) showToast(firstError || 'Failed to update snippet', 'error');
+                },
                 data: submittedData
             });
         } else {
             post(route('admin.chat-snippets.store'), {
-                onSuccess: () => onClose(),
+                onSuccess: () => {
+                    onClose();
+                    if (showToast) showToast('Snippet created successfully');
+                },
+                onError: (err) => {
+                    const firstError = Object.values(err)[0];
+                    if (showToast) showToast(firstError || 'Failed to create snippet', 'error');
+                },
                 data: submittedData
             });
         }
@@ -146,7 +160,7 @@ export default function ChatSnippetFormSlideOver({ isOpen, onClose, snippet }) {
                                 value={data.content_text}
                                 onChange={e => setData('content_text', e.target.value)}
                                 rows={6}
-                                className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border rounded-xl text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 resize-none ${
+                                className={`w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border rounded-xl text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 resize-none ${
                                     errors.content_text 
                                     ? 'border-red-300 dark:border-red-500/50 focus:border-red-500' 
                                     : 'border-gray-200 dark:border-gray-800 focus:border-gray-300 dark:focus:border-gray-600 text-gray-900 dark:text-white'

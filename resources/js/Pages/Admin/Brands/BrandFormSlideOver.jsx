@@ -46,11 +46,12 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
             post(route('admin.brands.update', brand.id), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    if (showToast) showToast('Brand updated successfully!');
                     onClose();
+                    if (showToast) showToast('Brand updated successfully!');
                 },
-                onError: () => {
-                    if (showToast) showToast('Failed to update brand. Please check the inputs.');
+                onError: (err) => {
+                    const firstError = Object.values(err)[0];
+                    if (showToast) showToast(firstError || 'Failed to update brand', 'error');
                 },
                 forceFormData: true,
             });
@@ -58,11 +59,12 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
             post(route('admin.brands.store'), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    if (showToast) showToast('Brand created successfully!');
                     onClose();
+                    if (showToast) showToast('Brand created successfully!');
                 },
-                onError: () => {
-                    if (showToast) showToast('Failed to create brand. Please check the inputs.');
+                onError: (err) => {
+                    const firstError = Object.values(err)[0];
+                    if (showToast) showToast(firstError || 'Failed to create brand', 'error');
                 },
                 forceFormData: true,
             });
@@ -96,7 +98,7 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
     };
 
     const labelClass = "block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2 ml-1";
-    const inputClass = "w-full bg-[#f4f5f5] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 focus:bg-white dark:focus:bg-gray-800 transition-all";
+    const inputClass = "w-full bg-[#f4f5f5] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 focus:bg-white dark:focus:bg-gray-800 transition-all";
 
     if (!isOpen || !mounted) return null;
 

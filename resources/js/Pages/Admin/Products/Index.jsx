@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import MainLayout from '../../../Layouts/MainLayout';
 import { useForm, router } from '@inertiajs/react';
-import { Plus, Edit2, Trash2, ArrowLeft, Filter, Eye, X, Tag } from 'lucide-react';
+import { Plus, Edit2, Trash2, ArrowLeft, Filter, Eye, X, Tag, Box } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import ProductFormSlideOver from './ProductFormSlideOver';
+import CustomSelect from '../../../Components/CustomSelect';
+import ConfirmModal from '../../../Components/ConfirmModal';
+import Pagination from '../../../Components/Pagination';
 
 // Specs Modal Component
 const SpecsModal = ({ isOpen, onClose, product, service }) => {
@@ -117,7 +120,7 @@ const SpecsModal = ({ isOpen, onClose, product, service }) => {
                 </div>
                 
                 <div className="px-8 py-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 flex justify-end">
-                    <button onClick={onClose} className="px-6 py-2.5 bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 transition-colors">
+                    <button onClick={onClose} className="px-4 py-2.5 bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 transition-colors">
                         Close
                     </button>
                 </div>
@@ -136,21 +139,32 @@ const SpecsModal = ({ isOpen, onClose, product, service }) => {
 
 export default function Index({ products, services, showToast }) {
     const { delete: destroy } = useForm();
+    const params = new URLSearchParams(window.location.search);
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [selectedServiceFilter, setSelectedServiceFilter] = useState('all');
+    const [selectedServiceFilter, setSelectedServiceFilter] = useState(params.get('service_id') || 'all');
     
     // Modal state
     const [isSpecsModalOpen, setIsSpecsModalOpen] = useState(false);
     const [viewSpecsProduct, setViewSpecsProduct] = useState(null);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [productToDelete, setProductToDelete] = useState(null);
 
     const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this product?')) {
-            destroy(route('admin.products.destroy', id), {
+        setProductToDelete(id);
+        setIsConfirmModalOpen(true);
+    };
+
+    const confirmDelete = () => {
+        if (productToDelete) {
+            destroy(route('admin.products.destroy', productToDelete), {
                 onSuccess: () => {
+                    setIsConfirmModalOpen(false);
+                    setProductToDelete(null);
                     if (showToast) showToast('Product deleted successfully');
                 },
                 onError: (errors) => {
+                    setIsConfirmModalOpen(false);
                     if (showToast) showToast(errors.error || 'Failed to delete product', 'error');
                 }
             });
@@ -181,9 +195,13 @@ export default function Index({ products, services, showToast }) {
         }).format(amount);
     };
 
-    const filteredProducts = selectedServiceFilter === 'all' 
-        ? products 
-        : products.filter(p => p.service_id == selectedServiceFilter);
+    const handleFilterChange = (e) => {
+        const val = e.target.value;
+        setSelectedServiceFilter(val);
+        router.get(route('admin.products.index'), { service_id: val === 'all' ? null : val }, { preserveState: true, replace: true });
+    };
+
+    const filteredProducts = products.data;
 
     return (
         <div className="flex flex-col h-full w-full bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden transition-colors duration-300">
@@ -203,25 +221,17 @@ export default function Index({ products, services, showToast }) {
                     </button>
                     
                     {/* Dropdown Filter replacing Tabs */}
-                    <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Filter className="w-4 h-4 text-gray-400" />
-                        </div>
-                        <select
+                    <div className="w-48">
+                        <CustomSelect
                             value={selectedServiceFilter}
-                            onChange={(e) => setSelectedServiceFilter(e.target.value)}
-                            className="appearance-none pl-9 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl font-bold text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-400 cursor-pointer transition-colors"
-                        >
-                            <option value="all">All Services</option>
-                            {services.map(service => (
-                                <option key={service.id} value={service.id}>
-                                    {service.name}
-                                </option>
-                            ))}
-                        </select>
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </div>
+                            onChange={handleFilterChange}
+                            options={[
+                                { value: 'all', label: 'All Services' },
+                                ...services.map(service => ({ value: service.id, label: service.name }))
+                            ]}
+                            icon={<Filter className="w-4 h-4" />}
+                            className="pl-3 py-2.5 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                        />
                     </div>
 
                     <button 
@@ -261,9 +271,15 @@ export default function Index({ products, services, showToast }) {
                             filteredProducts.map((product) => (
                                 <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
                                     <td className="px-8 py-5">
-                                        <span className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border border-transparent dark:border-gray-700">
-                                            {product.service?.name || '-'}
-                                        </span>
+                                        {product.service ? (
+                                            <span className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border border-transparent dark:border-gray-700">
+                                                {product.service.name}
+                                            </span>
+                                        ) : (
+                                            <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border border-transparent dark:border-red-800">
+                                                No Service
+                                            </span>
+                                        )}
                                     </td>
                                     <td className="px-8 py-5 font-bold text-gray-900 dark:text-white">
                                         {product.name}
@@ -310,6 +326,7 @@ export default function Index({ products, services, showToast }) {
                         )}
                     </tbody>
                 </table>
+                <Pagination links={products.links} />
             </div>
 
             <ProductFormSlideOver 
@@ -325,6 +342,15 @@ export default function Index({ products, services, showToast }) {
                 onClose={() => setIsSpecsModalOpen(false)}
                 product={viewSpecsProduct}
                 service={viewSpecsProduct ? services.find(s => s.id === viewSpecsProduct.service_id) : null}
+            />
+
+            <ConfirmModal 
+                isOpen={isConfirmModalOpen} 
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Product"
+                message="Are you sure you want to delete this product?"
+                confirmText="Delete"
             />
         </div>
     );

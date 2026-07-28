@@ -5,6 +5,7 @@ import { X, Save, Box, Book, Monitor, Server, TrendingUp, Plus, Trash2, GripVert
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import CustomSelect from '../../../Components/CustomSelect';
 
 function SortableField({ field, updateSchemaField, removeSchemaField }) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: field.id });
@@ -12,7 +13,7 @@ function SortableField({ field, updateSchemaField, removeSchemaField }) {
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
-        zIndex: isDragging ? 10 : 1,
+        zIndex: isDragging ? 50 : undefined,
         opacity: isDragging ? 0.9 : 1,
         boxShadow: isDragging ? '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' : 'none',
     };
@@ -21,7 +22,7 @@ function SortableField({ field, updateSchemaField, removeSchemaField }) {
         <div 
             ref={setNodeRef} 
             style={style}
-            className="flex items-start gap-3 bg-[#f8f9fa] dark:bg-gray-900/50 p-4 rounded-xl border border-gray-100 dark:border-gray-800 relative group"
+            className="flex items-start gap-3 bg-[#f8f9fa] dark:bg-gray-900/50 p-4 rounded-xl border border-gray-100 dark:border-gray-800 relative group focus-within:z-40 hover:z-30"
         >
             <div 
                 {...attributes} 
@@ -46,17 +47,18 @@ function SortableField({ field, updateSchemaField, removeSchemaField }) {
                 
                 <div className="md:col-span-1">
                     <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Input Type</label>
-                    <select 
-                        className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-gray-900 dark:focus:ring-gray-500 outline-none"
+                    <CustomSelect 
+                        className="py-2 px-3 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-sm font-normal"
                         value={field.type}
                         onChange={(e) => updateSchemaField(field.id, 'type', e.target.value)}
-                    >
-                        <option value="text">Short Text</option>
-                        <option value="textarea">Long Text</option>
-                        <option value="number">Number</option>
-                        <option value="url">URL / Link</option>
-                        <option value="tags">Tags (Comma Separated)</option>
-                    </select>
+                        options={[
+                            { value: 'text', label: 'Short Text' },
+                            { value: 'textarea', label: 'Long Text' },
+                            { value: 'number', label: 'Number' },
+                            { value: 'url', label: 'URL / Link' },
+                            { value: 'tags', label: 'Tags (Comma Separated)' }
+                        ]}
+                    />
                 </div>
                 
                 <div className="md:col-span-1">
@@ -95,7 +97,7 @@ function SortableField({ field, updateSchemaField, removeSchemaField }) {
     );
 }
 
-export default function ServiceFormSlideOver({ isOpen, onClose, service }) {
+export default function ServiceFormSlideOver({ isOpen, onClose, service, showToast }) {
     const isEdit = !!service;
     const [mounted, setMounted] = useState(false);
 
@@ -166,11 +168,25 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service }) {
         e.preventDefault();
         if (isEdit) {
             put(route('admin.services.update', service.id), {
-                onSuccess: () => onClose()
+                onSuccess: () => {
+                    onClose();
+                    if (showToast) showToast('Service updated successfully');
+                },
+                onError: (err) => {
+                    const firstError = Object.values(err)[0];
+                    if (showToast) showToast(firstError || 'Failed to update service', 'error');
+                }
             });
         } else {
             post(route('admin.services.store'), {
-                onSuccess: () => onClose()
+                onSuccess: () => {
+                    onClose();
+                    if (showToast) showToast('Service created successfully');
+                },
+                onError: (err) => {
+                    const firstError = Object.values(err)[0];
+                    if (showToast) showToast(firstError || 'Failed to create service', 'error');
+                }
             });
         }
     };
@@ -231,7 +247,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service }) {
     };
 
     const labelClass = "block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2 ml-1";
-    const inputClass = "w-full bg-[#f4f5f5] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 focus:bg-white dark:focus:bg-gray-800 transition-all";
+    const inputClass = "w-full bg-[#f4f5f5] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 focus:bg-white dark:focus:bg-gray-800 transition-all";
 
     if (!isOpen || !mounted) return null;
 

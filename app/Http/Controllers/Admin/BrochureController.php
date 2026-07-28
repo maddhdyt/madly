@@ -13,7 +13,7 @@ class BrochureController extends Controller
 {
     public function index()
     {
-        $brochures = Brochure::with('brand')->latest()->get();
+        $brochures = Brochure::with('brand')->latest()->paginate(15)->withQueryString();
         $brands = Brand::orderBy('name')->get();
 
         return Inertia::render('Admin/Brochures/Index', [

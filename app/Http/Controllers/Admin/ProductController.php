@@ -10,9 +10,17 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('service')->orderBy('name')->get();
+        $serviceId = $request->input('service_id');
+        
+        $products = Product::with('service')
+            ->when($serviceId && $serviceId !== 'all', function($query) use ($serviceId) {
+                return $query->where('service_id', $serviceId);
+            })
+            ->orderBy('name')
+            ->paginate(15)
+            ->withQueryString();
 
         return Inertia::render('Admin/Products/Index', [
             'products' => $products,

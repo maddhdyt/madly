@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import MainLayout from '../../../Layouts/MainLayout';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { Search, Plus, Minus, Trash2, Save, ShoppingCart, User, Receipt, Filter, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
+import CustomSelect from '../../../Components/CustomSelect';
 
 export default function Calculator({ products, brands, services }) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -215,27 +216,29 @@ export default function Calculator({ products, brands, services }) {
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
                             </div>
-                            <div className="relative">
-                                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <select 
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-9 pr-8 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 appearance-none"
+                            <div className="w-full">
+                                <CustomSelect 
+                                    className="bg-gray-50 border-gray-200 py-2 pl-3 text-sm font-medium text-gray-700"
                                     value={activeService}
                                     onChange={(e) => setActiveService(e.target.value)}
-                                >
-                                    <option value="all">All Services</option>
-                                    {services.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                                </select>
+                                    options={[
+                                        { value: 'all', label: 'All Services' },
+                                        ...services.map(s => ({ value: s.id, label: s.name }))
+                                    ]}
+                                    icon={<Filter className="w-4 h-4 text-gray-400" />}
+                                />
                             </div>
-                            <div className="relative">
-                                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <select 
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-9 pr-8 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 appearance-none"
+                            <div className="w-full">
+                                <CustomSelect 
+                                    className="bg-gray-50 border-gray-200 py-2 pl-3 text-sm font-medium text-gray-700"
                                     value={activeBrand}
                                     onChange={(e) => setActiveBrand(e.target.value)}
-                                >
-                                    <option value="all">All Brands</option>
-                                    {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-                                </select>
+                                    options={[
+                                        { value: 'all', label: 'All Brands' },
+                                        ...brands.map(b => ({ value: b.id, label: b.name }))
+                                    ]}
+                                    icon={<Filter className="w-4 h-4 text-gray-400" />}
+                                />
                             </div>
                         </div>
                     </div>

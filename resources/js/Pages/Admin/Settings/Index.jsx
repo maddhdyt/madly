@@ -58,7 +58,7 @@ export default function Settings({ settings, showToast }) {
         { id: 'preferences', label: 'Preferences', icon: Monitor, desc: 'Theme and system settings' },
     ];
 
-    const inputClass = "w-full bg-gray-50 dark:bg-gray-800 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 dark:text-white transition-all";
+    const inputClass = "w-full bg-gray-50 dark:bg-gray-800 border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 dark:text-white transition-all";
     const labelClass = "block text-xs font-bold text-gray-900 dark:text-gray-100 mb-2 uppercase tracking-wide";
 
     return (
@@ -114,7 +114,7 @@ export default function Settings({ settings, showToast }) {
                                 <div>
                                     <h3 className="font-bold text-gray-900 dark:text-white text-lg">{user.name}</h3>
                                     <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">{user.email}</p>
-                                    <button className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                    <button className="px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                                         Change Avatar
                                     </button>
                                 </div>

@@ -52,3 +52,8 @@ Strict brutalist-minimalist (Notion-esque):
    - Inputs/Buttons: `bg-transparent`, `border border-gray-200`, `focus:ring-1 focus:ring-gray-900 focus:border-gray-900`.
 4. **IMAGE ATTACHMENTS (OBSERVATION RULE):**
    - Wajib jeli dan sangat teliti ketika pengguna melampirkan gambar, baik itu sebagai referensi desain, tata letak, ukuran font, maupun pelaporan _bug_ visual. Pastikan semua detail di dalam gambar dianalisis dan diterapkan/diperbaiki dengan presisi yang sama.
+5. **NATIVE UI BANNED:**
+   - Dilarang keras menggunakan antarmuka bawaan sistem operasi atau browser (seperti `confirm()`, `alert()`, `prompt()`, atau native `<select>` / dropdown). 
+   - Semua elemen interaktif (modals, dropdowns, toasts) wajib menggunakan komponen UI kustom (React/Tailwind) yang sesuai dengan tema monokrom dan minimalis aplikasi ini.
+6. **ACTION FEEDBACK (TOASTS):**
+   - Wajib memberikan *feedback* visual (seperti *toast notification* global) setelah pengguna berhasil atau gagal melakukan operasi CRUD (Create, Update, Delete) agar status aksi jelas tanpa menggunakan pesan *alert* bawaan browser.

@@ -15,7 +15,7 @@ class PricelistController extends Controller
 {
     public function index()
     {
-        $pricelists = Pricelist::with('service', 'prices.product')->latest()->get();
+        $pricelists = Pricelist::with('service', 'prices.product')->latest()->paginate(15)->withQueryString();
         $products = Product::orderBy('name')->get();
         $services = Service::orderBy('name')->get();
 

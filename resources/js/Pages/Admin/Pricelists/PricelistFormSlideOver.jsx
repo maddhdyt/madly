@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useForm } from '@inertiajs/react';
 import { X, Save, Plus, Trash2, ListPlus, Box, Book, Monitor, Server, TrendingUp, Briefcase, Code, PenTool, Award, Shield, Globe, Camera, Palette, Database, Layers } from 'lucide-react';
+import CustomSelect from '../../../Components/CustomSelect';
 
 export default function PricelistFormSlideOver({ isOpen, onClose, pricelist, products = [], services = [], showToast }) {
     const isEdit = !!pricelist;
@@ -92,7 +93,7 @@ export default function PricelistFormSlideOver({ isOpen, onClose, pricelist, pro
     };
 
     const labelClass = "block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2 ml-1";
-    const inputClass = "w-full bg-[#f4f5f5] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 focus:bg-white dark:focus:bg-gray-800 transition-all";
+    const inputClass = "w-full bg-[#f4f5f5] dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 focus:bg-white dark:focus:bg-gray-800 transition-all";
     const errorClass = "text-red-500 text-xs mt-1 ml-1";
 
     if (!isOpen || !mounted) return null;
@@ -306,17 +307,15 @@ export default function PricelistFormSlideOver({ isOpen, onClose, pricelist, pro
                                                         <span className="text-orange-400">HPP: {formatCurrency(hpp)}</span>
                                                     )}
                                                 </label>
-                                                <select 
-                                                    className={`${inputClass} !bg-gray-800 !border-gray-700 !text-white focus:!bg-gray-900`}
+                                                <CustomSelect 
+                                                    className={`${inputClass} !bg-gray-800 !border-gray-700 !text-white focus:!bg-gray-900 !py-3`}
                                                     value={price.product_id}
                                                     onChange={e => updatePrice(idx, 'product_id', e.target.value)}
-                                                    required
-                                                >
-                                                    <option value="">-- Pilih Jurnal --</option>
-                                                    {products.map(p => (
-                                                        <option key={p.id} value={p.id}>{p.name} ({p.accreditation_type || '-'})</option>
-                                                    ))}
-                                                </select>
+                                                    options={[
+                                                        { value: '', label: '-- Pilih Jurnal --' },
+                                                        ...products.map(p => ({ value: p.id, label: `${p.name} (${p.accreditation_type || '-'})` }))
+                                                    ]}
+                                                />
                                                 {errors[`prices.${idx}.product_id`] && <p className={errorClass}>{errors[`prices.${idx}.product_id`]}</p>}
                                             </div>
 

@@ -3,10 +3,14 @@ import MainLayout from '../../../Layouts/MainLayout';
 import { useForm, router, Head } from '@inertiajs/react';
 import { Plus, Edit2, Trash2, Box, Book, Monitor, Server, TrendingUp, Briefcase, Code, PenTool, Award, Shield, Globe, Camera, Palette, Database, Layers } from 'lucide-react';
 import ServiceFormSlideOver from './ServiceFormSlideOver';
+import ConfirmModal from '../../../Components/ConfirmModal';
+import Pagination from '../../../Components/Pagination';
 
-export default function Index({ services }) {
+export default function Index({ services, showToast }) {
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
     const [selectedService, setSelectedService] = useState(null);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [serviceToDelete, setServiceToDelete] = useState(null);
 
     const handleAddService = () => {
         setSelectedService(null);
@@ -19,8 +23,23 @@ export default function Index({ services }) {
     };
 
     const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this service type? Products connected to it will lose their type association.')) {
-            router.delete(route('admin.services.destroy', id));
+        setServiceToDelete(id);
+        setIsConfirmModalOpen(true);
+    };
+
+    const confirmDelete = () => {
+        if (serviceToDelete) {
+            router.delete(route('admin.services.destroy', serviceToDelete), {
+                onSuccess: () => {
+                    setIsConfirmModalOpen(false);
+                    setServiceToDelete(null);
+                    if (showToast) showToast('Service type deleted successfully');
+                },
+                onError: () => {
+                    setIsConfirmModalOpen(false);
+                    if (showToast) showToast('Failed to delete service type', 'error');
+                }
+            });
         }
     };
 
@@ -59,7 +78,7 @@ export default function Index({ services }) {
                     
                     <button 
                         onClick={handleAddService}
-                        className="bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 rounded-full font-bold text-sm transition-colors flex items-center gap-2 shadow-sm"
+                        className="bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-100 text-white dark:text-gray-900 px-4 py-2.5 rounded-xl font-bold text-sm transition-colors flex items-center gap-2 shadow-sm"
                     >
                         <Plus className="w-4 h-4" />
                         Add Service Type
@@ -69,10 +88,10 @@ export default function Index({ services }) {
                 {/* Body Area */}
                 <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-900">
                     <div className="flex flex-col">
-                        {services.map((service, idx) => (
+                        {services.data.map((service, idx) => (
                             <div 
                                 key={service.id} 
-                                className={`flex items-center justify-between p-6 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all group ${idx !== services.length - 1 ? 'border-b border-gray-100 dark:border-gray-800' : ''}`}
+                                className={`flex items-center justify-between p-6 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all group ${idx !== services.data.length - 1 ? 'border-b border-gray-100 dark:border-gray-800' : ''}`}
                             >
                                 <div className="flex items-center gap-5 flex-1 min-w-0">
                                     <div className="w-12 h-12 flex-shrink-0 rounded-2xl bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 flex items-center justify-center border border-gray-200/50 dark:border-gray-800">
@@ -106,13 +125,14 @@ export default function Index({ services }) {
                             </div>
                         ))}
                     </div>
-                    {services.length === 0 && (
+                    {services.data.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-20 text-center">
                             <Box className="w-16 h-16 text-gray-200 dark:text-gray-700 mb-4" />
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white">No service types found</h3>
                             <p className="text-gray-500 dark:text-gray-400 mt-2">Create your first service type to start selling.</p>
                         </div>
                     )}
+                    <Pagination links={services.links} />
                 </div>
             </div>
 
@@ -120,6 +140,16 @@ export default function Index({ services }) {
                 isOpen={isSlideOverOpen} 
                 onClose={() => setIsSlideOverOpen(false)} 
                 service={selectedService} 
+                showToast={showToast}
+            />
+
+            <ConfirmModal 
+                isOpen={isConfirmModalOpen} 
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Service Type"
+                message="Are you sure you want to delete this service type? Products connected to it will lose their type association."
+                confirmText="Delete"
             />
         </MainLayout>
     );

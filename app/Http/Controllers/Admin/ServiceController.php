@@ -12,7 +12,7 @@ class ServiceController extends Controller
 {
     public function index()
     {
-        $services = Service::latest()->get();
+        $services = Service::orderBy('name')->paginate(15)->withQueryString();
         return Inertia::render('Admin/Services/Index', [
             'services' => $services
         ]);

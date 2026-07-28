@@ -4,6 +4,7 @@ import { useForm, router } from '@inertiajs/react';
 import { Plus, Edit2, Trash2, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import BrandFormSlideOver from './BrandFormSlideOver';
+import Pagination from '../../../Components/Pagination';
 
 export default function Index({ brands, showToast }) {
     const { delete: destroy } = useForm();
@@ -51,14 +52,14 @@ export default function Index({ brands, showToast }) {
                 <div className="flex items-center gap-3">
                     <button 
                         onClick={() => router.visit(route('home'))}
-                        className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors"
+                        className="px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back to Dashboard
                     </button>
                     <button 
                         onClick={openCreateForm}
-                        className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm transition-colors"
+                        className="px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm transition-colors"
                     >
                         <Plus className="w-4 h-4" />
                         Add Brand
@@ -78,14 +79,14 @@ export default function Index({ brands, showToast }) {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
-                        {brands.length === 0 ? (
+                        {brands.data.length === 0 ? (
                             <tr>
                                 <td colSpan="5" className="px-8 py-12 text-center text-gray-500 dark:text-gray-400">
                                     No brands found. Create one to get started.
                                 </td>
                             </tr>
                         ) : (
-                            brands.map((brand) => (
+                            brands.data.map((brand) => (
                                 <tr key={brand.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
                                     <td className="px-8 py-4">
                                         <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 font-bold overflow-hidden border border-gray-200 dark:border-gray-700 shrink-0">
@@ -120,6 +121,7 @@ export default function Index({ brands, showToast }) {
                         )}
                     </tbody>
                 </table>
+                <Pagination links={brands.links} />
             </div>
 
             <BrandFormSlideOver 

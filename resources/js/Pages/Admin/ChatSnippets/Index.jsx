@@ -3,15 +3,34 @@ import MainLayout from '../../../Layouts/MainLayout';
 import { useForm, router, usePage } from '@inertiajs/react';
 import { Plus, Edit2, Trash2, ArrowLeft, MessageSquareQuote } from 'lucide-react';
 import ChatSnippetFormSlideOver from './ChatSnippetFormSlideOver';
+import ConfirmModal from '../../../Components/ConfirmModal';
+import Pagination from '../../../Components/Pagination';
 
-export default function Index({ snippets, filters }) {
+export default function Index({ snippets, filters, showToast }) {
     const { delete: destroy } = useForm();
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
     const [selectedSnippet, setSelectedSnippet] = useState(null);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [snippetToDelete, setSnippetToDelete] = useState(null);
 
     const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this chat snippet?')) {
-            destroy(route('admin.chat-snippets.destroy', id));
+        setSnippetToDelete(id);
+        setIsConfirmModalOpen(true);
+    };
+
+    const confirmDelete = () => {
+        if (snippetToDelete) {
+            destroy(route('admin.chat-snippets.destroy', snippetToDelete), {
+                onSuccess: () => {
+                    setIsConfirmModalOpen(false);
+                    setSnippetToDelete(null);
+                    if (showToast) showToast('Chat snippet deleted successfully');
+                },
+                onError: () => {
+                    setIsConfirmModalOpen(false);
+                    if (showToast) showToast('Failed to delete chat snippet', 'error');
+                }
+            });
         }
     };
 
@@ -36,14 +55,14 @@ export default function Index({ snippets, filters }) {
                 <div className="flex items-center gap-3">
                     <button 
                         onClick={() => router.visit(route('home'))}
-                        className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors"
+                        className="px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back to Dashboard
                     </button>
                     <button 
                         onClick={openCreateForm}
-                        className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm transition-colors"
+                        className="px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm transition-colors"
                     >
                         <Plus className="w-4 h-4" />
                         Add Snippet
@@ -107,12 +126,22 @@ export default function Index({ snippets, filters }) {
                 </table>
             </div>
             
-            {/* Pagination could go here */}
+            <Pagination links={snippets.links} />
 
             <ChatSnippetFormSlideOver 
                 isOpen={isSlideOverOpen}
                 onClose={() => setIsSlideOverOpen(false)}
                 snippet={selectedSnippet}
+                showToast={showToast}
+            />
+
+            <ConfirmModal 
+                isOpen={isConfirmModalOpen} 
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Chat Snippet"
+                message="Are you sure you want to delete this chat snippet?"
+                confirmText="Delete"
             />
         </div>
     );

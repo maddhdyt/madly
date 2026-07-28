@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 
 class SettingController extends Controller
 {
@@ -34,6 +35,8 @@ class SettingController extends Controller
         foreach ($data as $key => $value) {
             Setting::set($key, $value);
         }
+
+        Cache::forget('global_settings');
 
         return redirect()->back()->with('success', 'Settings updated successfully.');
     }

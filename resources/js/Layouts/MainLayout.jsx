@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { LayoutGrid, Box, Briefcase, ChevronUp, ChevronDown, Users, ShoppingBag, TrendingUp, Megaphone, Search, CheckCircle2, MessageSquare, Moon, Sun, Bell, PanelLeftClose, PanelLeftOpen, HelpCircle, FolderOpen, Calculator, Zap, BookOpen, Settings, Tag } from 'lucide-react';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
+import useCopyToClipboard from '../Hooks/useCopyToClipboard';
+import GlobalSearchModal from '../Components/GlobalSearchModal';
 
 export default function MainLayout({ children, title = "Dashboard" }) {
     const { url, props } = usePage();
+    const user = props.auth?.user || { name: 'Guest', role: 'sales' };
+    const settings = props.global_settings || {};
     const [toast, setToast] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
     useEffect(() => {
         // Initialize dark mode from localStorage or system preference
@@ -18,10 +23,9 @@ export default function MainLayout({ children, title = "Dashboard" }) {
         if (isDark) document.documentElement.classList.add('dark');
         
         const handleKeyDown = (e) => {
-            if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+            if ((e.key === '/' || (e.ctrlKey && e.key === 'k')) && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
                 e.preventDefault();
-                const searchInput = document.getElementById('global-search');
-                if (searchInput) searchInput.focus();
+                setIsSearchModalOpen(true);
             }
         };
         document.addEventListener('keydown', handleKeyDown);
@@ -47,11 +51,7 @@ export default function MainLayout({ children, title = "Dashboard" }) {
         if (props.flash?.error) showToast(props.flash.error);
     }, [props.flash]);
 
-    const copyToClipboard = (text) => {
-        navigator.clipboard.writeText(text).then(() => {
-            showToast('Tersalin!');
-        }).catch(err => console.error('Failed to copy text: ', err));
-    };
+    const [copiedText, copyToClipboard] = useCopyToClipboard(showToast);
 
     const toggleDark = (dark) => {
         setIsDarkMode(dark);
@@ -63,6 +63,34 @@ export default function MainLayout({ children, title = "Dashboard" }) {
             localStorage.setItem('theme', 'light');
         }
     };
+
+    const menuGroups = [
+        {
+            title: 'GENERAL',
+            items: [
+                { name: 'Dashboard', icon: LayoutGrid, href: route('home'), active: url === '/' },
+                { name: 'Quick Quotation', icon: Calculator, href: route('admin.calculator.index'), active: url.startsWith('/admin/calculator') },
+                { name: 'Chat Snippets', icon: MessageSquare, href: route('admin.chat-snippets.index'), active: url.startsWith('/admin/chat-snippets') },
+            ]
+        },
+        ...(user.role === 'admin' || user.role === 'manager' ? [{
+            title: 'DATABASE',
+            items: [
+                { name: 'Products', icon: Box, href: route('admin.products.index'), active: url.startsWith('/admin/products') },
+                { name: 'Pricelists', icon: BookOpen, href: route('admin.pricelists.index'), active: url.startsWith('/admin/pricelists') },
+                { name: 'Brochures', icon: FolderOpen, href: route('admin.brochures.index'), active: url.startsWith('/admin/brochures') },
+                { name: 'Brands', icon: Tag, href: route('admin.brands.index'), active: url.startsWith('/admin/brands') },
+                { name: 'Service Types', icon: Briefcase, href: route('admin.services.index'), active: url.startsWith('/admin/services') },
+            ]
+        }] : []),
+        ...(user.role === 'admin' ? [{
+            title: 'SYSTEM',
+            items: [
+                { name: 'Users', icon: Users, href: route('admin.users.index'), active: url.startsWith('/admin/users') },
+                { name: 'Settings', icon: Settings, href: route('admin.settings.index'), active: url.startsWith('/admin/settings') },
+            ]
+        }] : [])
+    ];
 
     return (
         <>
@@ -83,70 +111,24 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                             <rect x="7" y="12" width="2" height="2" />
                         </svg>
                     </div>
-                    <span className="font-extrabold text-[22px] tracking-tighter text-gray-900 dark:text-white">Madly</span>
+                    <span className="font-extrabold text-[22px] tracking-tighter text-gray-900 dark:text-white">{settings.company_name || 'Madly'}</span>
                 </div>
 
                 {/* Navigation */}
                 <nav className="flex-1 overflow-y-auto space-y-1 px-1 mt-2 pb-4">
-                    {/* GENERAL */}
-                    <div className="pt-2 pb-1">
-                        <p className="px-4 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase">General</p>
-                    </div>
-                    
-                    <Link href={route('home')} className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url === '/' ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
-                        <LayoutGrid className={`w-5 h-5 ${url === '/' ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url === '/' ? 2 : 1.5} />
-                        Dashboard
-                    </Link>
-
-                    <Link href={route('admin.calculator.index')} className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/calculator') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
-                        <Calculator className={`w-5 h-5 ${url.startsWith('/admin/calculator') ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url.startsWith('/admin/calculator') ? 2 : 1.5} />
-                        Quick Quotation
-                    </Link>
-
-                    <Link href={route('admin.chat-snippets.index')} className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/chat-snippets') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
-                        <MessageSquare className={`w-5 h-5 ${url.startsWith('/admin/chat-snippets') ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url.startsWith('/admin/chat-snippets') ? 2 : 1.5} />
-                        Chat Snippets
-                    </Link>
-
-                    {/* DATABASE */}
-                    <div className="pt-6 pb-1">
-                        <p className="px-4 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase">Database</p>
-                    </div>
-
-                    <Link href={route('admin.products.index')} className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/products') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
-                        <Box className={`w-5 h-5 ${url.startsWith('/admin/products') ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url.startsWith('/admin/products') ? 2 : 1.5} />
-                        Products
-                    </Link>
-
-                    <Link href={route('admin.pricelists.index')} className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/pricelists') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
-                        <BookOpen className={`w-5 h-5 ${url.startsWith('/admin/pricelists') ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url.startsWith('/admin/pricelists') ? 2 : 1.5} />
-                        Pricelists
-                    </Link>
-
-                    <Link href={route('admin.brochures.index')} className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/brochures') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
-                        <FolderOpen className={`w-5 h-5 ${url.startsWith('/admin/brochures') ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url.startsWith('/admin/brochures') ? 2 : 1.5} />
-                        Brochures
-                    </Link>
-
-                    <Link href={route('admin.brands.index')} className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/brands') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
-                        <Tag className={`w-5 h-5 ${url.startsWith('/admin/brands') ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url.startsWith('/admin/brands') ? 2 : 1.5} />
-                        Brands
-                    </Link>
-
-                    <Link href={route('admin.services.index')} className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/services') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
-                        <Briefcase className={`w-5 h-5 ${url.startsWith('/admin/services') ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url.startsWith('/admin/services') ? 2 : 1.5} />
-                        Service Types
-                    </Link>
-
-                    {/* SYSTEM */}
-                    <div className="pt-6 pb-1">
-                        <p className="px-4 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase">System</p>
-                    </div>
-
-                    <Link href={route('admin.settings.index')} className={`flex items-center gap-4 px-4 py-3 text-[15px] transition-colors rounded-xl ${url.startsWith('/admin/settings') ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
-                        <Settings className={`w-5 h-5 ${url.startsWith('/admin/settings') ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={url.startsWith('/admin/settings') ? 2 : 1.5} />
-                        Settings
-                    </Link>
+                    {menuGroups.map((group, idx) => (
+                        <div key={idx}>
+                            <div className="pt-6 pb-1 first:pt-0">
+                                <p className="px-4 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase">{group.title}</p>
+                            </div>
+                            {group.items.map((item, itemIdx) => (
+                                <Link key={itemIdx} href={item.href} className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors rounded-xl ${item.active ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
+                                    <item.icon className={`w-5 h-5 ${item.active ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={item.active ? 2 : 1.5} />
+                                    {item.name}
+                                </Link>
+                            ))}
+                        </div>
+                    ))}
                 </nav>
 
                     {/* Bottom Left Floating Settings Pill */}
@@ -203,7 +185,7 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                     {/* Right: Actions */}
                     <div className="flex items-center gap-3">
                         {/* Search Pill */}
-                        <div className="bg-white dark:bg-gray-900 rounded-full px-4 py-2.5 flex items-center gap-2.5 w-[240px] shadow-sm cursor-text focus-within:ring-2 focus-within:ring-gray-300 dark:focus-within:ring-gray-600 transition-shadow">
+                        <div className="bg-white dark:bg-gray-900 rounded-xl px-4 py-2.5 flex items-center gap-2.5 w-[240px] shadow-sm cursor-text focus-within:ring-2 focus-within:ring-gray-300 dark:focus-within:ring-gray-600 transition-shadow">
                             <Search className="w-4 h-4 text-gray-400 dark:text-gray-500" strokeWidth={2.5} />
                             <input 
                                 type="text" 
@@ -219,35 +201,26 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                         <div className="relative ml-1">
                             <button 
                                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                className={`w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden hover:ring-2 hover:ring-gray-300 dark:hover:ring-gray-600 transition-all ${isProfileOpen ? 'ring-2 ring-gray-900 dark:ring-white' : ''}`}
+                                className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden hover:ring-2 hover:ring-gray-300 dark:hover:ring-gray-600 transition-all focus:outline-none flex items-center justify-center text-gray-900 dark:text-white"
                             >
-                                {/* Realistic placeholder avatar */}
-                                <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Felix&backgroundColor=e2e8f0" alt="Avatar" className="w-full h-full object-cover" />
+                                <span className="font-bold text-sm">{user.name.charAt(0)}</span>
                             </button>
 
-                            {/* Dropdown Menu */}
+                            {/* Profile Dropdown */}
                             {isProfileOpen && (
                                 <>
                                     <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)}></div>
-                                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-xl z-50 overflow-hidden origin-top-right animate-fade-in">
-                                        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
-                                            <p className="text-sm font-bold text-gray-900 dark:text-white">Admin User</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">admin@madly.com</p>
+                                    <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#111] rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 py-2 z-50 animate-in fade-in slide-in-from-top-2">
+                                        <div className="px-4 py-2.5 border-b border-gray-100 dark:border-gray-800">
+                                            <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{user.name}</p>
+                                            <p className="text-xs text-gray-500 truncate capitalize">{user.role}</p>
                                         </div>
-                                        <div className="p-1.5 flex flex-col gap-0.5">
-                                            <button 
-                                                onClick={() => setIsProfileOpen(false)}
-                                                className="w-full text-left px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
-                                            >
-                                                Profile Settings
-                                            </button>
-                                            <button 
-                                                onClick={() => setIsProfileOpen(false)}
-                                                className="w-full text-left px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                            >
-                                                Logout
-                                            </button>
-                                        </div>
+                                        <button 
+                                            onClick={() => router.post(route('logout'))}
+                                            className="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium transition-colors"
+                                        >
+                                            Sign out
+                                        </button>
                                     </div>
                                 </>
                             )}
@@ -269,12 +242,17 @@ export default function MainLayout({ children, title = "Dashboard" }) {
             {/* Toast Notification */}
             <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
                 {toast && (
-                    <div className="bg-gray-900 text-white text-[15px] px-5 py-3.5 rounded-2xl flex items-center gap-3 shadow-2xl transition-opacity duration-300">
+                    <div className="bg-gray-900 text-white text-sm px-5 py-3.5 rounded-2xl flex items-center gap-3 shadow-2xl transition-opacity duration-300">
                         <CheckCircle2 className="w-5 h-5 text-green-400" />
                         <span className="font-semibold">{toast}</span>
                     </div>
                 )}
             </div>
+            
+            <GlobalSearchModal 
+                isOpen={isSearchModalOpen} 
+                onClose={() => setIsSearchModalOpen(false)} 
+            />
         </div>
         </>
     );
