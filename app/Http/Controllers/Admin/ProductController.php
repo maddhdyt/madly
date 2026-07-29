@@ -13,18 +13,64 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $serviceId = $request->input('service_id');
+        $activeFilters = $request->input('filters', []);
+        $search = $request->input('search');
         
         $products = Product::with('service')
             ->when($serviceId && $serviceId !== 'all', function($query) use ($serviceId) {
                 return $query->where('service_id', $serviceId);
             })
+            ->when($search, function($query) use ($search) {
+                return $query->where('name', 'like', '%' . $search . '%');
+            })
+            ->when(!empty($activeFilters) && is_array($activeFilters), function($query) use ($activeFilters) {
+                foreach ($activeFilters as $key => $value) {
+                    if (!empty($value)) {
+                        // Dynamically filter inside the JSON attributes column using LIKE
+                        $query->where('attributes->' . $key, 'like', '%' . $value . '%');
+                    }
+                }
+            })
             ->orderBy('name')
             ->paginate(15)
             ->withQueryString();
 
+        $filterOptions = [];
+        if ($serviceId && $serviceId !== 'all') {
+            $service = Service::find($serviceId);
+            if ($service && !empty($service->product_schema)) {
+                $allProducts = Product::where('service_id', $serviceId)->get();
+                foreach ($service->product_schema as $field) {
+                    if (!in_array($field['type'] ?? '', ['tags', 'label'])) {
+                        continue;
+                    }
+                    $fieldName = $field['name'];
+                    $values = [];
+                    foreach ($allProducts as $product) {
+                        $val = $product->attributes[$fieldName] ?? null;
+                        if (!empty($val)) {
+                            $parts = explode(',', (string)$val);
+                            foreach ($parts as $part) {
+                                $cleaned = trim($part);
+                                if (!empty($cleaned) && strlen($cleaned) < 60) {
+                                    $values[] = $cleaned;
+                                }
+                            }
+                        }
+                    }
+                    $uniqueVals = collect($values)->unique()->sort()->values()->toArray();
+                    if (!empty($uniqueVals)) {
+                        $filterOptions[$fieldName] = $uniqueVals;
+                    }
+                }
+            }
+        }
+
         return Inertia::render('Admin/Products/Index', [
             'products' => $products,
-            'services' => Service::orderBy('name')->get()
+            'services' => Service::orderBy('name')->get(),
+            'activeFilters' => $activeFilters,
+            'filterOptions' => $filterOptions
         ]);
     }
 

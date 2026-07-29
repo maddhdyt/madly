@@ -16,7 +16,7 @@ class CalculatorController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['service', 'prices.brand'])->orderBy('name')->get();
+        $products = Product::with(['service', 'prices'])->orderBy('name')->get();
         $brands = Brand::orderBy('name')->get();
         $services = Service::orderBy('name')->get();
 

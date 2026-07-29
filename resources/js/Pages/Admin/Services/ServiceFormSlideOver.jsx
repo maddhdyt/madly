@@ -32,7 +32,7 @@ function SortableField({ field, updateSchemaField, removeSchemaField }) {
                 <GripVertical className="w-4 h-4" />
             </div>
             
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="md:col-span-2">
                     <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Field Label (Display)</label>
                     <input 
@@ -56,24 +56,13 @@ function SortableField({ field, updateSchemaField, removeSchemaField }) {
                             { value: 'textarea', label: 'Long Text' },
                             { value: 'number', label: 'Number' },
                             { value: 'url', label: 'URL / Link' },
-                            { value: 'tags', label: 'Tags (Comma Separated)' }
+                            { value: 'tags', label: 'Tags (Comma Separated)' },
+                            { value: 'label', label: 'Label (Filterable)' }
                         ]}
                     />
                 </div>
-                
-                <div className="md:col-span-1">
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Field Name (System)</label>
-                    <input 
-                        type="text" 
-                        className="w-full bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-xs font-mono text-gray-600 dark:text-gray-400 focus:ring-1 focus:ring-gray-900 outline-none"
-                        placeholder="e.g., kapasitas_hosting"
-                        value={field.name}
-                        onChange={(e) => updateSchemaField(field.id, 'name', e.target.value)}
-                        required
-                    />
-                </div>
 
-                <div className="md:col-span-4">
+                <div className="md:col-span-3">
                     <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Placeholder (Example value)</label>
                     <input 
                         type="text" 
@@ -199,7 +188,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
     const addSchemaField = () => {
         setData('product_schema', [
             ...data.product_schema,
-            { id: generateId(), name: '', label: '', type: 'text', placeholder: '' }
+            { id: generateId(), name: '', label: '', type: 'text', placeholder: '', isNew: true }
         ]);
     };
 
@@ -210,12 +199,9 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
         const newSchema = [...data.product_schema];
         newSchema[index][key] = value;
         
-        // Auto-generate name from label if label is being typed and name is empty/matches old label format
+        // Auto-generate name from label only if it's a new field or name is empty
         if (key === 'label') {
-            const oldGeneratedName = newSchema[index].name;
-            const expectedOldName = newSchema[index].name === '' ? '' : oldGeneratedName;
-            
-            if (!newSchema[index].name || newSchema[index].name.toLowerCase().replace(/[^a-z0-9]/g, '_') === expectedOldName) {
+            if (!newSchema[index].name || newSchema[index].isNew) {
                 newSchema[index].name = value.toLowerCase().replace(/[^a-z0-9]/g, '_');
             }
         }

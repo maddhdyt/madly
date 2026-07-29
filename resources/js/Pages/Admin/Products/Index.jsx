@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import MainLayout from '../../../Layouts/MainLayout';
 import { useForm, router } from '@inertiajs/react';
-import { Plus, Edit2, Trash2, ArrowLeft, Filter, Eye, X, Tag, Box } from 'lucide-react';
+import { Plus, Edit2, Trash2, ArrowLeft, Filter, Eye, X, Tag, Box, Search } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import ProductFormSlideOver from './ProductFormSlideOver';
 import CustomSelect from '../../../Components/CustomSelect';
@@ -21,17 +21,25 @@ const SpecsModal = ({ isOpen, onClose, product, service }) => {
     const renderValue = (val, type) => {
         if (!val) return null;
         
-        if (type === 'url') {
+        if (type === 'url' || (typeof val === 'string' && val.includes('http'))) {
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const parts = val.split(urlRegex);
+            
             return (
-                <a 
-                    href={val.startsWith('http') ? val : `https://${val}`} 
-                    target="_blank" 
-                    rel="noreferrer" 
-                    className="inline-flex items-center gap-1.5 text-gray-900 dark:text-white hover:text-gray-500 dark:hover:text-gray-400 font-bold transition-colors underline-offset-4 underline hover:no-underline break-words"
-                >
-                    {val}
-                    <svg className="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                </a>
+                <div className="text-sm font-semibold text-gray-900 dark:text-white break-words leading-relaxed whitespace-pre-wrap flex flex-col gap-1.5">
+                    {parts.map((part, i) => {
+                        if (part.match(urlRegex)) {
+                            return (
+                                <a key={i} href={part} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-blue-600 dark:text-blue-500 hover:text-blue-800 dark:hover:text-blue-400 font-bold transition-colors underline-offset-4 underline hover:no-underline w-fit">
+                                    {part}
+                                    <svg className="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                </a>
+                            );
+                        }
+                        // Render plain text parts if they are not empty spaces
+                        return part.trim() ? <span key={i} className="text-gray-600 dark:text-gray-400 font-medium">{part}</span> : null;
+                    })}
+                </div>
             );
         }
         
@@ -137,16 +145,50 @@ const SpecsModal = ({ isOpen, onClose, product, service }) => {
     );
 };
 
-export default function Index({ products, services, showToast }) {
+export default function Index({ products, services, showToast, activeFilters = {}, filterOptions = {} }) {
     const { delete: destroy } = useForm();
     const params = new URLSearchParams(window.location.search);
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [selectedServiceFilter, setSelectedServiceFilter] = useState(params.get('service_id') || 'all');
     
+    // Dynamic Filters State
+    const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+    const [filterValues, setFilterValues] = useState(activeFilters);
+    
+    const selectedServiceObj = services.find(s => s.id.toString() === selectedServiceFilter?.toString());
+    const productSchema = selectedServiceObj?.product_schema || [];
+    const filterableSchema = productSchema.filter(field => ['tags', 'label'].includes(field.type));
+    
     // Modal state
     const [isSpecsModalOpen, setIsSpecsModalOpen] = useState(false);
     const [viewSpecsProduct, setViewSpecsProduct] = useState(null);
+    
+    // Search state
+    const urlParams = new URLSearchParams(window.location.search);
+    const [searchQuery, setSearchQuery] = useState(urlParams.get('search') || '');
+    const previousSearch = useRef(urlParams.get('search') || '');
+
+    useEffect(() => {
+        if (searchQuery === previousSearch.current) return;
+
+        const delayDebounceFn = setTimeout(() => {
+            previousSearch.current = searchQuery;
+            const params = new URLSearchParams(window.location.search);
+            if (searchQuery) {
+                params.set('search', searchQuery);
+            } else {
+                params.delete('search');
+            }
+            params.delete('page');
+            router.get(route('admin.products.index'), Object.fromEntries(params), {
+                preserveState: true,
+                preserveScroll: true,
+            });
+        }, 400); // 400ms debounce
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchQuery]);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [productToDelete, setProductToDelete] = useState(null);
 
@@ -196,9 +238,25 @@ export default function Index({ products, services, showToast }) {
     };
 
     const handleFilterChange = (e) => {
-        const val = e.target.value;
+        const val = e.target.value.toString();
         setSelectedServiceFilter(val);
+        setFilterValues({});
+        setIsFilterPanelOpen(false);
         router.get(route('admin.products.index'), { service_id: val === 'all' ? null : val }, { preserveState: true, replace: true });
+    };
+
+    const handleApplyFilters = () => {
+        router.get(route('admin.products.index'), { 
+            service_id: selectedServiceFilter === 'all' ? null : selectedServiceFilter, 
+            filters: filterValues
+        }, { preserveState: true, replace: true });
+    };
+
+    const handleClearFilters = () => {
+        setFilterValues({});
+        router.get(route('admin.products.index'), { 
+            service_id: selectedServiceFilter === 'all' ? null : selectedServiceFilter
+        }, { preserveState: true, replace: true });
     };
 
     const filteredProducts = products.data;
@@ -221,7 +279,17 @@ export default function Index({ products, services, showToast }) {
                     </button>
                     
                     {/* Dropdown Filter replacing Tabs */}
-                    <div className="w-48">
+                    <div className="flex items-center gap-3">
+                        <div className="relative">
+                            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <input 
+                                type="text"
+                                placeholder="Search products..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 focus:bg-white transition-all w-64"
+                            />
+                        </div>
                         <CustomSelect
                             value={selectedServiceFilter}
                             onChange={handleFilterChange}
@@ -233,6 +301,82 @@ export default function Index({ products, services, showToast }) {
                             className="pl-3 py-2.5 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                         />
                     </div>
+
+                    {selectedServiceFilter !== 'all' && filterableSchema.length > 0 && (
+                        <div className="relative">
+                            <button 
+                                onClick={() => setIsFilterPanelOpen(!isFilterPanelOpen)}
+                                className={`px-4 py-2.5 border rounded-xl font-bold text-sm flex items-center gap-2 transition-colors shadow-sm ${Object.values(activeFilters).some(v => v) ? 'bg-gray-100 border-gray-300 text-gray-900 dark:bg-gray-800 dark:border-gray-600 dark:text-white' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'}`}
+                            >
+                                <Filter className="w-4 h-4" />
+                                Filters
+                                {Object.values(activeFilters).some(v => v) && (
+                                    <span className="w-2 h-2 rounded-full bg-gray-900 dark:bg-white"></span>
+                                )}
+                            </button>
+
+                            {isFilterPanelOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setIsFilterPanelOpen(false)}></div>
+                                    <div className="absolute right-0 top-full mt-2 w-[420px] z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl animate-fade-in origin-top-right flex flex-col">
+                                        <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/30 rounded-t-2xl">
+                                            <div className="flex items-center gap-2">
+                                                <Filter className="w-4 h-4 text-gray-500" />
+                                                <h3 className="text-sm font-bold text-gray-900 dark:text-white">Advanced Filters</h3>
+                                            </div>
+                                            {Object.values(filterValues).some(v => v) && (
+                                                <button onClick={handleClearFilters} className="text-xs font-bold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
+                                                    Clear All
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="p-6 flex flex-col gap-6">
+                                            {filterableSchema.map(field => (
+                                                <div key={field.name} className="flex flex-col gap-2 relative">
+                                                    <label className="text-xs font-bold text-gray-600 dark:text-gray-400">{field.label}</label>
+                                                    {filterOptions[field.name] ? (
+                                                        <CustomSelect
+                                                            value={filterValues[field.name] || ''}
+                                                            onChange={(e) => setFilterValues({...filterValues, [field.name]: e.target.value})}
+                                                            options={[
+                                                                { value: '', label: `All ${field.label}` },
+                                                                ...filterOptions[field.name].map(opt => ({ value: opt, label: opt }))
+                                                            ]}
+                                                            placeholder={`All ${field.label}`}
+                                                            className="py-2.5 px-4 text-sm font-medium border-gray-200 dark:border-gray-700 shadow-sm rounded-xl w-full"
+                                                        />
+                                                    ) : (
+                                                        <input 
+                                                            type="text" 
+                                                            placeholder={`Search ${field.label}...`}
+                                                            value={filterValues[field.name] || ''}
+                                                            onChange={(e) => setFilterValues({...filterValues, [field.name]: e.target.value})}
+                                                            onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
+                                                            className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent transition-all shadow-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                                                        />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 flex justify-end gap-3 rounded-b-2xl">
+                                            <button 
+                                                onClick={() => setIsFilterPanelOpen(false)}
+                                                className="px-5 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button 
+                                                onClick={handleApplyFilters}
+                                                className="px-5 py-2.5 bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 transition-colors shadow-sm"
+                                            >
+                                                Apply Filters
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    )}
 
                     <button 
                         onClick={openCreateForm}
@@ -249,10 +393,11 @@ export default function Index({ products, services, showToast }) {
                 <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
                     <thead className="bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-widest font-extrabold border-b border-gray-100 dark:border-gray-800">
                         <tr>
+                            <th className="px-8 py-5 w-16">No.</th>
                             <th className="px-8 py-5">Service Category</th>
                             <th className="px-8 py-5">Product Name</th>
                             <th className="px-8 py-5">Base HPP</th>
-                            <th className="px-8 py-5">Status</th>
+                            <th className="px-8 py-5">Akreditasi</th>
                             <th className="px-8 py-5 text-center">Specifications</th>
                             <th className="px-8 py-5 text-right sticky right-0 bg-white dark:bg-gray-900 z-10">Actions</th>
                         </tr>
@@ -268,8 +413,11 @@ export default function Index({ products, services, showToast }) {
                                 </td>
                             </tr>
                         ) : (
-                            filteredProducts.map((product) => (
+                            filteredProducts.map((product, index) => (
                                 <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
+                                    <td className="px-8 py-5 text-gray-500 dark:text-gray-400 font-medium">
+                                        {(products.current_page - 1) * products.per_page + index + 1}
+                                    </td>
                                     <td className="px-8 py-5">
                                         {product.service ? (
                                             <span className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border border-transparent dark:border-gray-700">
@@ -288,9 +436,9 @@ export default function Index({ products, services, showToast }) {
                                         {formatCurrency(product.hpp)}
                                     </td>
                                     <td className="px-8 py-5">
-                                        {product.status_note ? (
-                                            <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide">
-                                                {product.status_note}
+                                        {product.attributes?.accreditation_type ? (
+                                            <span className="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-200 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide border border-gray-200 dark:border-gray-700">
+                                                {product.attributes.accreditation_type}
                                             </span>
                                         ) : '-'}
                                     </td>

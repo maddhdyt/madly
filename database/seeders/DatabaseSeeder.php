@@ -74,5 +74,6 @@ class DatabaseSeeder extends Seeder
 
         // 4. Seed Journal Products
         $this->call(JournalProductSeeder::class);
+        $this->call(ImportedJournalSeeder::class);
     }
 }
