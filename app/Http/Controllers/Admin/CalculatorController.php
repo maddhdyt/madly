@@ -16,14 +16,14 @@ class CalculatorController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['service', 'prices'])->orderBy('name')->get();
+        $products = Product::with(['service'])->orderBy('name')->get();
         $brands = Brand::orderBy('name')->get();
         $services = Service::orderBy('name')->get();
 
         return Inertia::render('Admin/Calculator/Index', [
             'products' => $products,
             'brands' => $brands,
-            'services' => $services,
+            'services' => $services
         ]);
     }
 

@@ -8,5 +8,8 @@ class Brand extends Model
 {
     protected $guarded = [];
 
-
+    public function pricelists()
+    {
+        return $this->hasMany(Pricelist::class);
+    }
 }

@@ -36,8 +36,9 @@ class DatabaseSeeder extends Seeder
             'description' => 'National & International Journal Publications',
             'icon' => 'book',
             'product_schema' => [
+                ['name' => 'hpp_usd', 'label' => 'Base HPP (USD) - Opsional', 'type' => 'text', 'placeholder' => 'Misal: 1500'],
                 ['name' => 'focus_scope', 'label' => 'Focus & Scope', 'type' => 'tags', 'placeholder' => 'Hukum Pidana, Perdata, dll'],
-                ['name' => 'link', 'label' => 'Link Jurnal', 'type' => 'text', 'placeholder' => 'https://...'],
+                ['name' => 'links', 'label' => 'Daftar Link Jurnal', 'type' => 'link_builder'],
                 ['name' => 'publication_months', 'label' => 'Bulan Terbit', 'type' => 'text', 'placeholder' => 'Jan, Mar, May'],
                 ['name' => 'estimated_time', 'label' => 'Estimasi Waktu', 'type' => 'text', 'placeholder' => 'Internal LoA 1-2 hari'],
                 ['name' => 'accreditation_type', 'label' => 'Akreditasi', 'type' => 'text', 'placeholder' => 'SINTA 4 / Scopus Q3'],

@@ -74,16 +74,37 @@ class ProductController extends Controller
         ]);
     }
 
+    private function calculateHppFromUsd(array &$validated)
+    {
+        if (!empty($validated['attributes']['hpp_usd'])) {
+            $rate = \Illuminate\Support\Facades\Cache::remember('usd_to_idr', 43200, function () {
+                try {
+                    $json = @file_get_contents('https://open.er-api.com/v6/latest/USD');
+                    if ($json) {
+                        $data = json_decode($json, true);
+                        return $data['rates']['IDR'] ?? 16000;
+                    }
+                } catch (\Exception $e) {
+                }
+                return 16000;
+            });
+            $usdPrice = (float) $validated['attributes']['hpp_usd'];
+            $validated['hpp'] = round($usdPrice * $rate);
+        }
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'hpp' => 'required|numeric|min:0',
+            'min_price' => 'nullable|numeric|min:0',
             'status_note' => 'nullable|string',
             'service_id' => 'required|exists:services,id',
             'attributes' => 'nullable|array'
         ]);
 
+        $this->calculateHppFromUsd($validated);
         Product::create($validated);
 
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
@@ -94,10 +115,13 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'hpp' => 'required|numeric|min:0',
+            'min_price' => 'nullable|numeric|min:0',
             'status_note' => 'nullable|string',
             'service_id' => 'required|exists:services,id',
             'attributes' => 'nullable|array'
         ]);
+        
+        $this->calculateHppFromUsd($validated);
 
         $product->update($validated);
 

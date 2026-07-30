@@ -106,6 +106,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
             footer_text_label: 'Footer Text',
             footer_text_placeholder: 'e.g., Price excludes VAT',
         },
+        includes: [],
         product_schema: []
     });
 
@@ -132,6 +133,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                         footer_text_label: 'Footer Text',
                         footer_text_placeholder: 'e.g., Price excludes VAT',
                     },
+                    includes: service.includes || [],
                     product_schema: schemaWithIds
                 });
             } else {
@@ -147,6 +149,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                         footer_text_label: 'Footer Text',
                         footer_text_placeholder: 'e.g., Price excludes VAT',
                     },
+                    includes: [],
                     product_schema: []
                 });
             }
@@ -182,6 +185,23 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
 
     const updateConfig = (field, value) => {
         setData('form_config', { ...data.form_config, [field]: value });
+    };
+
+    // INCLUDES LOGIC
+    const addInclude = () => {
+        setData('includes', [...data.includes, '']);
+    };
+
+    const updateInclude = (index, value) => {
+        const newIncludes = [...data.includes];
+        newIncludes[index] = value;
+        setData('includes', newIncludes);
+    };
+
+    const removeInclude = (index) => {
+        const newIncludes = [...data.includes];
+        newIncludes.splice(index, 1);
+        setData('includes', newIncludes);
     };
 
     // FORM BUILDER LOGIC
@@ -321,6 +341,46 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                                         ))}
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* SECTION 1.5: Includes Master Data */}
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
+                            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 border-b border-gray-100 dark:border-gray-700 pb-3 flex items-center gap-2">
+                                <Award className="w-4 h-4 text-gray-400" />
+                                Master Fasilitas & Includes
+                            </h3>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Atur daftar fasilitas yang tersedia untuk jenis layanan ini. Saat membuat Pricelist, Anda cukup mencentang dari daftar ini.</p>
+                            
+                            <div className="flex flex-col gap-3">
+                                {data.includes.map((inc, idx) => (
+                                    <div key={idx} className="flex gap-3">
+                                        <div className="flex-1 relative">
+                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">✅</div>
+                                            <input 
+                                                type="text" 
+                                                className={`${inputClass} pl-10`}
+                                                placeholder="e.g., Editing Mendeley"
+                                                value={inc}
+                                                onChange={e => updateInclude(idx, e.target.value)}
+                                            />
+                                        </div>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => removeInclude(idx)}
+                                            className="w-11 h-11 flex-shrink-0 flex items-center justify-center border border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                                <button 
+                                    type="button"
+                                    onClick={addInclude}
+                                    className="w-fit text-xs font-bold text-gray-900 dark:text-white hover:underline flex items-center gap-1 mt-2 bg-gray-100 dark:bg-gray-900 px-4 py-2 rounded-lg transition-colors"
+                                >
+                                    <Plus className="w-3 h-3" /> Tambah Fasilitas / Include
+                                </button>
                             </div>
                         </div>
 

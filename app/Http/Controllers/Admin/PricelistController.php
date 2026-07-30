@@ -3,173 +3,121 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Pricelist;
+use App\Models\Brand;
 use App\Models\Product;
-use App\Models\ProductPrice;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
 
 class PricelistController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pricelists = Pricelist::with('service', 'prices.product')->latest()->paginate(15)->withQueryString();
-        $products = Product::orderBy('name')->get();
-        $services = Service::orderBy('name')->get();
+        $serviceId = $request->input('service_id');
+        $activeFilters = $request->input('filters', []);
+        $search = $request->input('search');
+        
+        $products = Product::with('service')
+            ->when($serviceId && $serviceId !== 'all', function($query) use ($serviceId) {
+                return $query->where('service_id', $serviceId);
+            })
+            ->when($search, function($query) use ($search) {
+                return $query->where('name', 'like', '%' . $search . '%')
+                             ->orWhere('attributes->focus_scope', 'like', '%' . $search . '%');
+            })
+            ->when(!empty($activeFilters) && is_array($activeFilters), function($query) use ($activeFilters) {
+                foreach ($activeFilters as $key => $value) {
+                    if (!empty($value)) {
+                        $query->where('attributes->' . $key, 'like', '%' . $value . '%');
+                    }
+                }
+            })
+            ->orderBy('name')
+            ->paginate(20)
+            ->withQueryString();
+
+        $filterOptions = [];
+        if ($serviceId && $serviceId !== 'all') {
+            $service = Service::find($serviceId);
+            if ($service && !empty($service->product_schema)) {
+                $allProducts = Product::where('service_id', $serviceId)->get();
+                foreach ($service->product_schema as $field) {
+                    if (!in_array($field['type'] ?? '', ['tags', 'label'])) {
+                        continue;
+                    }
+                    $fieldName = $field['name'];
+                    $values = [];
+                    foreach ($allProducts as $product) {
+                        $val = $product->attributes[$fieldName] ?? null;
+                        if (!empty($val)) {
+                            $parts = explode(',', (string)$val);
+                            foreach ($parts as $part) {
+                                $cleaned = trim($part);
+                                if (!empty($cleaned) && strlen($cleaned) < 60) {
+                                    $values[] = $cleaned;
+                                }
+                            }
+                        }
+                    }
+                    $uniqueVals = collect($values)->unique()->sort()->values()->toArray();
+                    if (!empty($uniqueVals)) {
+                        $filterOptions[$fieldName] = $uniqueVals;
+                    }
+                }
+            }
+        }
 
         return Inertia::render('Admin/Pricelists/Index', [
-            'pricelists' => $pricelists,
             'products' => $products,
-            'services' => $services
+            'services' => Service::orderBy('name')->get(),
+            'activeFilters' => $activeFilters,
+            'filterOptions' => $filterOptions
         ]);
     }
 
-    public function store(Request $request)
+    public function bulkUpdate(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'service_id' => 'required|exists:services,id',
-            'promo_header' => 'nullable|string',
-            'footer_text' => 'nullable|string',
-            'includes' => 'nullable|array',
-            'prices' => 'nullable|array',
-            'prices.*.product_id' => 'required|exists:products,id',
-            'prices.*.package_name' => 'required|string',
-            'prices.*.normal_price' => 'required|numeric|min:0',
-            'prices.*.promo_price' => 'nullable|numeric|min:0',
-            'prices.*.notes' => 'nullable|string',
+            'product_ids' => 'required|array',
+            'product_ids.*' => 'exists:products,id',
+            'target_field' => 'required|in:harga_jual_minimum_info,harga_jual_standar',
+            'update_type' => 'required|in:fixed,percentage',
+            'base_field' => 'nullable|in:hpp,harga_jual_minimum_info',
+            'fixed_price' => 'nullable|numeric|min:0',
+            'percentage_increase' => 'nullable|numeric',
         ]);
 
-        // Validate HPP
-        if (isset($validated['prices']) && is_array($validated['prices'])) {
-            foreach ($validated['prices'] as $idx => $priceItem) {
-                $product = Product::find($priceItem['product_id']);
-                if ($product) {
-                    if ($priceItem['normal_price'] < $product->hpp) {
-                        throw ValidationException::withMessages([
-                            "prices.{$idx}.normal_price" => "Normal price for {$product->name} cannot be lower than its HPP (Rp " . number_format($product->hpp, 0, ',', '.') . ")."
-                        ]);
+        $products = Product::whereIn('id', $validated['product_ids'])->get();
+
+        DB::beginTransaction();
+        try {
+            foreach ($products as $product) {
+                $attrs = $product->attributes ?? [];
+                $targetField = $validated['target_field'];
+                
+                if ($validated['update_type'] === 'fixed') {
+                    $attrs[$targetField] = $validated['fixed_price'];
+                } else if ($validated['update_type'] === 'percentage') {
+                    $baseAmount = 0;
+                    if ($validated['base_field'] === 'hpp') {
+                        $baseAmount = floatval($product->hpp);
+                    } else if ($validated['base_field'] === 'harga_jual_minimum_info') {
+                        $baseAmount = floatval($attrs['harga_jual_minimum_info'] ?? $product->hpp);
                     }
-                    if (isset($priceItem['promo_price']) && $priceItem['promo_price'] < $product->hpp) {
-                        throw ValidationException::withMessages([
-                            "prices.{$idx}.promo_price" => "Promo price for {$product->name} cannot be lower than its HPP (Rp " . number_format($product->hpp, 0, ',', '.') . ")."
-                        ]);
-                    }
+                    
+                    $increase = $baseAmount * ($validated['percentage_increase'] / 100);
+                    $attrs[$targetField] = $baseAmount + $increase;
                 }
+
+                $product->attributes = $attrs;
+                $product->save();
             }
+            DB::commit();
+            return redirect()->back()->with('success', count($products) . ' products updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to update prices.');
         }
-
-        $pricelist = Pricelist::create([
-            'name' => $validated['name'],
-            'service_id' => $validated['service_id'],
-            'promo_header' => $validated['promo_header'],
-            'footer_text' => $validated['footer_text'],
-            'includes' => $validated['includes'] ?? [],
-        ]);
-
-        if (isset($validated['prices']) && is_array($validated['prices'])) {
-            foreach ($validated['prices'] as $priceItem) {
-                $pricelist->prices()->create([
-                    'product_id' => $priceItem['product_id'],
-                    'package_name' => $priceItem['package_name'],
-                    'normal_price' => $priceItem['normal_price'],
-                    'promo_price' => $priceItem['promo_price'],
-                    'notes' => $priceItem['notes'],
-                ]);
-            }
-        }
-
-        return redirect()->route('admin.pricelists.index')->with('success', 'Pricelist created successfully.');
-    }
-
-    public function update(Request $request, Pricelist $pricelist)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'service_id' => 'required|exists:services,id',
-            'promo_header' => 'nullable|string',
-            'footer_text' => 'nullable|string',
-            'includes' => 'nullable|array',
-            'prices' => 'nullable|array',
-            'prices.*.id' => 'nullable|exists:product_prices,id',
-            'prices.*.product_id' => 'required|exists:products,id',
-            'prices.*.package_name' => 'required|string',
-            'prices.*.normal_price' => 'required|numeric|min:0',
-            'prices.*.promo_price' => 'nullable|numeric|min:0',
-            'prices.*.notes' => 'nullable|string',
-        ]);
-
-        // Validate HPP
-        if (isset($validated['prices']) && is_array($validated['prices'])) {
-            foreach ($validated['prices'] as $idx => $priceItem) {
-                $product = Product::find($priceItem['product_id']);
-                if ($product) {
-                    if ($priceItem['normal_price'] < $product->hpp) {
-                        throw ValidationException::withMessages([
-                            "prices.{$idx}.normal_price" => "Normal price for {$product->name} cannot be lower than its HPP (Rp " . number_format($product->hpp, 0, ',', '.') . ")."
-                        ]);
-                    }
-                    if (isset($priceItem['promo_price']) && $priceItem['promo_price'] < $product->hpp) {
-                        throw ValidationException::withMessages([
-                            "prices.{$idx}.promo_price" => "Promo price for {$product->name} cannot be lower than its HPP (Rp " . number_format($product->hpp, 0, ',', '.') . ")."
-                        ]);
-                    }
-                }
-            }
-        }
-
-        $pricelist->update([
-            'name' => $validated['name'],
-            'service_id' => $validated['service_id'],
-            'promo_header' => $validated['promo_header'],
-            'footer_text' => $validated['footer_text'],
-            'includes' => $validated['includes'] ?? [],
-        ]);
-
-        // Sync prices
-        $existingPriceIds = $pricelist->prices()->pluck('id')->toArray();
-        $newPriceIds = [];
-
-        if (isset($validated['prices']) && is_array($validated['prices'])) {
-            foreach ($validated['prices'] as $priceItem) {
-                if (isset($priceItem['id'])) {
-                    // Update existing
-                    $pricelist->prices()->where('id', $priceItem['id'])->update([
-                        'product_id' => $priceItem['product_id'],
-                        'package_name' => $priceItem['package_name'],
-                        'normal_price' => $priceItem['normal_price'],
-                        'promo_price' => $priceItem['promo_price'],
-                        'notes' => $priceItem['notes'],
-                    ]);
-                    $newPriceIds[] = $priceItem['id'];
-                } else {
-                    // Create new
-                    $newPrice = $pricelist->prices()->create([
-                        'product_id' => $priceItem['product_id'],
-                        'package_name' => $priceItem['package_name'],
-                        'normal_price' => $priceItem['normal_price'],
-                        'promo_price' => $priceItem['promo_price'],
-                        'notes' => $priceItem['notes'],
-                    ]);
-                    $newPriceIds[] = $newPrice->id;
-                }
-            }
-        }
-
-        // Delete removed prices
-        $pricesToDelete = array_diff($existingPriceIds, $newPriceIds);
-        if (count($pricesToDelete) > 0) {
-            ProductPrice::whereIn('id', $pricesToDelete)->delete();
-        }
-
-        return redirect()->route('admin.pricelists.index')->with('success', 'Pricelist updated successfully.');
-    }
-
-    public function destroy(Pricelist $pricelist)
-    {
-        $pricelist->delete();
-        return redirect()->back()->with('success', 'Pricelist deleted successfully.');
     }
 }

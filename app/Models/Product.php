@@ -10,6 +10,7 @@ class Product extends Model
 
     protected $casts = [
         'hpp' => 'decimal:2',
+        'min_price' => 'decimal:2',
         'attributes' => 'array'
     ];
 
@@ -18,8 +19,5 @@ class Product extends Model
         return $this->belongsTo(Service::class);
     }
 
-    public function prices()
-    {
-        return $this->hasMany(ProductPrice::class);
-    }
+
 }

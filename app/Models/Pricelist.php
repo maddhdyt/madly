@@ -21,4 +21,9 @@ class Pricelist extends Model
     {
         return $this->hasMany(ProductPrice::class);
     }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
 }

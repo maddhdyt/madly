@@ -4,6 +4,7 @@ import { LayoutGrid, Box, Briefcase, ChevronUp, ChevronDown, Users, ShoppingBag,
 import { Head, router } from '@inertiajs/react';
 import useCopyToClipboard from '../Hooks/useCopyToClipboard';
 import GlobalSearchModal from '../Components/GlobalSearchModal';
+import logoImg from '../../img/pile_2.webp';
 
 export default function MainLayout({ children, title = "Dashboard" }) {
     const { url, props } = usePage();
@@ -105,13 +106,10 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                 <div className="flex flex-col py-8 px-5 w-[280px] h-full">
                     {/* Logo */}
                 <div className="mb-10 px-3 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded bg-gray-900 dark:bg-white flex items-center justify-center cursor-pointer hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors">
-                        <svg viewBox="0 0 16 16" className="w-5 h-5 text-white dark:text-gray-900" fill="currentColor" shapeRendering="crispEdges">
-                            <path d="M2 14 V2 H5 V6 H7 V4 H9 V6 H11 V2 H14 V14 H11 V8 H9 V10 H7 V8 H5 V14 Z" />
-                            <rect x="7" y="12" width="2" height="2" />
-                        </svg>
+                    <div className="w-9 h-9 flex items-center justify-center cursor-pointer transition-transform hover:scale-105">
+                        <img src={logoImg} alt="Madly Logo" className="w-full h-full object-contain" />
                     </div>
-                    <span className="font-extrabold text-[22px] tracking-tighter text-gray-900 dark:text-white">{settings.company_name || 'Madly'}</span>
+                    <span className="font-display font-extrabold text-[26px] tracking-normal text-gray-900 dark:text-white">{settings.company_name || 'Madly'}</span>
                 </div>
 
                 {/* Navigation */}

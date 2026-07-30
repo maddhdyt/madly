@@ -21,6 +21,23 @@ const SpecsModal = ({ isOpen, onClose, product, service }) => {
     const renderValue = (val, type) => {
         if (!val) return null;
         
+        if (type === 'link_builder' && Array.isArray(val)) {
+            if (val.length === 0) return <span className="text-gray-400 italic">No links available</span>;
+            return (
+                <div className="flex flex-col gap-2">
+                    {val.map((link, i) => (
+                        <div key={i} className="flex flex-col gap-0.5">
+                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{link.label}</span>
+                            <a href={link.url} target="_blank" rel="noreferrer" className="inline-flex items-start gap-1.5 text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 font-bold transition-colors underline-offset-4 underline hover:no-underline w-fit text-sm break-all">
+                                {link.url}
+                                <svg className="w-3.5 h-3.5 opacity-70 shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            </a>
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+
         if (type === 'url' || (typeof val === 'string' && val.includes('http'))) {
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             const parts = val.split(urlRegex);
@@ -30,9 +47,9 @@ const SpecsModal = ({ isOpen, onClose, product, service }) => {
                     {parts.map((part, i) => {
                         if (part.match(urlRegex)) {
                             return (
-                                <a key={i} href={part} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-blue-600 dark:text-blue-500 hover:text-blue-800 dark:hover:text-blue-400 font-bold transition-colors underline-offset-4 underline hover:no-underline w-fit">
+                                <a key={i} href={part} target="_blank" rel="noreferrer" className="inline-flex items-start gap-1.5 text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 font-bold transition-colors underline-offset-4 underline hover:no-underline w-fit break-all">
                                     {part}
-                                    <svg className="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                    <svg className="w-3.5 h-3.5 opacity-70 shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                                 </a>
                             );
                         }
@@ -397,6 +414,7 @@ export default function Index({ products, services, showToast, activeFilters = {
                             <th className="px-8 py-5">Service Category</th>
                             <th className="px-8 py-5">Product Name</th>
                             <th className="px-8 py-5">Base HPP</th>
+                            <th className="px-8 py-5">Min Price</th>
                             <th className="px-8 py-5">Akreditasi</th>
                             <th className="px-8 py-5 text-center">Specifications</th>
                             <th className="px-8 py-5 text-right sticky right-0 bg-white dark:bg-gray-900 z-10">Actions</th>
@@ -432,8 +450,20 @@ export default function Index({ products, services, showToast, activeFilters = {
                                     <td className="px-8 py-5 font-bold text-gray-900 dark:text-white">
                                         {product.name}
                                     </td>
-                                    <td className="px-8 py-5 font-bold text-gray-900 dark:text-white">
-                                        {formatCurrency(product.hpp)}
+                                    <td className="px-8 py-5">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="font-bold text-gray-900 dark:text-white">{formatCurrency(product.hpp)}</span>
+                                            {product.attributes?.hpp_usd && (
+                                                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-md w-fit border border-emerald-100 dark:border-emerald-800">
+                                                    $ {Number(product.attributes.hpp_usd).toLocaleString('en-US')}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-5">
+                                        <span className="font-bold text-gray-900 dark:text-white">
+                                            {product.min_price ? formatCurrency(product.min_price) : '-'}
+                                        </span>
                                     </td>
                                     <td className="px-8 py-5">
                                         {product.attributes?.accreditation_type ? (

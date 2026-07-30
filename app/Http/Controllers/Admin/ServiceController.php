@@ -34,11 +34,17 @@ class ServiceController extends Controller
             'product_schema' => 'nullable|array',
             'product_schema.*.name' => 'required|string',
             'product_schema.*.label' => 'required|string',
-            'product_schema.*.type' => 'required|string|in:text,number,textarea,url,tags',
+            'product_schema.*.type' => 'required|string',
             'product_schema.*.placeholder' => 'nullable|string',
+            'includes' => 'nullable|array',
+            'includes.*' => 'nullable|string'
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
+
+        if (isset($validated['includes']) && is_array($validated['includes'])) {
+            $validated['includes'] = array_values(array_filter($validated['includes']));
+        }
 
         Service::create($validated);
 
@@ -61,11 +67,17 @@ class ServiceController extends Controller
             'product_schema' => 'nullable|array',
             'product_schema.*.name' => 'required|string',
             'product_schema.*.label' => 'required|string',
-            'product_schema.*.type' => 'required|string|in:text,number,textarea,url,tags',
+            'product_schema.*.type' => 'required|string',
             'product_schema.*.placeholder' => 'nullable|string',
+            'includes' => 'nullable|array',
+            'includes.*' => 'nullable|string'
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
+        
+        if (isset($validated['includes']) && is_array($validated['includes'])) {
+            $validated['includes'] = array_values(array_filter($validated['includes']));
+        }
 
         $service->update($validated);
 

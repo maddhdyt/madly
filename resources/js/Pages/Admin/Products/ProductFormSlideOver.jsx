@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useForm } from '@inertiajs/react';
-import { X, Save, Image as ImageIcon, Box, Book, Monitor, Server, TrendingUp, Tag, List, Briefcase, Code, PenTool, Award, Shield, Globe, Camera, Palette, Database, Layers } from 'lucide-react';
+import { X, Save, Image as ImageIcon, Box, Book, Monitor, Server, TrendingUp, Tag, List, Briefcase, Code, PenTool, Award, Shield, Globe, Camera, Palette, Database, Layers, Trash } from 'lucide-react';
 
 export default function ProductFormSlideOver({ isOpen, onClose, product, services = [], showToast }) {
     const isEdit = !!product;
@@ -15,6 +15,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
         service_id: '',
         name: '',
         hpp: '',
+        min_price: '',
         status_note: '',
         attributes: {}
     });
@@ -27,6 +28,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                     service_id: product.service_id || (services.length > 0 ? services[0].id : ''),
                     name: product.name || '',
                     hpp: product.hpp || '',
+                    min_price: product.min_price || '',
                     status_note: product.status_note || '',
                     attributes: product.attributes || {}
                 });
@@ -35,6 +37,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                     service_id: services.length > 0 ? services[0].id : '',
                     name: '',
                     hpp: '',
+                    min_price: '',
                     status_note: '',
                     attributes: {}
                 });
@@ -160,7 +163,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                             </h3>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                <div>
+                                <div className="md:col-span-2">
                                     <label className={labelClass}>Product Name</label>
                                     <input 
                                         type="text" 
@@ -194,6 +197,26 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                                     {errors.hpp && <p className="text-red-500 text-xs mt-1">{errors.hpp}</p>}
                                 </div>
 
+                                <div>
+                                    <label className={labelClass}>Min Selling Price</label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <span className="text-gray-500 dark:text-gray-400 font-bold text-sm">Rp</span>
+                                        </div>
+                                        <input 
+                                            type="text" 
+                                            className={`${inputClass} pl-11`}
+                                            placeholder="e.g., 3.000.000"
+                                            value={data.min_price ? new Intl.NumberFormat('id-ID').format(data.min_price) : ''}
+                                            onChange={e => {
+                                                const rawValue = e.target.value.replace(/\D/g, '');
+                                                setData('min_price', rawValue);
+                                            }}
+                                        />
+                                    </div>
+                                    {errors.min_price && <p className="text-red-500 text-xs mt-1">{errors.min_price}</p>}
+                                </div>
+
                                 <div className="md:col-span-2">
                                     <label className={labelClass}>Status Note (Optional)</label>
                                     <input 
@@ -217,7 +240,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     {productSchema.map((field, index) => (
-                                        <div key={index} className={field.type === 'textarea' ? "md:col-span-2" : ""}>
+                                        <div key={index} className={(field.type === 'textarea' || field.type === 'link_builder') ? "md:col-span-2" : ""}>
                                             <label className={labelClass}>{field.label}</label>
                                             {field.type === 'textarea' ? (
                                                 <textarea 
@@ -238,6 +261,49 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                                                     />
                                                     <p className="text-[10px] text-gray-500 mt-1 ml-1 font-medium">Separate with commas (e.g., a, b, c)</p>
                                                 </>
+                                            ) : field.type === 'link_builder' ? (
+                                                <div className="flex flex-col gap-2">
+                                                    {(Array.isArray(data.attributes?.[field.name]) ? data.attributes[field.name] : []).map((linkObj, i) => (
+                                                        <div key={i} className="flex gap-2 items-start">
+                                                            <input 
+                                                                type="text" 
+                                                                placeholder="Label (e.g., Scopus)" 
+                                                                className={`${inputClass.replace('w-full', '')} w-1/3 text-xs`}
+                                                                value={linkObj.label || ''}
+                                                                onChange={e => {
+                                                                    const newArr = [...(data.attributes[field.name] || [])];
+                                                                    newArr[i] = {...newArr[i], label: e.target.value};
+                                                                    handleAttributeChange(field.name, newArr);
+                                                                }}
+                                                            />
+                                                            <input 
+                                                                type="url" 
+                                                                placeholder="URL (https://...)" 
+                                                                className={`${inputClass.replace('w-full', '')} flex-1 text-xs`}
+                                                                value={linkObj.url || ''}
+                                                                onChange={e => {
+                                                                    const newArr = [...(data.attributes[field.name] || [])];
+                                                                    newArr[i] = {...newArr[i], url: e.target.value};
+                                                                    handleAttributeChange(field.name, newArr);
+                                                                }}
+                                                            />
+                                                            <button type="button" onClick={() => {
+                                                                const newArr = [...data.attributes[field.name]];
+                                                                newArr.splice(i, 1);
+                                                                handleAttributeChange(field.name, newArr);
+                                                            }} className="p-2.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-colors border border-transparent hover:border-red-100 dark:hover:border-red-800">
+                                                                <Trash className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                    <button type="button" onClick={() => {
+                                                        const newArr = [...(Array.isArray(data.attributes?.[field.name]) ? data.attributes[field.name] : [])];
+                                                        newArr.push({label: '', url: ''});
+                                                        handleAttributeChange(field.name, newArr);
+                                                    }} className="text-xs font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 rounded-xl w-fit mt-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                                                        + Add Link
+                                                    </button>
+                                                </div>
                                             ) : (
                                                 <input 
                                                     type={field.type === 'url' ? 'url' : field.type || 'text'}

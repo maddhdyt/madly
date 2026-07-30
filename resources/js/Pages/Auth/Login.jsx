@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { Hexagon, Loader2, Star } from 'lucide-react';
+import { Loader2, Star } from 'lucide-react';
+import logoImg from '../../../img/pile_2.webp';
 
 export default function Login() {
     const { props } = usePage();
@@ -27,14 +28,14 @@ export default function Login() {
                 {/* Left Side (Branding & Trust) */}
                 <div className="flex-1 space-y-8 w-full">
                     {/* Logo */}
-                    <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center">
-                        <Hexagon className="w-8 h-8 text-black fill-black" />
+                    <div className="w-14 h-14 flex items-center justify-center">
+                        <img src={logoImg} alt="Madly Logo" className="w-full h-full object-contain" />
                     </div>
                     
                     {/* Welcome Text */}
                     <div>
                         <h1 className="text-4xl lg:text-[44px] font-black text-gray-900 tracking-tight leading-[1.1]">
-                            Welcome back to<br/>{companyName}!
+                            Welcome back to<br/><span className="font-display tracking-normal text-5xl lg:text-[52px]">{companyName}</span>!
                         </h1>
                         <p className="text-gray-500 mt-5 text-[15px] font-medium max-w-md leading-relaxed">
                             Thank you for continuing your experience with us and always trusting the expertise of our team.

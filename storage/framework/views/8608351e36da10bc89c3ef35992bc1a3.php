@@ -160,8 +160,8 @@
 <body>
 
     <div class="header">
-        <h1 class="logo">MADLY</h1>
-        <p class="meta-text">Digital Marketing & IT Solutions</p>
+        <h1 class="logo"><?php echo e(\App\Models\Setting::get('company_name', 'MADLY')); ?></h1>
+        <p class="meta-text"><?php echo e(\App\Models\Setting::get('company_tagline', 'Digital Marketing & IT Solutions')); ?></p>
     </div>
 
     <?php if($quotation->client_name || $quotation->client_email || $quotation->client_phone): ?>
@@ -240,6 +240,20 @@
             <div class="totals-value">Rp <?php echo e(number_format($quotation->total_amount, 0, ',', '.')); ?></div>
         </div>
     </div>
+    
+    <?php if(\App\Models\Setting::get('quotation_terms')): ?>
+    <div style="margin-top: 40px; font-size: 12px; color: #666; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+        <h4 style="margin: 0 0 5px 0; color: #333;">Terms & Conditions:</h4>
+        <p style="margin: 0; white-space: pre-wrap;"><?php echo e(\App\Models\Setting::get('quotation_terms')); ?></p>
+    </div>
+    <?php endif; ?>
+    
+    <?php if(\App\Models\Setting::get('quotation_footer')): ?>
+    <div style="margin-top: 20px; text-align: center; font-size: 11px; color: #aaa;">
+        <?php echo e(\App\Models\Setting::get('quotation_footer')); ?>
+
+    </div>
+    <?php endif; ?>
 
 </body>
 </html>
