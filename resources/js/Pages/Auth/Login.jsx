@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { Loader2, Star } from 'lucide-react';
+import { Loader2, Star, Check } from 'lucide-react';
 import logoImg from '../../../img/pile_2.webp';
 import useTranslations from '../../Hooks/useTranslations';
 
@@ -116,8 +116,17 @@ export default function Login() {
                                         type="checkbox"
                                         checked={data.remember}
                                         onChange={e => setData('remember', e.target.checked)}
-                                        className="w-5 h-5 rounded-[6px] border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-0 focus:ring-offset-0 bg-transparent transition-colors cursor-pointer checked:border-gray-900 dark:checked:border-white"
+                                        className="sr-only"
                                     />
+                                    <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center transition-all duration-200 ${
+                                        data.remember 
+                                        ? 'bg-gray-900 border-gray-900 dark:bg-white dark:border-white' 
+                                        : 'bg-transparent border-gray-300 dark:border-gray-600 group-hover:border-gray-400 dark:group-hover:border-gray-500'
+                                    }`}>
+                                        <Check className={`w-3.5 h-3.5 text-white dark:text-gray-900 transition-transform duration-300 ${
+                                            data.remember ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+                                        }`} strokeWidth={3} />
+                                    </div>
                                 </div>
                                 <span className="text-[13px] font-bold text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">{t('Keep me logged in')}</span>
                             </label>
