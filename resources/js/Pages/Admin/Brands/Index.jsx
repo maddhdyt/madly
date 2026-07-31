@@ -3,6 +3,7 @@ import MainLayout from '../../../Layouts/MainLayout';
 import { useForm, router } from '@inertiajs/react';
 import { Plus, Edit2, Trash2, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { createPortal } from 'react-dom';
+import ConfirmModal from '../../../Components/ConfirmModal';
 import BrandFormSlideOver from './BrandFormSlideOver';
 import Pagination from '../../../Components/Pagination';
 import useTranslations from '../../../Hooks/useTranslations';
@@ -133,57 +134,16 @@ export default function Index({ brands, showToast }) {
                 showToast={showToast}
             />
 
-            {/* Custom Delete Modal using createPortal to cover entire screen */}
-            {deleteModal.isOpen && createPortal(
-                <div className="fixed inset-0 z-[100] flex items-center justify-center">
-                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity animate-fade-in" onClick={() => setDeleteModal({ isOpen: false, brandId: null, count: 0, brandName: '' })}></div>
-                    <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-8 animate-slide-up mx-4">
-                        <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-6 mx-auto">
-                            {deleteModal.isOpen ? (
-                                <Trash2 className="w-8 h-8 text-red-600 dark:text-red-400" />
-                            ) : null}
-                        </div>
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">Delete Brand?</h2>
-                        
-                        <p className="text-gray-500 dark:text-gray-400 text-center mb-8 text-sm leading-relaxed">
-                            Are you sure you want to delete <strong className="text-gray-900 dark:text-white">{deleteModal.brandName}</strong>? This action cannot be undone.
-                        </p>
-                        
-                        <div className="flex gap-3">
-                            <button 
-                                onClick={() => setDeleteModal({ isOpen: false, brandId: null, count: 0, brandName: '' })}
-                                className="flex-1 px-5 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button 
-                                onClick={confirmDelete}
-                                className="flex-1 px-5 py-3 bg-red-600 text-white rounded-xl font-bold text-sm hover:bg-red-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                Yes, Delete
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <style>{`
-                        @keyframes slideUp {
-                            from { opacity: 0; transform: translateY(20px) scale(0.95); }
-                            to { opacity: 1; transform: translateY(0) scale(1); }
-                        }
-                        @keyframes fadeIn {
-                            from { opacity: 0; }
-                            to { opacity: 1; }
-                        }
-                        .animate-slide-up {
-                            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-                        }
-                        .animate-fade-in {
-                            animation: fadeIn 0.2s ease-out forwards;
-                        }
-                    `}</style>
-                </div>,
-                document.body
-            )}
+            {/* Confirm Delete Modal */}
+            <ConfirmModal 
+                isOpen={deleteModal.isOpen} 
+                onClose={() => setDeleteModal({ isOpen: false, brandId: null, count: 0, brandName: '' })}
+                onConfirm={confirmDelete}
+                title={t('Delete Brand?')}
+                message={<>Are you sure you want to delete <strong className="text-gray-900 dark:text-white">{deleteModal.brandName}</strong>? This action cannot be undone.</>}
+                confirmText={t('Yes, Delete')}
+                type="danger"
+            />
         </div>
     );
 }

@@ -279,7 +279,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
     ];
 
     return createPortal(
-        <div className="fixed inset-0 z-[100] flex justify-end">
+        <div className="fixed inset-0 z-100 flex justify-end">
             <div className="absolute inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity animate-fade-in" onClick={onClose}></div>
             
             <div className="relative w-full max-w-3xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col h-full animate-slide-in">
@@ -371,7 +371,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                                         <button 
                                             type="button" 
                                             onClick={() => removeInclude(idx)}
-                                            className="w-11 h-11 flex-shrink-0 flex items-center justify-center border border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                            className="w-11 h-11 shrink-0 flex items-center justify-center border border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>

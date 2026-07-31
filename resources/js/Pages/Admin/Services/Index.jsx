@@ -96,7 +96,7 @@ export default function Index({ services, showToast }) {
                                 className={`flex items-center justify-between p-6 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all group ${idx !== services.data.length - 1 ? 'border-b border-gray-100 dark:border-gray-800' : ''}`}
                             >
                                 <div className="flex items-center gap-5 flex-1 min-w-0">
-                                    <div className="w-12 h-12 flex-shrink-0 rounded-2xl bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 flex items-center justify-center border border-gray-200/50 dark:border-gray-800">
+                                    <div className="w-12 h-12 shrink-0 rounded-2xl bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 flex items-center justify-center border border-gray-200/50 dark:border-gray-800">
                                         {renderIcon(service.icon)}
                                     </div>
                                     <div className="flex-1 min-w-0">

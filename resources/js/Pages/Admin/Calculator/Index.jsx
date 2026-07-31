@@ -175,7 +175,7 @@ export default function Calculator({ products, brands, services }) {
             {/* Toast Notification */}
             <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-out ${showToast ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10 pointer-events-none'}`}>
                 <div className="bg-gray-900 border border-gray-700 shadow-2xl rounded-2xl p-4 flex items-center gap-3 min-w-72">
-                    <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
                         <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                     </div>
                     <div>

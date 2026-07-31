@@ -105,7 +105,7 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
     if (!isOpen || !mounted) return null;
 
     return createPortal(
-        <div className="fixed inset-0 z-[100] flex justify-end">
+        <div className="fixed inset-0 z-100 flex justify-end">
             {/* Backdrop */}
             <div 
                 className="absolute inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity animate-fade-in" 

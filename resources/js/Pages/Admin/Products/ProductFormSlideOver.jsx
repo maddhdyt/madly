@@ -110,7 +110,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
     const productSchema = selectedService?.product_schema || [];
 
     return createPortal(
-        <div className="fixed inset-0 z-[100] flex justify-end">
+        <div className="fixed inset-0 z-100 flex justify-end">
             <div 
                 className="absolute inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity animate-fade-in" 
                 onClick={onClose}
@@ -144,7 +144,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                                             key={type.id}
                                             type="button"
                                             onClick={() => setData('service_id', type.id)}
-                                            className={`flex-shrink-0 px-4 py-2.5 rounded-2xl border flex items-center gap-3 transition-all snap-start ${isSelected ? 'border-gray-900 dark:border-white bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-md' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                                            className={`shrink-0 px-4 py-2.5 rounded-2xl border flex items-center gap-3 transition-all snap-start ${isSelected ? 'border-gray-900 dark:border-white bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-md' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                                         >
                                             <div className={`p-2 rounded-xl ${isSelected ? 'bg-white/20 dark:bg-gray-900/10 text-white dark:text-gray-900' : 'bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400'}`}>
                                                 {renderIcon(type.icon)}

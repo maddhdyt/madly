@@ -45,7 +45,7 @@ $types = [
         'solid' => 'bg-blue-700 dark:border-blue-600 dark:bg-blue-700',
     ],
     'error' => [
-        'soft' => 'bg-rose-200 text-rose-900 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-100 dark:[&_svg]:!text-white',
+        'soft' => 'bg-rose-200 text-rose-900 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-100 dark:[&_svg]:text-white!',
         'solid' => 'bg-rose-600 dark:border-rose-500 dark:bg-rose-600',
     ],
     'alert' => [
@@ -60,7 +60,7 @@ $types = [
 
 $variants = [
     'soft' => '',
-    'solid' => 'text-white dark:text-white [&_svg]:!text-white',
+    'solid' => 'text-white dark:text-white [&_svg]:text-white!',
 ];
 
 $typeClasses = $types[$type][$variant] ?? $types['default']['soft'];

@@ -117,7 +117,7 @@ unset($__defined_vars, $__key, $__value); ?>
             x-cloak
             @click="copyToClipboard()"
             class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                "rounded-md w-6 h-6 flex flex-shrink-0 items-center justify-center cursor-pointer border transition-colors duration-200 ease-in-out",
+                "rounded-md w-6 h-6 flex shrink-0 items-center justify-center cursor-pointer border transition-colors duration-200 ease-in-out",
                 "bg-white/5 border-neutral-200 hover:bg-neutral-100 dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10",
             ]); ?>"
         >

@@ -96,7 +96,7 @@ export default function Settings({ settings, showToast }) {
 
             <div className="flex flex-col md:flex-row gap-8 items-start h-full pb-10">
                 {/* Left Sidebar Tabs */}
-                <div className="w-full md:w-72 flex-shrink-0 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm p-3 sticky top-4">
+                <div className="w-full md:w-72 shrink-0 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm p-3 sticky top-4">
                     <nav className="flex flex-col gap-1">
                         {tabs.map(tab => (
                             <button
@@ -135,7 +135,7 @@ export default function Settings({ settings, showToast }) {
                                 {avatarPreview ? (
                                     <img src={avatarPreview} alt="Avatar" className="w-24 h-24 rounded-full object-cover shadow-lg border border-gray-200 dark:border-gray-700" />
                                 ) : (
-                                    <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 flex items-center justify-center text-3xl text-white dark:text-gray-900 font-bold shadow-lg">
+                                    <div className="w-24 h-24 rounded-full bg-linear-to-tr from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 flex items-center justify-center text-3xl text-white dark:text-gray-900 font-bold shadow-lg">
                                         {user.name.charAt(0)}
                                     </div>
                                 )}

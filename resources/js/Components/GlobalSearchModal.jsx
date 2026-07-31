@@ -80,13 +80,13 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
     if (!isOpen) return null;
 
     return createPortal(
-        <div className="fixed inset-0 z-[200] flex items-start justify-center pt-24 sm:pt-32 px-4">
+        <div className="fixed inset-0 z-200 flex items-start justify-center pt-24 sm:pt-32 px-4">
             <div className="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
             
             <div className="relative w-full max-w-2xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800 animate-in fade-in zoom-in-95 duration-200">
                 {/* Search Input */}
                 <div className="flex items-center px-6 py-4 border-b border-gray-100 dark:border-gray-800">
-                    <Search className="w-6 h-6 text-gray-400 mr-4 flex-shrink-0" />
+                    <Search className="w-6 h-6 text-gray-400 mr-4 shrink-0" />
                     <input
                         ref={inputRef}
                         type="text"
@@ -122,7 +122,7 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
                                         : 'hover:bg-gray-50 dark:hover:bg-gray-800'
                                     }`}
                                 >
-                                    <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 flex items-center justify-center mr-4 flex-shrink-0">
+                                    <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 flex items-center justify-center mr-4 shrink-0">
                                         {getIcon(item.type)}
                                     </div>
                                     <div className="flex-1 min-w-0">

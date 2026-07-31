@@ -47,7 +47,7 @@ unset($__defined_vars, $__key, $__value); ?>
         @click="hasCode && (expanded = !expanded)"
     >
         
-        <div class="flex size-3 items-center justify-center flex-shrink-0">
+        <div class="flex size-3 items-center justify-center shrink-0">
           <div
           class="size-2 rounded-full"
           :class="{
@@ -100,7 +100,7 @@ unset($__defined_vars, $__key, $__value); ?>
 <?php endif; ?>
         </div>
 
-        <div class="flex-shrink-0">
+        <div class="shrink-0">
             <button
                 x-cloak
                 type="button"

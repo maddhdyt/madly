@@ -44,7 +44,7 @@ const SpecsModal = ({ isOpen, onClose, product, service, t }) => {
             const parts = val.split(urlRegex);
             
             return (
-                <div className="text-sm font-semibold text-gray-900 dark:text-white break-words leading-relaxed whitespace-pre-wrap flex flex-col gap-1.5">
+                <div className="text-sm font-semibold text-gray-900 dark:text-white wrap-break-word leading-relaxed whitespace-pre-wrap flex flex-col gap-1.5">
                     {parts.map((part, i) => {
                         if (part.match(urlRegex)) {
                             return (
@@ -77,14 +77,14 @@ const SpecsModal = ({ isOpen, onClose, product, service, t }) => {
         }
         
         return (
-            <span className="text-sm font-semibold text-gray-900 dark:text-white break-words leading-relaxed whitespace-pre-wrap">
+            <span className="text-sm font-semibold text-gray-900 dark:text-white wrap-break-word leading-relaxed whitespace-pre-wrap">
                 {val}
             </span>
         );
     };
 
     return createPortal(
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-110 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity animate-fade-in" onClick={onClose}></div>
             
             <div className="relative w-full max-w-lg bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden animate-scale-in">
