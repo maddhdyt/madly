@@ -36,8 +36,8 @@ export default function Login() {
                     
                     {/* Welcome Text */}
                     <div>
-                        <h1 className="text-4xl lg:text-[44px] font-black text-gray-900 dark:text-white tracking-tight leading-[1.1]">
-                            {t('Welcome back to')}<br/><span className="font-display tracking-normal text-5xl lg:text-[52px]">{companyName}</span>!
+                        <h1 className="text-4xl lg:text-11 font-black text-gray-900 dark:text-white tracking-tight leading-[1.1]">
+                            {t('Welcome back to')}<br/><span className="font-display tracking-normal text-5xl lg:text-13">{companyName}</span>!
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400 mt-5 text-[15px] font-medium max-w-md leading-relaxed">
                             {t('Thank you for continuing your experience with us and always trusting the expertise of our team.')}
@@ -72,7 +72,7 @@ export default function Login() {
                 </div>
 
                 {/* Right Side (Login Form) */}
-                <div className="w-full lg:w-[460px] shrink-0 bg-white dark:bg-gray-900 p-10 lg:p-12 rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-transparent dark:border-gray-800 transition-colors">
+                <div className="w-full lg:w-115 shrink-0 bg-white dark:bg-gray-900 p-10 lg:p-12 rounded-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-transparent dark:border-gray-800 transition-colors">
                     <div className="mb-10 text-left">
                         <h2 className="text-[26px] font-black text-gray-900 dark:text-white tracking-tight">{t('Log In')}</h2>
                         <p className="text-[14px] font-medium text-gray-500 dark:text-gray-400 mt-1.5">{t('Please enter your details to access your dashboard.')}</p>
@@ -80,7 +80,7 @@ export default function Login() {
 
                     <form onSubmit={submit} className="space-y-5">
                         <div>
-                            <label className="block text-[12px] font-bold text-gray-700 dark:text-gray-300 mb-2">{t('Enter your email')}</label>
+                            <label className="block text-3 font-bold text-gray-700 dark:text-gray-300 mb-2">{t('Enter your email')}</label>
                             <input
                                 type="email"
                                 value={data.email}
@@ -98,7 +98,7 @@ export default function Login() {
 
                         <div>
                             <div className="flex justify-between items-center mb-2">
-                                <label className="block text-[12px] font-bold text-gray-700 dark:text-gray-300">{t('Password')}</label>
+                                <label className="block text-3 font-bold text-gray-700 dark:text-gray-300">{t('Password')}</label>
                                 <a href="#" onClick={e => e.preventDefault()} className="text-[11px] font-bold text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">{t('Forgot password?')}</a>
                             </div>
                             <input
@@ -130,7 +130,7 @@ export default function Login() {
                         </div>
                         
                         <div className="pt-4">
-                            <p className="text-[12px] font-medium text-gray-500 dark:text-gray-400 text-center">
+                            <p className="text-3 font-medium text-gray-500 dark:text-gray-400 text-center">
                                 {t('New to the platform?')} <a href="#" onClick={(e) => {e.preventDefault(); alert('Please ask your Manager to create an account for you.')}} className="text-gray-900 dark:text-white font-bold hover:underline transition-all">{t('Create an account')}</a>
                             </p>
                         </div>

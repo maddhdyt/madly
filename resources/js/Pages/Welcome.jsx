@@ -149,7 +149,7 @@ export default function Welcome({ copyToClipboard, searchQuery = "", snippets = 
                     <div className="flex flex-col gap-8">
                         
                         {/* Snippets List */}
-                        <div className="flex flex-col bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm overflow-hidden h-[400px]">
+                        <div className="flex flex-col bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm overflow-hidden h-100">
                             <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
                                 <h2 className="text-sm font-bold text-gray-900 dark:text-white tracking-tight">{t('Quick Replies')}</h2>
                                 <Search className="w-4 h-4 text-gray-400 dark:text-gray-500" />

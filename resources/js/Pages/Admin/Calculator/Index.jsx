@@ -208,7 +208,7 @@ export default function Calculator({ products, brands, services }) {
                                 />
                             </div>
                             <div className="flex items-center gap-3 shrink-0">
-                                <div className="w-[200px]">
+                                <div className="w-50">
                                     <CustomSelect 
                                         className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-[42px] pl-3 text-sm font-medium text-gray-700 dark:text-gray-300"
                                         value={activeService}
@@ -356,7 +356,7 @@ export default function Calculator({ products, brands, services }) {
                 </div>
 
                 {/* RIGHT PANEL: Live WA Generator */}
-                <div className="w-full lg:w-[400px] xl:w-[450px] shrink-0 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col overflow-hidden relative transition-colors min-h-[500px]">
+                <div className="w-full lg:w-100 xl:w-[450px] shrink-0 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col overflow-hidden relative transition-colors min-h-125">
                     {!selectedProduct ? (
                         <div className="h-full flex flex-col items-center justify-center text-center px-6">
                             <div className="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">

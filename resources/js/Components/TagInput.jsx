@@ -69,7 +69,7 @@ export default function TagInput({ value, onChange, placeholder, className = '' 
                 onKeyDown={handleKeyDown}
                 onBlur={() => { if(inputValue) addTag(inputValue) }}
                 placeholder={tags.length === 0 ? placeholder : ''}
-                className="flex-1 min-w-[120px] bg-transparent border-none p-0 m-0 focus:ring-0 text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400"
+                className="flex-1 min-w-30 bg-transparent border-none p-0 m-0 focus:ring-0 text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400"
             />
         </div>
     );

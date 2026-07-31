@@ -121,7 +121,7 @@ export default function Settings({ settings, showToast }) {
                 </div>
 
                 {/* Right Content Area */}
-                <div className="flex-1 w-full bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden min-h-[500px]">
+                <div className="flex-1 w-full bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden min-h-125">
                     
                     {/* PROFILE TAB */}
                     {activeTab === 'profile' && (

@@ -352,7 +352,7 @@ export default function Index({ products, brands, services, activeFilters = {}, 
                                 {isFilterPanelOpen && (
                                     <>
                                         <div className="fixed inset-0 z-40" onClick={() => setIsFilterPanelOpen(false)}></div>
-                                        <div className="absolute right-0 top-full mt-2 w-[300px] sm:w-[420px] z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl animate-fade-in origin-top-right flex flex-col">
+                                        <div className="absolute right-0 top-full mt-2 w-75 sm:w-105 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl animate-fade-in origin-top-right flex flex-col">
                                             <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/30 rounded-t-2xl">
                                                 <div className="flex items-center gap-2">
                                                     <Filter className="w-4 h-4 text-gray-500" />

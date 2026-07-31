@@ -165,10 +165,10 @@ export default function MainLayout({ children, title = "Dashboard" }) {
             {/* Sidebar */}
             <aside 
                 className={`fixed inset-y-0 left-0 md:relative z-50 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] bg-white dark:bg-gray-900 border-r border-transparent dark:border-gray-800 overflow-hidden ${
-                    isSidebarOpen ? 'translate-x-0 w-[280px] opacity-100 shadow-2xl md:shadow-none' : '-translate-x-full md:translate-x-0 md:w-0 opacity-0 md:invisible'
+                    isSidebarOpen ? 'translate-x-0 w-70 opacity-100 shadow-2xl md:shadow-none' : '-translate-x-full md:translate-x-0 md:w-0 opacity-0 md:invisible'
                 }`}
             >
-                <div className="flex flex-col py-8 px-5 w-[280px] h-full">
+                <div className="flex flex-col py-8 px-5 w-70 h-full">
                     {/* Logo */}
                 <div className="mb-10 px-3 flex items-center gap-3">
                     <div className="w-9 h-9 flex items-center justify-center cursor-pointer transition-transform hover:scale-105">
@@ -256,7 +256,7 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                             )}
                         </button>
                         <div className={`transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSidebarOpen ? 'ml-2' : 'ml-1'}`}>
-                            <h1 className="text-xl md:text-[28px] font-bold font-display text-gray-900 dark:text-white tracking-tight leading-tight">
+                            <h1 className="text-xl md:text-7 font-bold font-display text-gray-900 dark:text-white tracking-tight leading-tight">
                                 {t(title)}
                             </h1>
                             <div className="flex flex-wrap items-center gap-1 md:gap-2 mt-0.5 text-[11px] md:text-[13px] font-semibold text-gray-500 dark:text-gray-400">
@@ -293,18 +293,18 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                         <div className="relative bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-1 flex items-center shadow-inner overflow-hidden border border-gray-200/50 dark:border-gray-700/50 h-10">
                             {/* Sliding Indicator */}
                             <div 
-                                className={`absolute left-1 top-1 bottom-1 w-[36px] bg-white dark:bg-gray-700 rounded-lg shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${locale === 'id' ? 'translate-x-[36px]' : 'translate-x-0'}`}
+                                className={`absolute left-1 top-1 bottom-1 w-9 bg-white dark:bg-gray-700 rounded-lg shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${locale === 'id' ? 'translate-x-9' : 'translate-x-0'}`}
                             ></div>
                             
                             <button
                                 onClick={() => locale !== 'en' && router.post(route('language.switch'), { locale: 'en' }, { preserveScroll: true })}
-                                className={`relative z-10 w-[36px] flex justify-center items-center text-[11px] font-bold tracking-wider transition-colors duration-300 ${locale === 'en' ? 'text-gray-900 dark:text-white' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                                className={`relative z-10 w-9 flex justify-center items-center text-[11px] font-bold tracking-wider transition-colors duration-300 ${locale === 'en' ? 'text-gray-900 dark:text-white' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
                             >
                                 EN
                             </button>
                             <button
                                 onClick={() => locale !== 'id' && router.post(route('language.switch'), { locale: 'id' }, { preserveScroll: true })}
-                                className={`relative z-10 w-[36px] flex justify-center items-center text-[11px] font-bold tracking-wider transition-colors duration-300 ${locale === 'id' ? 'text-gray-900 dark:text-white' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                                className={`relative z-10 w-9 flex justify-center items-center text-[11px] font-bold tracking-wider transition-colors duration-300 ${locale === 'id' ? 'text-gray-900 dark:text-white' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
                             >
                                 ID
                             </button>
