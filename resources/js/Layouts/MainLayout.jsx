@@ -256,7 +256,7 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                             )}
                         </button>
                         <div className={`transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSidebarOpen ? 'ml-2' : 'ml-1'}`}>
-                            <h1 className="text-xl md:text-7 font-bold font-display text-gray-900 dark:text-white tracking-tight leading-tight">
+                            <h1 className="text-xl md:text-[28px] font-bold font-display text-gray-900 dark:text-white tracking-tight leading-tight">
                                 {t(title)}
                             </h1>
                             <div className="flex flex-wrap items-center gap-1 md:gap-2 mt-0.5 text-[11px] md:text-[13px] font-semibold text-gray-500 dark:text-gray-400">
