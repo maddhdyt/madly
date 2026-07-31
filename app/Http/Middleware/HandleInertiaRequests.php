@@ -50,6 +50,8 @@ class HandleInertiaRequests extends Middleware
             'settings' => Cache::rememberForever('global_settings', function () {
                 return Setting::pluck('value', 'key')->toArray();
             }),
+            'locale' => fn () => app()->getLocale(),
+            'translations' => fn () => json_decode(file_get_contents(base_path('lang/' . app()->getLocale() . '.json')), true) ?? [],
         ];
     }
 }

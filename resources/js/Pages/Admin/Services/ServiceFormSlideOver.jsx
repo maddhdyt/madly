@@ -6,8 +6,10 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import CustomSelect from '../../../Components/CustomSelect';
+import useTranslations from '../../../Hooks/useTranslations';
 
 function SortableField({ field, updateSchemaField, removeSchemaField }) {
+    const { t } = useTranslations();
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: field.id });
     
     const style = {
@@ -34,11 +36,11 @@ function SortableField({ field, updateSchemaField, removeSchemaField }) {
             
             <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="md:col-span-2">
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Field Label (Display)</label>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{t('Field Label (Display)')}</label>
                     <input 
                         type="text" 
                         className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-gray-900 dark:focus:ring-gray-500 outline-none"
-                        placeholder="e.g., Kapasitas Hosting"
+                        placeholder={t('e.g., Kapasitas Hosting')}
                         value={field.label}
                         onChange={(e) => updateSchemaField(field.id, 'label', e.target.value)}
                         required
@@ -46,28 +48,28 @@ function SortableField({ field, updateSchemaField, removeSchemaField }) {
                 </div>
                 
                 <div className="md:col-span-1">
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Input Type</label>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{t('Input Type')}</label>
                     <CustomSelect 
                         className="py-2 px-3 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-sm font-normal"
                         value={field.type}
                         onChange={(e) => updateSchemaField(field.id, 'type', e.target.value)}
                         options={[
-                            { value: 'text', label: 'Short Text' },
-                            { value: 'textarea', label: 'Long Text' },
-                            { value: 'number', label: 'Number' },
-                            { value: 'url', label: 'URL / Link' },
-                            { value: 'tags', label: 'Tags (Comma Separated)' },
-                            { value: 'label', label: 'Label (Filterable)' }
+                            { value: 'text', label: t('Short Text') },
+                            { value: 'textarea', label: t('Long Text') },
+                            { value: 'number', label: t('Number') },
+                            { value: 'url', label: t('URL / Link') },
+                            { value: 'tags', label: t('Tags (Comma Separated)') },
+                            { value: 'label', label: t('Label (Filterable)') }
                         ]}
                     />
                 </div>
 
                 <div className="md:col-span-3">
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Placeholder (Example value)</label>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{t('Placeholder (Example value)')}</label>
                     <input 
                         type="text" 
                         className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-gray-900 dark:focus:ring-gray-500 outline-none"
-                        placeholder="e.g., 5GB / Unlimited"
+                        placeholder={t('e.g., 5GB / Unlimited')}
                         value={field.placeholder || ''}
                         onChange={(e) => updateSchemaField(field.id, 'placeholder', e.target.value)}
                     />
@@ -87,6 +89,7 @@ function SortableField({ field, updateSchemaField, removeSchemaField }) {
 }
 
 export default function ServiceFormSlideOver({ isOpen, onClose, service, showToast }) {
+    const { t } = useTranslations();
     const isEdit = !!service;
     const [mounted, setMounted] = useState(false);
 
@@ -162,22 +165,22 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
             put(route('admin.services.update', service.id), {
                 onSuccess: () => {
                     onClose();
-                    if (showToast) showToast('Service updated successfully');
+                    if (showToast) showToast(t('Service updated successfully'));
                 },
                 onError: (err) => {
                     const firstError = Object.values(err)[0];
-                    if (showToast) showToast(firstError || 'Failed to update service', 'error');
+                    if (showToast) showToast(firstError || t('Failed to update service'), 'error');
                 }
             });
         } else {
             post(route('admin.services.store'), {
                 onSuccess: () => {
                     onClose();
-                    if (showToast) showToast('Service created successfully');
+                    if (showToast) showToast(t('Service created successfully'));
                 },
                 onError: (err) => {
                     const firstError = Object.values(err)[0];
-                    if (showToast) showToast(firstError || 'Failed to create service', 'error');
+                    if (showToast) showToast(firstError || t('Failed to create service'), 'error');
                 }
             });
         }
@@ -282,8 +285,8 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
             <div className="relative w-full max-w-3xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col h-full animate-slide-in">
                 <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 z-10">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{isEdit ? 'Edit Service Type' : 'Add Service Type'}</h2>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Configure service template, quotation labels, and product form schema.</p>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{isEdit ? t('Edit Service Type') : t('Add Service Type')}</h2>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('Configure service template, quotation labels, and product form schema.')}</p>
                     </div>
                     <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
                         <X className="w-5 h-5" />
@@ -297,16 +300,16 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
                             <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 border-b border-gray-100 dark:border-gray-700 pb-3 flex items-center gap-2">
                                 <Box className="w-4 h-4 text-gray-400" />
-                                General Information
+                                {t('General Information')}
                             </h3>
                             
                             <div className="grid grid-cols-1 gap-5">
                                 <div>
-                                    <label className={labelClass}>Service Name</label>
+                                    <label className={labelClass}>{t('Service Name')}</label>
                                     <input 
                                         type="text" 
                                         className={inputClass}
-                                        placeholder="e.g., Web Development"
+                                        placeholder={t('e.g., Web Development')}
                                         value={data.name}
                                         onChange={e => setData('name', e.target.value)}
                                         required
@@ -315,18 +318,18 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                                 </div>
 
                                 <div>
-                                    <label className={labelClass}>Description</label>
+                                    <label className={labelClass}>{t('Description')}</label>
                                     <input 
                                         type="text" 
                                         className={inputClass}
-                                        placeholder="Brief explanation of this service"
+                                        placeholder={t('Brief explanation of this service')}
                                         value={data.description}
                                         onChange={e => setData('description', e.target.value)}
                                     />
                                 </div>
 
                                 <div>
-                                    <label className={labelClass}>Icon Selection</label>
+                                    <label className={labelClass}>{t('Icon Selection')}</label>
                                     <div className="flex flex-wrap gap-3">
                                         {availableIcons.map(ic => (
                                             <button
@@ -348,9 +351,9 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
                             <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 border-b border-gray-100 dark:border-gray-700 pb-3 flex items-center gap-2">
                                 <Award className="w-4 h-4 text-gray-400" />
-                                Master Fasilitas & Includes
+                                {t('Master Fasilitas & Includes')}
                             </h3>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Atur daftar fasilitas yang tersedia untuk jenis layanan ini. Saat membuat Pricelist, Anda cukup mencentang dari daftar ini.</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">{t('Atur daftar fasilitas yang tersedia untuk jenis layanan ini. Saat membuat Pricelist, Anda cukup mencentang dari daftar ini.')}</p>
                             
                             <div className="flex flex-col gap-3">
                                 {data.includes.map((inc, idx) => (
@@ -360,7 +363,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                                             <input 
                                                 type="text" 
                                                 className={`${inputClass} pl-10`}
-                                                placeholder="e.g., Editing Mendeley"
+                                                placeholder={t('e.g., Editing Mendeley')}
                                                 value={inc}
                                                 onChange={e => updateInclude(idx, e.target.value)}
                                             />
@@ -379,7 +382,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                                     onClick={addInclude}
                                     className="w-fit text-xs font-bold text-gray-900 dark:text-white hover:underline flex items-center gap-1 mt-2 bg-gray-100 dark:bg-gray-900 px-4 py-2 rounded-lg transition-colors"
                                 >
-                                    <Plus className="w-3 h-3" /> Tambah Fasilitas / Include
+                                    <Plus className="w-3 h-3" /> {t('Tambah Fasilitas / Include')}
                                 </button>
                             </div>
                         </div>
@@ -389,24 +392,24 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                             <div className="flex items-center justify-between mb-5 border-b border-gray-100 dark:border-gray-700 pb-3">
                                 <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
                                     <Settings className="w-4 h-4 text-gray-400" />
-                                    Product Form Builder
+                                    {t('Product Form Builder')}
                                 </h3>
                                 <button 
                                     type="button" 
                                     onClick={addSchemaField}
                                     className="text-xs font-bold bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                                 >
-                                    <Plus className="w-3 h-3" /> Add Field
+                                    <Plus className="w-3 h-3" /> {t('Add Field')}
                                 </button>
                             </div>
                             
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Define the custom fields that will appear when creating a new product under this service.</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">{t('Define the custom fields that will appear when creating a new product under this service.')}</p>
 
                             <div className="space-y-4">
                                 {data.product_schema.length === 0 ? (
                                     <div className="text-center py-8 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">No custom fields defined yet.</p>
-                                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Products in this service will only have basic fields (Name, HPP).</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{t('No custom fields defined yet.')}</p>
+                                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('Products in this service will only have basic fields (Name, HPP).')}</p>
                                     </div>
                                 ) : (
                                     <DndContext 
@@ -436,12 +439,12 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
                             <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 border-b border-gray-100 dark:border-gray-700 pb-3 flex items-center gap-2">
                                 <Book className="w-4 h-4 text-gray-400" />
-                                Quotation Configuration
+                                {t('Quotation Configuration')}
                             </h3>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div>
-                                    <label className={labelClass}>Promo Header Label</label>
+                                    <label className={labelClass}>{t('Promo Header Label')}</label>
                                     <input 
                                         type="text" 
                                         className={inputClass}
@@ -451,7 +454,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                                     />
                                 </div>
                                 <div>
-                                    <label className={labelClass}>Promo Header Placeholder</label>
+                                    <label className={labelClass}>{t('Promo Header Placeholder')}</label>
                                     <input 
                                         type="text" 
                                         className={inputClass}
@@ -462,7 +465,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                                 </div>
 
                                 <div>
-                                    <label className={labelClass}>Includes Label</label>
+                                    <label className={labelClass}>{t('Includes Label')}</label>
                                     <input 
                                         type="text" 
                                         className={inputClass}
@@ -472,7 +475,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                                     />
                                 </div>
                                 <div>
-                                    <label className={labelClass}>Includes Placeholder</label>
+                                    <label className={labelClass}>{t('Includes Placeholder')}</label>
                                     <input 
                                         type="text" 
                                         className={inputClass}
@@ -483,7 +486,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                                 </div>
 
                                 <div>
-                                    <label className={labelClass}>Footer Text Label</label>
+                                    <label className={labelClass}>{t('Footer Text Label')}</label>
                                     <input 
                                         type="text" 
                                         className={inputClass}
@@ -493,7 +496,7 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
                                     />
                                 </div>
                                 <div>
-                                    <label className={labelClass}>Footer Text Placeholder</label>
+                                    <label className={labelClass}>{t('Footer Text Placeholder')}</label>
                                     <input 
                                         type="text" 
                                         className={inputClass}
@@ -510,11 +513,11 @@ export default function ServiceFormSlideOver({ isOpen, onClose, service, showToa
 
                 <div className="px-6 py-4 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3 z-10">
                     <button type="button" onClick={onClose} className="px-5 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-700">
-                        Cancel
+                        {t('Cancel')}
                     </button>
                     <button type="submit" form="service-form" disabled={processing} className="px-8 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm disabled:opacity-70 transition-colors">
                         <Save className="w-4 h-4" /> 
-                        {processing ? 'Saving...' : 'Save Service Type'}
+                        {processing ? t('Saving...') : t('Save Service Type')}
                     </button>
                 </div>
             </div>

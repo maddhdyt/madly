@@ -14,7 +14,7 @@ class BrochureController extends Controller
     public function index()
     {
         $brochures = Brochure::with('brand')->latest()->paginate(15)->withQueryString();
-        $brands = Brand::orderBy('name')->get();
+        $brands = \Illuminate\Support\Facades\Cache::remember('master_brands', 86400, function() { return Brand::orderBy('name')->get(); });
 
         return Inertia::render('Admin/Brochures/Index', [
             'brochures' => $brochures,

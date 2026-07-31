@@ -7,9 +7,10 @@ import ProductFormSlideOver from './ProductFormSlideOver';
 import CustomSelect from '../../../Components/CustomSelect';
 import ConfirmModal from '../../../Components/ConfirmModal';
 import Pagination from '../../../Components/Pagination';
+import useTranslations from '../../../Hooks/useTranslations';
 
 // Specs Modal Component
-const SpecsModal = ({ isOpen, onClose, product, service }) => {
+const SpecsModal = ({ isOpen, onClose, product, service, t }) => {
     if (!isOpen || !product) return null;
 
     const attributes = product.attributes || {};
@@ -94,7 +95,7 @@ const SpecsModal = ({ isOpen, onClose, product, service }) => {
                         </div>
                         <div>
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">
-                                Product Specifications
+                                {t('Product Specifications')}
                             </h3>
                             <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-0.5">{product.name}</p>
                         </div>
@@ -107,7 +108,7 @@ const SpecsModal = ({ isOpen, onClose, product, service }) => {
                 <div className="p-0 max-h-[60vh] overflow-y-auto scrollbar-none">
                     {!hasAttributes ? (
                         <div className="text-center py-12 text-gray-500 dark:text-gray-400 italic text-sm">
-                            No custom specifications for this product.
+                            {t('No custom specifications for this product.')}
                         </div>
                     ) : (
                         <div className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -117,7 +118,7 @@ const SpecsModal = ({ isOpen, onClose, product, service }) => {
                                     const val = attributes[field.name];
                                     if (!val) return null;
                                     return (
-                                        <div key={field.name} className="flex flex-col gap-2 px-8 py-5 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
+                                        <div key={field.name} className="flex flex-col gap-2 px-4 lg:px-8 py-4 lg:py-5 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
                                             <span className="font-bold text-[11px] uppercase tracking-widest text-gray-500 dark:text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
                                                 {field.label}
                                             </span>
@@ -131,7 +132,7 @@ const SpecsModal = ({ isOpen, onClose, product, service }) => {
                                     if (!val) return null;
                                     const formattedKey = key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
                                     return (
-                                        <div key={key} className="flex flex-col gap-2 px-8 py-5 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
+                                        <div key={key} className="flex flex-col gap-2 px-4 lg:px-8 py-4 lg:py-5 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
                                             <span className="font-bold text-[11px] uppercase tracking-widest text-gray-500 dark:text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
                                                 {formattedKey}
                                             </span>
@@ -144,9 +145,9 @@ const SpecsModal = ({ isOpen, onClose, product, service }) => {
                     )}
                 </div>
                 
-                <div className="px-8 py-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 flex justify-end">
+                <div className="px-4 lg:px-8 py-4 lg:py-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 flex justify-end">
                     <button onClick={onClose} className="px-4 py-2.5 bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 transition-colors">
-                        Close
+                        {t('Close')}
                     </button>
                 </div>
             </div>
@@ -162,7 +163,8 @@ const SpecsModal = ({ isOpen, onClose, product, service }) => {
     );
 };
 
-export default function Index({ products, services, showToast, activeFilters = {}, filterOptions = {} }) {
+export default function Index({ products, brands, services, activeFilters = {}, filterOptions = {}, showToast }) {
+    const { t } = useTranslations();
     const { delete: destroy } = useForm();
     const params = new URLSearchParams(window.location.search);
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
@@ -283,125 +285,133 @@ export default function Index({ products, services, showToast, activeFilters = {
             {/* Header Area */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between px-8 py-8 border-b border-gray-100 dark:border-gray-800 gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Product Management (Master Data)</h1>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage global product catalog and their base HPP.</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{t('Product Management (Master Data)')}</h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('Manage global product catalog and their base HPP.')}</p>
                 </div>
-                <div className="flex flex-wrap items-center gap-3">
-                    <button 
-                        onClick={() => router.visit(route('home'))}
-                        className="px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Back
-                    </button>
+                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 w-full md:w-auto mt-4 md:mt-0">
                     
-                    {/* Dropdown Filter replacing Tabs */}
-                    <div className="flex items-center gap-3">
-                        <div className="relative">
-                            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                            <input 
-                                type="text"
-                                placeholder="Search products..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 focus:bg-white transition-all w-64"
-                            />
-                        </div>
-                        <CustomSelect
-                            value={selectedServiceFilter}
-                            onChange={handleFilterChange}
-                            options={[
-                                { value: 'all', label: 'All Services' },
-                                ...services.map(service => ({ value: service.id, label: service.name }))
-                            ]}
-                            icon={<Filter className="w-4 h-4" />}
-                            className="pl-3 py-2.5 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-                        />
+                    {/* Mobile: Row 3, Desktop: Left */}
+                    <div className="flex items-center justify-between gap-3 w-full md:w-auto order-3 md:order-1">
+                        <button 
+                            onClick={() => router.visit(route('home'))}
+                            className="px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors flex-1 md:flex-none justify-center"
+                        >
+                            <ArrowLeft className="w-4 h-4" />
+                            <span className="md:inline">{t('Back')}</span>
+                        </button>
+                        
+                        <button 
+                            onClick={openCreateForm}
+                            className="px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm transition-colors flex-1 md:flex-none justify-center"
+                        >
+                            <Plus className="w-4 h-4" />
+                            {t('Add Product')}
+                        </button>
                     </div>
 
-                    {selectedServiceFilter !== 'all' && filterableSchema.length > 0 && (
-                        <div className="relative">
-                            <button 
-                                onClick={() => setIsFilterPanelOpen(!isFilterPanelOpen)}
-                                className={`px-4 py-2.5 border rounded-xl font-bold text-sm flex items-center gap-2 transition-colors shadow-sm ${Object.values(activeFilters).some(v => v) ? 'bg-gray-100 border-gray-300 text-gray-900 dark:bg-gray-800 dark:border-gray-600 dark:text-white' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'}`}
-                            >
-                                <Filter className="w-4 h-4" />
-                                Filters
-                                {Object.values(activeFilters).some(v => v) && (
-                                    <span className="w-2 h-2 rounded-full bg-gray-900 dark:bg-white"></span>
-                                )}
-                            </button>
-
-                            {isFilterPanelOpen && (
-                                <>
-                                    <div className="fixed inset-0 z-40" onClick={() => setIsFilterPanelOpen(false)}></div>
-                                    <div className="absolute right-0 top-full mt-2 w-[420px] z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl animate-fade-in origin-top-right flex flex-col">
-                                        <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/30 rounded-t-2xl">
-                                            <div className="flex items-center gap-2">
-                                                <Filter className="w-4 h-4 text-gray-500" />
-                                                <h3 className="text-sm font-bold text-gray-900 dark:text-white">Advanced Filters</h3>
-                                            </div>
-                                            {Object.values(filterValues).some(v => v) && (
-                                                <button onClick={handleClearFilters} className="text-xs font-bold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
-                                                    Clear All
-                                                </button>
-                                            )}
-                                        </div>
-                                        <div className="p-6 flex flex-col gap-6">
-                                            {filterableSchema.map(field => (
-                                                <div key={field.name} className="flex flex-col gap-2 relative">
-                                                    <label className="text-xs font-bold text-gray-600 dark:text-gray-400">{field.label}</label>
-                                                    {filterOptions[field.name] ? (
-                                                        <CustomSelect
-                                                            value={filterValues[field.name] || ''}
-                                                            onChange={(e) => setFilterValues({...filterValues, [field.name]: e.target.value})}
-                                                            options={[
-                                                                { value: '', label: `All ${field.label}` },
-                                                                ...filterOptions[field.name].map(opt => ({ value: opt, label: opt }))
-                                                            ]}
-                                                            placeholder={`All ${field.label}`}
-                                                            className="py-2.5 px-4 text-sm font-medium border-gray-200 dark:border-gray-700 shadow-sm rounded-xl w-full"
-                                                        />
-                                                    ) : (
-                                                        <input 
-                                                            type="text" 
-                                                            placeholder={`Search ${field.label}...`}
-                                                            value={filterValues[field.name] || ''}
-                                                            onChange={(e) => setFilterValues({...filterValues, [field.name]: e.target.value})}
-                                                            onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
-                                                            className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent transition-all shadow-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                                                        />
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                        <div className="p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 flex justify-end gap-3 rounded-b-2xl">
-                                            <button 
-                                                onClick={() => setIsFilterPanelOpen(false)}
-                                                className="px-5 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                                            >
-                                                Cancel
-                                            </button>
-                                            <button 
-                                                onClick={handleApplyFilters}
-                                                className="px-5 py-2.5 bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 transition-colors shadow-sm"
-                                            >
-                                                Apply Filters
-                                            </button>
-                                        </div>
-                                    </div>
-                                </>
-                            )}
+                    {/* Mobile: Row 1, Desktop: Middle */}
+                    <div className="relative w-full md:w-auto order-1 md:order-2">
+                        <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input 
+                            type="text"
+                            placeholder={t('Search products...')}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 focus:bg-white transition-all w-full md:w-64"
+                        />
+                    </div>
+                    
+                    {/* Mobile: Row 2, Desktop: Right */}
+                    <div className="flex items-center gap-3 w-full md:w-auto order-2 md:order-3">
+                        <div className="flex-1 md:flex-none">
+                            <CustomSelect
+                                value={selectedServiceFilter}
+                                onChange={handleFilterChange}
+                                options={[
+                                    { value: 'all', label: t('All Services') },
+                                    ...services.map(service => ({ value: service.id, label: service.name }))
+                                ]}
+                                icon={<Filter className="w-4 h-4" />}
+                                className="pl-3 py-2.5 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 w-full"
+                            />
                         </div>
-                    )}
 
-                    <button 
-                        onClick={openCreateForm}
-                        className="px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm transition-colors"
-                    >
-                        <Plus className="w-4 h-4" />
-                        Add Product
-                    </button>
+                        {selectedServiceFilter !== 'all' && filterableSchema.length > 0 && (
+                            <div className="relative">
+                                <button 
+                                    onClick={() => setIsFilterPanelOpen(!isFilterPanelOpen)}
+                                    className={`px-4 py-2.5 border rounded-xl font-bold text-sm flex items-center gap-2 transition-colors shadow-sm ${Object.values(activeFilters).some(v => v) ? 'bg-gray-100 border-gray-300 text-gray-900 dark:bg-gray-800 dark:border-gray-600 dark:text-white' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'}`}
+                                >
+                                    <Filter className="w-4 h-4" />
+                                    <span className="hidden sm:inline">{t('Filters')}</span>
+                                    {Object.values(activeFilters).some(v => v) && (
+                                        <span className="w-2 h-2 rounded-full bg-gray-900 dark:bg-white"></span>
+                                    )}
+                                </button>
+
+                                {isFilterPanelOpen && (
+                                    <>
+                                        <div className="fixed inset-0 z-40" onClick={() => setIsFilterPanelOpen(false)}></div>
+                                        <div className="absolute right-0 top-full mt-2 w-[300px] sm:w-[420px] z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl animate-fade-in origin-top-right flex flex-col">
+                                            <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/30 rounded-t-2xl">
+                                                <div className="flex items-center gap-2">
+                                                    <Filter className="w-4 h-4 text-gray-500" />
+                                                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">{t('Advanced Filters')}</h3>
+                                                </div>
+                                                {Object.values(filterValues).some(v => v) && (
+                                                    <button onClick={handleClearFilters} className="text-xs font-bold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
+                                                        {t('Clear All')}
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <div className="p-6 flex flex-col gap-6">
+                                                {filterableSchema.map(field => (
+                                                    <div key={field.name} className="flex flex-col gap-2 relative">
+                                                        <label className="text-xs font-bold text-gray-600 dark:text-gray-400">{field.label}</label>
+                                                        {filterOptions[field.name] ? (
+                                                            <CustomSelect
+                                                                value={filterValues[field.name] || ''}
+                                                                onChange={(e) => setFilterValues({...filterValues, [field.name]: e.target.value})}
+                                                                options={[
+                                                                    { value: '', label: t('All') + ' ' + field.label },
+                                                                    ...filterOptions[field.name].map(opt => ({ value: opt, label: opt }))
+                                                                ]}
+                                                                placeholder={t('All') + ` ${field.label}`}
+                                                                className="py-2.5 px-4 text-sm font-medium border-gray-200 dark:border-gray-700 shadow-sm rounded-xl w-full"
+                                                            />
+                                                        ) : (
+                                                            <input 
+                                                                type="text" 
+                                                                placeholder={t('Search') + ` ${field.label}...`}
+                                                                value={filterValues[field.name] || ''}
+                                                                onChange={(e) => setFilterValues({...filterValues, [field.name]: e.target.value})}
+                                                                onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
+                                                                className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent transition-all shadow-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                                                            />
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div className="p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 flex justify-end gap-3 rounded-b-2xl">
+                                                <button 
+                                                    onClick={() => setIsFilterPanelOpen(false)}
+                                                    className="px-5 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                                >
+                                                    {t('Cancel')}
+                                                </button>
+                                                <button 
+                                                    onClick={handleApplyFilters}
+                                                    className="px-5 py-2.5 bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 transition-colors shadow-sm"
+                                                >
+                                                    {t('Apply')}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -410,14 +420,14 @@ export default function Index({ products, services, showToast, activeFilters = {
                 <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
                     <thead className="bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-widest font-extrabold border-b border-gray-100 dark:border-gray-800">
                         <tr>
-                            <th className="px-8 py-5 w-16">No.</th>
-                            <th className="px-8 py-5">Service Category</th>
-                            <th className="px-8 py-5">Product Name</th>
-                            <th className="px-8 py-5">Base HPP</th>
-                            <th className="px-8 py-5">Min Price</th>
-                            <th className="px-8 py-5">Akreditasi</th>
-                            <th className="px-8 py-5 text-center">Specifications</th>
-                            <th className="px-8 py-5 text-right sticky right-0 bg-white dark:bg-gray-900 z-10">Actions</th>
+                            <th className="px-4 lg:px-8 py-4 lg:py-5 w-16">{t('No.')}</th>
+                            <th className="px-4 lg:px-8 py-4 lg:py-5">{t('Service Category')}</th>
+                            <th className="px-4 lg:px-8 py-4 lg:py-5">{t('Product Name')}</th>
+                            <th className="px-4 lg:px-8 py-4 lg:py-5">{t('Base HPP')}</th>
+                            <th className="px-4 lg:px-8 py-4 lg:py-5">{t('Min Price')}</th>
+                            <th className="px-4 lg:px-8 py-4 lg:py-5">{t('Akreditasi')}</th>
+                            <th className="px-4 lg:px-8 py-4 lg:py-5 text-center">{t('Specifications')}</th>
+                            <th className="px-4 lg:px-8 py-4 lg:py-5 text-right sticky right-0 bg-white dark:bg-gray-900 z-10 drop-shadow-[-5px_0_5px_rgba(0,0,0,0.05)] md:drop-shadow-none">{t('Actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
@@ -426,53 +436,53 @@ export default function Index({ products, services, showToast, activeFilters = {
                                 <td colSpan="100%" className="px-8 py-16 text-center">
                                     <div className="flex flex-col items-center justify-center">
                                         <Box className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-4" />
-                                        <p className="text-gray-500 dark:text-gray-400 font-medium">No products found in this category.</p>
+                                        <p className="text-gray-500 dark:text-gray-400 font-medium">{t('No products found in this category.')}</p>
                                     </div>
                                 </td>
                             </tr>
                         ) : (
                             filteredProducts.map((product, index) => (
                                 <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
-                                    <td className="px-8 py-5 text-gray-500 dark:text-gray-400 font-medium">
+                                    <td className="px-4 lg:px-8 py-4 lg:py-5 text-gray-500 dark:text-gray-400 font-medium">
                                         {(products.current_page - 1) * products.per_page + index + 1}
                                     </td>
-                                    <td className="px-8 py-5">
+                                    <td className="px-4 lg:px-8 py-4 lg:py-5">
                                         {product.service ? (
                                             <span className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border border-transparent dark:border-gray-700">
                                                 {product.service.name}
                                             </span>
                                         ) : (
                                             <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border border-transparent dark:border-red-800">
-                                                No Service
+                                                {t('No Service')}
                                             </span>
                                         )}
                                     </td>
-                                    <td className="px-8 py-5 font-bold text-gray-900 dark:text-white">
+                                    <td className="px-4 lg:px-8 py-4 lg:py-5 font-bold text-gray-900 dark:text-white">
                                         {product.name}
                                     </td>
-                                    <td className="px-8 py-5">
+                                    <td className="px-4 lg:px-8 py-4 lg:py-5">
                                         <div className="flex flex-col gap-1">
                                             <span className="font-bold text-gray-900 dark:text-white">{formatCurrency(product.hpp)}</span>
                                             {product.attributes?.hpp_usd && (
-                                                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-md w-fit border border-emerald-100 dark:border-emerald-800">
+                                                <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-md w-fit border border-gray-200/80 dark:border-gray-700">
                                                     $ {Number(product.attributes.hpp_usd).toLocaleString('en-US')}
                                                 </span>
                                             )}
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5">
+                                    <td className="px-4 lg:px-8 py-4 lg:py-5">
                                         <span className="font-bold text-gray-900 dark:text-white">
                                             {product.min_price ? formatCurrency(product.min_price) : '-'}
                                         </span>
                                     </td>
-                                    <td className="px-8 py-5">
+                                    <td className="px-4 lg:px-8 py-4 lg:py-5">
                                         {product.attributes?.accreditation_type ? (
                                             <span className="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-200 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide border border-gray-200 dark:border-gray-700">
                                                 {product.attributes.accreditation_type}
                                             </span>
                                         ) : '-'}
                                     </td>
-                                    <td className="px-8 py-5 text-center">
+                                    <td className="px-4 lg:px-8 py-4 lg:py-5 text-center">
                                         <button 
                                             onClick={() => openSpecsModal(product)}
                                             className="inline-flex items-center justify-center p-2 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 rounded-lg transition-colors border border-transparent group-hover:border-gray-200 dark:group-hover:border-gray-700 shadow-sm"
@@ -481,7 +491,7 @@ export default function Index({ products, services, showToast, activeFilters = {
                                             <Eye className="w-4 h-4" />
                                         </button>
                                     </td>
-                                    <td className="px-8 py-5 text-right sticky right-0 bg-white dark:bg-gray-900 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/50 transition-colors">
+                                    <td className="px-4 lg:px-8 py-4 lg:py-5 text-right sticky right-0 bg-white dark:bg-gray-900 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/50 transition-colors">
                                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button 
                                                 onClick={() => openEditForm(product)}
@@ -520,18 +530,19 @@ export default function Index({ products, services, showToast, activeFilters = {
                 onClose={() => setIsSpecsModalOpen(false)}
                 product={viewSpecsProduct}
                 service={viewSpecsProduct ? services.find(s => s.id === viewSpecsProduct.service_id) : null}
+                t={t}
             />
 
             <ConfirmModal 
                 isOpen={isConfirmModalOpen} 
                 onClose={() => setIsConfirmModalOpen(false)}
                 onConfirm={confirmDelete}
-                title="Delete Product"
-                message="Are you sure you want to delete this product?"
-                confirmText="Delete"
+                title={t('Delete Product')}
+                message={t('Are you sure you want to delete this product?')}
+                confirmText={t('Delete')}
             />
         </div>
     );
 }
 
-Index.layout = page => <MainLayout children={page} />;
+Index.layout = page => <MainLayout title="Products" children={page} />;

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\ChatSnippet;
-use App\Models\Pricelist;
 use App\Models\Brochure;
 
 class GlobalSearchController extends Controller
@@ -22,18 +21,19 @@ class GlobalSearchController extends Controller
         $results = [];
 
         // Search Products
-        $products = Product::where('name', 'like', "%{$query}%")
-            ->orWhere('category', 'like', "%{$query}%")
+        $products = Product::with('service:id,name')
+            ->where('name', 'like', "%{$query}%")
+            ->orWhere('attributes->focus_scope', 'like', "%{$query}%")
             ->limit(5)
-            ->get(['id', 'name', 'category']);
+            ->get(['id', 'name', 'service_id']);
             
         foreach ($products as $product) {
             $results[] = [
                 'id' => $product->id,
                 'title' => $product->name,
-                'subtitle' => $product->category,
+                'subtitle' => $product->service ? $product->service->name : 'Product',
                 'type' => 'Product',
-                'url' => route('admin.products.index')
+                'url' => route('admin.products.index', ['search' => $product->name])
             ];
         }
 
@@ -53,20 +53,7 @@ class GlobalSearchController extends Controller
             ];
         }
 
-        // Search Pricelists
-        $pricelists = Pricelist::where('name', 'like', "%{$query}%")
-            ->limit(5)
-            ->get(['id', 'name']);
-            
-        foreach ($pricelists as $pricelist) {
-            $results[] = [
-                'id' => $pricelist->id,
-                'title' => $pricelist->name,
-                'subtitle' => 'Catalog',
-                'type' => 'Pricelist',
-                'url' => route('admin.pricelists.index')
-            ];
-        }
+        // Pricelists are now managed within the products table, no need to search a non-existent pricelists table
 
         // Search Brochures
         $brochures = Brochure::where('title', 'like', "%{$query}%")

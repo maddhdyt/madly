@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
+import useTranslations from '../../../Hooks/useTranslations';
 
 export default function ChatSnippetFormSlideOver({ isOpen, onClose, snippet }) {
+    const { t } = useTranslations();
     const isEditing = !!snippet;
     const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm({
         shortcut: '',
@@ -51,11 +53,11 @@ export default function ChatSnippetFormSlideOver({ isOpen, onClose, snippet }) {
             put(route('admin.chat-snippets.update', snippet.id), {
                 onSuccess: () => {
                     onClose();
-                    if (showToast) showToast('Snippet updated successfully');
+                    if (showToast) showToast(t('Snippet updated successfully'));
                 },
                 onError: (err) => {
                     const firstError = Object.values(err)[0];
-                    if (showToast) showToast(firstError || 'Failed to update snippet', 'error');
+                    if (showToast) showToast(firstError || t('Failed to update snippet'), 'error');
                 },
                 data: submittedData
             });
@@ -63,11 +65,11 @@ export default function ChatSnippetFormSlideOver({ isOpen, onClose, snippet }) {
             post(route('admin.chat-snippets.store'), {
                 onSuccess: () => {
                     onClose();
-                    if (showToast) showToast('Snippet created successfully');
+                    if (showToast) showToast(t('Snippet created successfully'));
                 },
                 onError: (err) => {
                     const firstError = Object.values(err)[0];
-                    if (showToast) showToast(firstError || 'Failed to create snippet', 'error');
+                    if (showToast) showToast(firstError || t('Failed to create snippet'), 'error');
                 },
                 data: submittedData
             });
@@ -94,10 +96,10 @@ export default function ChatSnippetFormSlideOver({ isOpen, onClose, snippet }) {
                 <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
                     <div>
                         <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                            {isEditing ? 'Edit Snippet' : 'New Snippet'}
+                            {isEditing ? t('Edit Snippet') : t('New Snippet')}
                         </h2>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                            {isEditing ? 'Modify your chat snippet.' : 'Create a new text template.'}
+                            {isEditing ? t('Modify your chat snippet.') : t('Create a new text template.')}
                         </p>
                     </div>
                     <button 
@@ -113,7 +115,7 @@ export default function ChatSnippetFormSlideOver({ isOpen, onClose, snippet }) {
                     <form id="snippet-form" onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label className="block text-sm font-bold text-gray-900 dark:text-gray-200 mb-2">
-                                Shortcut
+                                {t('Shortcut')}
                             </label>
                             <input
                                 type="text"
@@ -124,17 +126,17 @@ export default function ChatSnippetFormSlideOver({ isOpen, onClose, snippet }) {
                                     ? 'border-red-300 dark:border-red-500/50 focus:border-red-500' 
                                     : 'border-gray-200 dark:border-gray-800 focus:border-gray-300 dark:focus:border-gray-600 text-gray-900 dark:text-white'
                                 }`}
-                                placeholder="e.g. /hello"
+                                placeholder={t('e.g. /hello')}
                             />
                             {errors.shortcut && (
                                 <p className="mt-1.5 text-sm text-red-500 font-medium">{errors.shortcut}</p>
                             )}
-                            <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">Used to quickly trigger this snippet (automatically adds / if missing).</p>
+                            <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">{t('Used to quickly trigger this snippet (automatically adds / if missing).')}</p>
                         </div>
 
                         <div>
                             <label className="block text-sm font-bold text-gray-900 dark:text-gray-200 mb-2">
-                                Title
+                                {t('Title')}
                             </label>
                             <input
                                 type="text"
@@ -145,7 +147,7 @@ export default function ChatSnippetFormSlideOver({ isOpen, onClose, snippet }) {
                                     ? 'border-red-300 dark:border-red-500/50 focus:border-red-500' 
                                     : 'border-gray-200 dark:border-gray-800 focus:border-gray-300 dark:focus:border-gray-600 text-gray-900 dark:text-white'
                                 }`}
-                                placeholder="e.g. Standard Greeting"
+                                placeholder={t('e.g. Standard Greeting')}
                             />
                             {errors.title && (
                                 <p className="mt-1.5 text-sm text-red-500 font-medium">{errors.title}</p>
@@ -154,7 +156,7 @@ export default function ChatSnippetFormSlideOver({ isOpen, onClose, snippet }) {
 
                         <div>
                             <label className="block text-sm font-bold text-gray-900 dark:text-gray-200 mb-2">
-                                Content
+                                {t('Content')}
                             </label>
                             <textarea
                                 value={data.content_text}
@@ -165,7 +167,7 @@ export default function ChatSnippetFormSlideOver({ isOpen, onClose, snippet }) {
                                     ? 'border-red-300 dark:border-red-500/50 focus:border-red-500' 
                                     : 'border-gray-200 dark:border-gray-800 focus:border-gray-300 dark:focus:border-gray-600 text-gray-900 dark:text-white'
                                 }`}
-                                placeholder="Type the full message here..."
+                                placeholder={t('Type the full message here...')}
                             />
                             {errors.content_text && (
                                 <p className="mt-1.5 text-sm text-red-500 font-medium">{errors.content_text}</p>
@@ -182,7 +184,7 @@ export default function ChatSnippetFormSlideOver({ isOpen, onClose, snippet }) {
                         disabled={processing}
                         className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                     >
-                        {processing ? 'Saving...' : 'Save Snippet'}
+                        {processing ? t('Saving...') : t('Save Snippet')}
                     </button>
                 </div>
             </div>

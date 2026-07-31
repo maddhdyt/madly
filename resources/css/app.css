@@ -3,15 +3,36 @@
 @custom-variant dark (&:is(.dark *));
 
 @font-face {
-  font-family: 'Cabinet Grotesk';
-  src: url('../font/CabinetGrotesk-Extrabold.otf') format('opentype');
-  font-weight: 800;
+  font-family: 'Supreme';
+  src: url('../font/supreme/Supreme-Variable.ttf') format('truetype');
+  font-weight: 100 900;
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Supreme';
+  src: url('../font/supreme/Supreme-VariableItalic.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Chubbo';
+  src: url('../font/chubbo/Chubbo-Variable.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Chubbo';
+  src: url('../font/chubbo/Chubbo-VariableItalic.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+}
+
 @theme {
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Cabinet Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Supreme", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Chubbo", ui-sans-serif, system-ui, sans-serif;
   
   --shadow-soft: 0 20px 40px -15px rgba(0,0,0,0.05);
   --shadow-pill: 0 4px 14px -4px rgba(0,0,0,0.05);

@@ -4,18 +4,67 @@ import { LayoutGrid, Box, Briefcase, ChevronUp, ChevronDown, Users, ShoppingBag,
 import { Head, router } from '@inertiajs/react';
 import useCopyToClipboard from '../Hooks/useCopyToClipboard';
 import GlobalSearchModal from '../Components/GlobalSearchModal';
+import ProfileModal from '../Components/ProfileModal';
+import ConfirmModal from '../Components/ConfirmModal';
 import logoImg from '../../img/pile_2.webp';
+import useTranslations from '../Hooks/useTranslations';
 
 export default function MainLayout({ children, title = "Dashboard" }) {
+    const { t, locale } = useTranslations();
     const { url, props } = usePage();
     const user = props.auth?.user || { name: 'Guest', role: 'sales' };
     const settings = props.global_settings || {};
     const [toast, setToast] = useState(null);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(typeof window !== 'undefined' ? window.innerWidth >= 768 : true);
     const [searchQuery, setSearchQuery] = useState("");
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+    
+    // Magic indicator states
+    const activeLinkRef = React.useRef(null);
+    const navRef = React.useRef(null);
+    const [indicatorStyle, setIndicatorStyle] = useState({ transform: 'translateY(0)', height: 0, opacity: 0 });
+
+    useEffect(() => {
+        const updateIndicator = () => {
+            if (activeLinkRef.current && navRef.current) {
+                setIndicatorStyle({
+                    transform: `translateY(${activeLinkRef.current.offsetTop}px)`,
+                    height: activeLinkRef.current.offsetHeight,
+                    opacity: 1
+                });
+            }
+        };
+        
+        // Double rAF ensures the DOM is fully painted and positioned before measuring
+        requestAnimationFrame(() => {
+            requestAnimationFrame(updateIndicator);
+        });
+        
+        // Close sidebar on mobile after navigation
+        if (typeof window !== 'undefined' && window.innerWidth < 768) {
+            setIsSidebarOpen(false);
+        }
+
+        window.addEventListener('resize', updateIndicator);
+        
+        const handleResize = () => {
+            if (window.innerWidth < 768) {
+                setIsSidebarOpen(false);
+            } else {
+                setIsSidebarOpen(true);
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        
+        return () => {
+            window.removeEventListener('resize', updateIndicator);
+            window.removeEventListener('resize', handleResize);
+        };
+    }, [url]);
 
     useEffect(() => {
         // Initialize dark mode from localStorage or system preference
@@ -67,40 +116,56 @@ export default function MainLayout({ children, title = "Dashboard" }) {
 
     const menuGroups = [
         {
-            title: 'GENERAL',
+            title: t('GENERAL'),
             items: [
-                { name: 'Dashboard', icon: LayoutGrid, href: route('home'), active: url === '/' },
-                { name: 'Quick Quotation', icon: Calculator, href: route('admin.calculator.index'), active: url.startsWith('/admin/calculator') },
-                { name: 'Chat Snippets', icon: MessageSquare, href: route('admin.chat-snippets.index'), active: url.startsWith('/admin/chat-snippets') },
+                { name: t('Dashboard'), icon: LayoutGrid, href: route('home'), active: url === '/' },
+                { name: t('Quick Quotation'), icon: Calculator, href: route('admin.calculator.index'), active: url.startsWith('/admin/calculator') },
+                { name: t('Chat Snippets'), icon: MessageSquare, href: route('admin.chat-snippets.index'), active: url.startsWith('/admin/chat-snippets') },
             ]
         },
         ...(user.role === 'admin' || user.role === 'manager' ? [{
-            title: 'DATABASE',
+            title: t('DATABASE'),
             items: [
-                { name: 'Products', icon: Box, href: route('admin.products.index'), active: url.startsWith('/admin/products') },
-                { name: 'Pricelists', icon: BookOpen, href: route('admin.pricelists.index'), active: url.startsWith('/admin/pricelists') },
-                { name: 'Brochures', icon: FolderOpen, href: route('admin.brochures.index'), active: url.startsWith('/admin/brochures') },
-                { name: 'Brands', icon: Tag, href: route('admin.brands.index'), active: url.startsWith('/admin/brands') },
-                { name: 'Service Types', icon: Briefcase, href: route('admin.services.index'), active: url.startsWith('/admin/services') },
+                { name: t('Products'), icon: Box, href: route('admin.products.index'), active: url.startsWith('/admin/products') },
+                { name: t('Pricelists'), icon: BookOpen, href: route('admin.pricelists.index'), active: url.startsWith('/admin/pricelists') },
+                { name: t('Brochures'), icon: FolderOpen, href: route('admin.brochures.index'), active: url.startsWith('/admin/brochures') },
+                { name: t('Brands'), icon: Tag, href: route('admin.brands.index'), active: url.startsWith('/admin/brands') },
+                { name: t('Service Types'), icon: Briefcase, href: route('admin.services.index'), active: url.startsWith('/admin/services') },
             ]
         }] : []),
         ...(user.role === 'admin' ? [{
-            title: 'SYSTEM',
+            title: t('SYSTEM'),
             items: [
-                { name: 'Users', icon: Users, href: route('admin.users.index'), active: url.startsWith('/admin/users') },
-                { name: 'Settings', icon: Settings, href: route('admin.settings.index'), active: url.startsWith('/admin/settings') },
+                { name: t('Users'), icon: Users, href: route('admin.users.index'), active: url.startsWith('/admin/users') },
+                { name: t('Settings'), icon: Settings, href: route('admin.settings.index'), active: url.startsWith('/admin/settings') },
             ]
         }] : [])
     ];
 
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return t('Good morning');
+        if (hour < 18) return t('Good afternoon');
+        return t('Good evening');
+    };
+
     return (
         <>
         <Head title={title} />
-        <div className="flex h-screen w-full bg-[#f4f5f5] dark:bg-gray-950 font-sans text-gray-800 dark:text-gray-200 selection:bg-gray-200 overflow-hidden transition-colors duration-300">
+        <div className="flex h-screen w-full bg-[#f4f5f5] dark:bg-gray-950 font-sans text-gray-800 dark:text-gray-200 selection:bg-gray-200 overflow-hidden transition-colors duration-300 relative">
+            
+            {/* Mobile Sidebar Overlay */}
+            {isSidebarOpen && (
+                <div 
+                    className="fixed inset-0 bg-gray-900/50 dark:bg-black/50 backdrop-blur-sm z-40 md:hidden transition-opacity"
+                    onClick={() => setIsSidebarOpen(false)}
+                ></div>
+            )}
+
             {/* Sidebar */}
             <aside 
-                className={`flex-shrink-0 relative z-20 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] dark:bg-gray-900 border-r border-transparent dark:border-gray-800 overflow-hidden ${
-                    isSidebarOpen ? 'w-[280px] opacity-100 visible' : 'w-0 opacity-0 invisible'
+                className={`fixed inset-y-0 left-0 md:relative z-50 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] bg-white dark:bg-gray-900 border-r border-transparent dark:border-gray-800 overflow-hidden ${
+                    isSidebarOpen ? 'translate-x-0 w-[280px] opacity-100 shadow-2xl md:shadow-none' : '-translate-x-full md:translate-x-0 md:w-0 opacity-0 md:invisible'
                 }`}
             >
                 <div className="flex flex-col py-8 px-5 w-[280px] h-full">
@@ -113,16 +178,31 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 overflow-y-auto space-y-1 px-1 mt-2 pb-4">
+                <nav ref={navRef} className="flex-1 overflow-y-auto relative space-y-1 px-1 mt-2 pb-4">
+                    {/* The magical sliding indicator */}
+                    <div 
+                        className="absolute left-1 right-1 rounded-xl bg-gray-900 dark:bg-white shadow-md z-0 pointer-events-none" 
+                        style={{
+                            ...indicatorStyle,
+                            transition: 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease',
+                            willChange: 'transform, height'
+                        }}
+                    ></div>
+                    
                     {menuGroups.map((group, idx) => (
-                        <div key={idx}>
-                            <div className="pt-6 pb-1 first:pt-0">
+                        <div key={idx} className="z-10">
+                            <div className="pt-6 pb-1 first:pt-0 relative z-10">
                                 <p className="px-4 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase">{group.title}</p>
                             </div>
                             {group.items.map((item, itemIdx) => (
-                                <Link key={itemIdx} href={item.href} className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors rounded-xl ${item.active ? 'font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white shadow-sm' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}>
-                                    <item.icon className={`w-5 h-5 ${item.active ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={item.active ? 2 : 1.5} />
-                                    {item.name}
+                                <Link 
+                                    key={itemIdx} 
+                                    href={item.href} 
+                                    ref={item.active ? activeLinkRef : null}
+                                    className={`relative z-10 flex items-center gap-3 px-4 py-2.5 text-sm transition-colors duration-300 rounded-xl ${item.active ? 'font-semibold text-white dark:text-gray-900' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}
+                                >
+                                    <item.icon className={`w-5 h-5 relative z-10 transition-colors duration-300 ${item.active ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={item.active ? 2 : 1.5} />
+                                    <span className="relative z-10">{item.name}</span>
                                 </Link>
                             ))}
                         </div>
@@ -160,7 +240,7 @@ export default function MainLayout({ children, title = "Dashboard" }) {
             <main className="flex-1 flex flex-col h-full overflow-hidden p-6 md:p-8 lg:px-10 relative z-10 dark:bg-gray-950">
                 
                 {/* Navbar (Top Header) matching reference */}
-                <header className="mb-6 flex items-center justify-between">
+                <header className="mb-6 flex items-center justify-between shrink-0">
                     
                     {/* Left: Title & Toggle */}
                     <div className="flex items-center gap-4">
@@ -175,24 +255,59 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                                 <PanelLeftOpen className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" strokeWidth={2} />
                             )}
                         </button>
-                        <h1 className={`text-[28px] font-bold text-gray-900 dark:text-white tracking-tight transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSidebarOpen ? 'ml-2' : 'ml-1'}`}>
-                            {title}
-                        </h1>
+                        <div className={`transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSidebarOpen ? 'ml-2' : 'ml-1'}`}>
+                            <h1 className="text-xl md:text-[28px] font-bold font-display text-gray-900 dark:text-white tracking-tight leading-tight">
+                                {t(title)}
+                            </h1>
+                            <div className="flex flex-wrap items-center gap-1 md:gap-2 mt-0.5 text-[11px] md:text-[13px] font-semibold text-gray-500 dark:text-gray-400">
+                                <span>{getGreeting()}, {user.name.split(' ')[0]} 👋</span>
+                                <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700"></span>
+                                <span>{new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Right: Actions */}
                     <div className="flex items-center gap-3">
-                        {/* Search Pill */}
-                        <div className="bg-white dark:bg-gray-900 rounded-xl px-4 py-2.5 flex items-center gap-2.5 w-[240px] shadow-sm cursor-text focus-within:ring-2 focus-within:ring-gray-300 dark:focus-within:ring-gray-600 transition-shadow">
-                            <Search className="w-4 h-4 text-gray-400 dark:text-gray-500" strokeWidth={2.5} />
-                            <input 
-                                type="text" 
-                                id="global-search"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search anything..." 
-                                className="w-full bg-transparent border-none text-sm text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 font-medium focus:outline-none focus:ring-0 p-0"
-                            />
+                        {/* Search Trigger */}
+                        <button 
+                            onClick={() => setIsSearchModalOpen(true)}
+                            className="hidden sm:flex items-center gap-2 px-3 lg:px-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all shadow-sm focus:outline-none group"
+                        >
+                            <Search className="w-4 h-4 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors" />
+                            <span className="text-sm font-medium mr-2 lg:mr-8 hidden lg:block">{t('Search...')}</span>
+                            <span className="hidden sm:flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 border border-gray-200 dark:border-gray-700 shadow-sm tracking-widest">
+                                Ctrl K
+                            </span>
+                        </button>
+                        
+                        {/* Mobile Search Icon */}
+                        <button 
+                            onClick={() => setIsSearchModalOpen(true)}
+                            className="sm:hidden p-2.5 rounded-xl text-gray-500 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            <Search className="w-5 h-5" />
+                        </button>
+
+                        {/* Language Toggle */}
+                        <div className="relative bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-1 flex items-center shadow-inner overflow-hidden border border-gray-200/50 dark:border-gray-700/50 h-10">
+                            {/* Sliding Indicator */}
+                            <div 
+                                className={`absolute left-1 top-1 bottom-1 w-[36px] bg-white dark:bg-gray-700 rounded-lg shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${locale === 'id' ? 'translate-x-[36px]' : 'translate-x-0'}`}
+                            ></div>
+                            
+                            <button
+                                onClick={() => locale !== 'en' && router.post(route('language.switch'), { locale: 'en' }, { preserveScroll: true })}
+                                className={`relative z-10 w-[36px] flex justify-center items-center text-[11px] font-bold tracking-wider transition-colors duration-300 ${locale === 'en' ? 'text-gray-900 dark:text-white' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                            >
+                                EN
+                            </button>
+                            <button
+                                onClick={() => locale !== 'id' && router.post(route('language.switch'), { locale: 'id' }, { preserveScroll: true })}
+                                className={`relative z-10 w-[36px] flex justify-center items-center text-[11px] font-bold tracking-wider transition-colors duration-300 ${locale === 'id' ? 'text-gray-900 dark:text-white' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                            >
+                                ID
+                            </button>
                         </div>
 
                         {/* Avatar (Profile/Logout placeholder) */}
@@ -214,10 +329,22 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                                             <p className="text-xs text-gray-500 truncate capitalize">{user.role}</p>
                                         </div>
                                         <button 
-                                            onClick={() => router.post(route('logout'))}
+                                            onClick={() => {
+                                                setIsProfileOpen(false);
+                                                setIsProfileModalOpen(true);
+                                            }}
+                                            className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium transition-colors border-b border-gray-100 dark:border-gray-800"
+                                        >
+                                            {t('My Profile')}
+                                        </button>
+                                        <button 
+                                            onClick={() => {
+                                                setIsProfileOpen(false);
+                                                setIsLogoutConfirmOpen(true);
+                                            }}
                                             className="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium transition-colors"
                                         >
-                                            Sign out
+                                            {t('Sign out')}
                                         </button>
                                     </div>
                                 </>
@@ -250,6 +377,26 @@ export default function MainLayout({ children, title = "Dashboard" }) {
             <GlobalSearchModal 
                 isOpen={isSearchModalOpen} 
                 onClose={() => setIsSearchModalOpen(false)} 
+            />
+
+            {/* Profile Modal */}
+            <ProfileModal 
+                isOpen={isProfileModalOpen} 
+                onClose={() => setIsProfileModalOpen(false)} 
+            />
+
+            {/* Logout Confirm Modal */}
+            <ConfirmModal 
+                isOpen={isLogoutConfirmOpen}
+                title={t('Sign out')}
+                message={t('Are you sure you want to sign out of your account?')}
+                confirmText={t('Sign out')}
+                onClose={() => setIsLogoutConfirmOpen(false)}
+                onConfirm={() => {
+                    setIsLogoutConfirmOpen(false);
+                    router.post(route('logout'));
+                }}
+                type="danger"
             />
         </div>
         </>

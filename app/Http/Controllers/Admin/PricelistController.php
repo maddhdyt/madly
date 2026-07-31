@@ -41,15 +41,15 @@ class PricelistController extends Controller
         if ($serviceId && $serviceId !== 'all') {
             $service = Service::find($serviceId);
             if ($service && !empty($service->product_schema)) {
-                $allProducts = Product::where('service_id', $serviceId)->get();
+                $allAttributes = Product::where('service_id', $serviceId)->pluck('attributes');
                 foreach ($service->product_schema as $field) {
                     if (!in_array($field['type'] ?? '', ['tags', 'label'])) {
                         continue;
                     }
                     $fieldName = $field['name'];
                     $values = [];
-                    foreach ($allProducts as $product) {
-                        $val = $product->attributes[$fieldName] ?? null;
+                    foreach ($allAttributes as $attributes) {
+                        $val = $attributes[$fieldName] ?? null;
                         if (!empty($val)) {
                             $parts = explode(',', (string)$val);
                             foreach ($parts as $part) {
@@ -70,7 +70,7 @@ class PricelistController extends Controller
 
         return Inertia::render('Admin/Pricelists/Index', [
             'products' => $products,
-            'services' => Service::orderBy('name')->get(),
+            'services' => \Illuminate\Support\Facades\Cache::remember('master_services', 86400, function() { return Service::orderBy('name')->get(); }),
             'activeFilters' => $activeFilters,
             'filterOptions' => $filterOptions
         ]);

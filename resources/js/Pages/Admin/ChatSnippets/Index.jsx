@@ -5,8 +5,10 @@ import { Plus, Edit2, Trash2, ArrowLeft, MessageSquareQuote } from 'lucide-react
 import ChatSnippetFormSlideOver from './ChatSnippetFormSlideOver';
 import ConfirmModal from '../../../Components/ConfirmModal';
 import Pagination from '../../../Components/Pagination';
+import useTranslations from '../../../Hooks/useTranslations';
 
 export default function Index({ snippets, filters, showToast }) {
+    const { t } = useTranslations();
     const { delete: destroy } = useForm();
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
     const [selectedSnippet, setSelectedSnippet] = useState(null);
@@ -24,11 +26,11 @@ export default function Index({ snippets, filters, showToast }) {
                 onSuccess: () => {
                     setIsConfirmModalOpen(false);
                     setSnippetToDelete(null);
-                    if (showToast) showToast('Chat snippet deleted successfully');
+                    if (showToast) showToast(t('Chat snippet deleted successfully'));
                 },
                 onError: () => {
                     setIsConfirmModalOpen(false);
-                    if (showToast) showToast('Failed to delete chat snippet', 'error');
+                    if (showToast) showToast(t('Failed to delete chat snippet'), 'error');
                 }
             });
         }
@@ -49,8 +51,8 @@ export default function Index({ snippets, filters, showToast }) {
             {/* Header Area */}
             <div className="flex items-center justify-between px-8 py-8 border-b border-gray-100 dark:border-gray-800">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Chat Snippets</h1>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage quick replies and text templates.</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{t('Chat Snippets')}</h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('Manage quick replies and text templates.')}</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button 
@@ -58,14 +60,14 @@ export default function Index({ snippets, filters, showToast }) {
                         className="px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Dashboard
+                        {t('Back to Dashboard')}
                     </button>
                     <button 
                         onClick={openCreateForm}
                         className="px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm transition-colors"
                     >
                         <Plus className="w-4 h-4" />
-                        Add Snippet
+                        {t('Add Snippet')}
                     </button>
                 </div>
             </div>
@@ -75,17 +77,17 @@ export default function Index({ snippets, filters, showToast }) {
                 <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300">
                     <thead className="bg-gray-50/50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider font-bold border-b border-gray-200 dark:border-gray-800">
                         <tr>
-                            <th className="px-8 py-4">Shortcut</th>
-                            <th className="px-8 py-4">Title</th>
-                            <th className="px-8 py-4 w-1/2">Content</th>
-                            <th className="px-8 py-4 text-right">Actions</th>
+                            <th className="px-8 py-4">{t('Shortcut')}</th>
+                            <th className="px-8 py-4">{t('Title')}</th>
+                            <th className="px-8 py-4 w-1/2">{t('Content')}</th>
+                            <th className="px-8 py-4 text-right">{t('Actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
                         {snippets.data.length === 0 ? (
                             <tr>
                                 <td colSpan="4" className="px-8 py-12 text-center text-gray-500 dark:text-gray-400">
-                                    No chat snippets found. Create one to get started.
+                                    {t('No chat snippets found. Create one to get started.')}
                                 </td>
                             </tr>
                         ) : (
@@ -147,4 +149,4 @@ export default function Index({ snippets, filters, showToast }) {
     );
 }
 
-Index.layout = page => <MainLayout children={page} />;
+Index.layout = page => <MainLayout title="Chat Snippets" children={page} />;

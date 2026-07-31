@@ -5,8 +5,10 @@ import { Plus, Edit2, Trash2, Box, Book, Monitor, Server, TrendingUp, Briefcase,
 import ServiceFormSlideOver from './ServiceFormSlideOver';
 import ConfirmModal from '../../../Components/ConfirmModal';
 import Pagination from '../../../Components/Pagination';
+import useTranslations from '../../../Hooks/useTranslations';
 
 export default function Index({ services, showToast }) {
+    const { t } = useTranslations();
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
     const [selectedService, setSelectedService] = useState(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -33,11 +35,11 @@ export default function Index({ services, showToast }) {
                 onSuccess: () => {
                     setIsConfirmModalOpen(false);
                     setServiceToDelete(null);
-                    if (showToast) showToast('Service type deleted successfully');
+                    if (showToast) showToast(t('Service type deleted successfully'));
                 },
                 onError: () => {
                     setIsConfirmModalOpen(false);
-                    if (showToast) showToast('Failed to delete service type', 'error');
+                    if (showToast) showToast(t('Failed to delete service type'), 'error');
                 }
             });
         }
@@ -64,15 +66,15 @@ export default function Index({ services, showToast }) {
     };
 
     return (
-        <MainLayout title="Service Types">
-            <Head title="Service Types" />
+        <>
+            <Head title={t('Service Types')} />
             <div className="flex flex-col h-full w-full bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden transition-colors duration-300">
                 {/* Header Area */}
                 <div className="flex items-center justify-between px-8 py-8 border-b border-gray-100 dark:border-gray-800">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Service Types</h1>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{t('Service Types')}</h1>
                         <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-2">
-                            Manage the templates and configurations for your product offerings.
+                            {t('Manage the templates and configurations for your product offerings.')}
                         </p>
                     </div>
                     
@@ -81,7 +83,7 @@ export default function Index({ services, showToast }) {
                         className="bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-100 text-white dark:text-gray-900 px-4 py-2.5 rounded-xl font-bold text-sm transition-colors flex items-center gap-2 shadow-sm"
                     >
                         <Plus className="w-4 h-4" />
-                        Add Service Type
+                        {t('Add Service Type')}
                     </button>
                 </div>
 
@@ -102,7 +104,7 @@ export default function Index({ services, showToast }) {
                                             <h3 className="text-[15px] font-bold text-gray-900 dark:text-white truncate">{service.name}</h3>
                                         </div>
                                         <p className="text-sm text-gray-500 dark:text-gray-400 truncate pr-4">
-                                            {service.description || 'No description provided.'}
+                                            {service.description || t('No description provided.')}
                                         </p>
                                     </div>
                                 </div>
@@ -128,8 +130,8 @@ export default function Index({ services, showToast }) {
                     {services.data.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-20 text-center">
                             <Box className="w-16 h-16 text-gray-200 dark:text-gray-700 mb-4" />
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">No service types found</h3>
-                            <p className="text-gray-500 dark:text-gray-400 mt-2">Create your first service type to start selling.</p>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('No service types found')}</h3>
+                            <p className="text-gray-500 dark:text-gray-400 mt-2">{t('Create your first service type to start selling.')}</p>
                         </div>
                     )}
                     <Pagination links={services.links} />
@@ -147,10 +149,12 @@ export default function Index({ services, showToast }) {
                 isOpen={isConfirmModalOpen} 
                 onClose={() => setIsConfirmModalOpen(false)}
                 onConfirm={confirmDelete}
-                title="Delete Service Type"
-                message="Are you sure you want to delete this service type? Products connected to it will lose their type association."
-                confirmText="Delete"
+                title={t('Delete Service Type')}
+                message={t('Are you sure you want to delete this service type? Products connected to it will lose their type association.')}
+                confirmText={t('Delete')}
             />
-        </MainLayout>
+        </>
     );
 }
+
+Index.layout = page => <MainLayout title="Service Types" children={page} />;

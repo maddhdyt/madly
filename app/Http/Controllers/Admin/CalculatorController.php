@@ -17,8 +17,8 @@ class CalculatorController extends Controller
     public function index()
     {
         $products = Product::with(['service'])->orderBy('name')->get();
-        $brands = Brand::orderBy('name')->get();
-        $services = Service::orderBy('name')->get();
+        $brands = \Illuminate\Support\Facades\Cache::remember('master_brands', 86400, function() { return Brand::orderBy('name')->get(); });
+        $services = \Illuminate\Support\Facades\Cache::remember('master_services', 86400, function() { return Service::orderBy('name')->get(); });
 
         return Inertia::render('Admin/Calculator/Index', [
             'products' => $products,

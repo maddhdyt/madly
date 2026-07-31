@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useForm } from '@inertiajs/react';
 import { X, Save, UploadCloud } from 'lucide-react';
+import useTranslations from '../../../Hooks/useTranslations';
 
 export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }) {
+    const { t } = useTranslations();
     const isEdit = !!brand;
     const [mounted, setMounted] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
@@ -47,11 +49,11 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
                 preserveScroll: true,
                 onSuccess: () => {
                     onClose();
-                    if (showToast) showToast('Brand updated successfully!');
+                    if (showToast) showToast(t('Brand updated successfully!'));
                 },
                 onError: (err) => {
                     const firstError = Object.values(err)[0];
-                    if (showToast) showToast(firstError || 'Failed to update brand', 'error');
+                    if (showToast) showToast(firstError || t('Failed to update brand'), 'error');
                 },
                 forceFormData: true,
             });
@@ -60,11 +62,11 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
                 preserveScroll: true,
                 onSuccess: () => {
                     onClose();
-                    if (showToast) showToast('Brand created successfully!');
+                    if (showToast) showToast(t('Brand created successfully!'));
                 },
                 onError: (err) => {
                     const firstError = Object.values(err)[0];
-                    if (showToast) showToast(firstError || 'Failed to create brand', 'error');
+                    if (showToast) showToast(firstError || t('Failed to create brand'), 'error');
                 },
                 forceFormData: true,
             });
@@ -115,8 +117,8 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 z-10">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{isEdit ? 'Edit Brand' : 'Add New Brand'}</h2>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Configure brand details.</p>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{isEdit ? t('Edit Brand') : t('Add New Brand')}</h2>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('Configure brand details.')}</p>
                     </div>
                     <button 
                         onClick={onClose} 
@@ -133,11 +135,11 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
                             <div className="flex flex-col gap-5">
                                 <div>
-                                    <label className={labelClass}>Brand Name</label>
+                                    <label className={labelClass}>{t('Brand Name')}</label>
                                     <input 
                                         type="text" 
                                         className={inputClass}
-                                        placeholder="e.g., Turnitin"
+                                        placeholder={t('e.g., Turnitin')}
                                         value={data.name}
                                         onChange={e => setData('name', e.target.value)}
                                         required
@@ -145,10 +147,10 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
                                     {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                                 </div>
                                 <div>
-                                    <label className={labelClass}>Description</label>
+                                    <label className={labelClass}>{t('Description')}</label>
                                     <textarea 
                                         className={inputClass}
-                                        placeholder="Short description about the brand..."
+                                        placeholder={t('Short description about the brand...')}
                                         value={data.description}
                                         onChange={e => setData('description', e.target.value)}
                                         rows="3"
@@ -156,7 +158,7 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
                                     {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
                                 </div>
                                 <div>
-                                    <label className={labelClass}>Brand Logo</label>
+                                    <label className={labelClass}>{t('Brand Logo')}</label>
                                     
                                     {data.logo || (isEdit && brand.logo) ? (
                                         <div 
@@ -175,10 +177,10 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
                                             <div className="absolute inset-0 bg-gray-900/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center backdrop-blur-[2px]">
                                                 <label htmlFor="file-upload" className="cursor-pointer px-5 py-2.5 bg-white text-gray-900 rounded-xl font-bold text-sm shadow-xl hover:scale-105 hover:bg-gray-50 transition-all flex items-center gap-2">
                                                     <UploadCloud className="w-4 h-4" strokeWidth={2.5} />
-                                                    Change Image
+                                                    {t('Change Image')}
                                                     <input id="file-upload" type="file" className="sr-only" onChange={e => setData('logo', e.target.files[0])} accept="image/*" />
                                                 </label>
-                                                <p className="text-white/80 text-xs mt-3 font-medium">or drag a new file here</p>
+                                                <p className="text-white/80 text-xs mt-3 font-medium">{t('or drag a new file here')}</p>
                                             </div>
                                             
                                             {/* Dragging Overlay */}
@@ -186,7 +188,7 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
                                                 <div className="absolute inset-0 bg-gray-900/80 flex items-center justify-center backdrop-blur-sm z-10">
                                                     <div className="text-center">
                                                         <UploadCloud className="w-10 h-10 text-white mx-auto mb-2 animate-bounce" />
-                                                        <p className="text-white font-bold text-sm">Drop to replace!</p>
+                                                        <p className="text-white font-bold text-sm">{t('Drop to replace!')}</p>
                                                     </div>
                                                 </div>
                                             )}
@@ -205,12 +207,12 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
                                                 </div>
                                                 <div className="flex text-sm text-gray-600 dark:text-gray-400 justify-center items-center">
                                                     <label htmlFor="file-upload-empty" className="relative cursor-pointer rounded-md font-bold text-gray-900 dark:text-white hover:text-blue-600 transition-colors">
-                                                        <span>Click to upload</span>
+                                                        <span>{t('Click to upload')}</span>
                                                         <input id="file-upload-empty" type="file" className="sr-only" onChange={e => setData('logo', e.target.files[0])} accept="image/*" />
                                                     </label>
-                                                    <p className="pl-1">or drag and drop</p>
+                                                    <p className="pl-1">{t('or drag and drop')}</p>
                                                 </div>
-                                                <p className="text-xs font-medium text-gray-400 dark:text-gray-500 mt-2">PNG, JPG, SVG (Max. 2MB)</p>
+                                                <p className="text-xs font-medium text-gray-400 dark:text-gray-500 mt-2">{t('PNG, JPG, SVG (Max. 2MB)')}</p>
                                             </div>
                                         </div>
                                     )}
@@ -229,7 +231,7 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
                         onClick={onClose} 
                         className="px-5 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
-                        Cancel
+                        {t('Cancel')}
                     </button>
                     <button 
                         type="submit" 
@@ -238,7 +240,7 @@ export default function BrandFormSlideOver({ isOpen, onClose, brand, showToast }
                         className="px-8 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm disabled:opacity-70 transition-colors"
                     >
                         <Save className="w-4 h-4" /> 
-                        {processing ? 'Saving...' : 'Save Brand'}
+                        {processing ? t('Saving...') : t('Save Brand')}
                     </button>
                 </div>
             </div>

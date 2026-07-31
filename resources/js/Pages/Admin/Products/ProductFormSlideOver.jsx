@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useForm } from '@inertiajs/react';
 import { X, Save, Image as ImageIcon, Box, Book, Monitor, Server, TrendingUp, Tag, List, Briefcase, Code, PenTool, Award, Shield, Globe, Camera, Palette, Database, Layers, Trash } from 'lucide-react';
+import useTranslations from '../../../Hooks/useTranslations';
 
 export default function ProductFormSlideOver({ isOpen, onClose, product, services = [], showToast }) {
+    const { t } = useTranslations();
     const isEdit = !!product;
     const [mounted, setMounted] = useState(false);
 
@@ -51,22 +53,22 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
             put(route('admin.products.update', product.id), {
                 onSuccess: () => {
                     onClose();
-                    if (showToast) showToast('Product updated successfully');
+                    if (showToast) showToast(t('Product updated successfully'));
                 },
                 onError: (err) => {
                     const firstError = Object.values(err)[0];
-                    if (showToast) showToast(firstError || 'Failed to update product', 'error');
+                    if (showToast) showToast(firstError || t('Failed to update product'), 'error');
                 }
             });
         } else {
             post(route('admin.products.store'), {
                 onSuccess: () => {
                     onClose();
-                    if (showToast) showToast('Product created successfully');
+                    if (showToast) showToast(t('Product created successfully'));
                 },
                 onError: (err) => {
                     const firstError = Object.values(err)[0];
-                    if (showToast) showToast(firstError || 'Failed to create product', 'error');
+                    if (showToast) showToast(firstError || t('Failed to create product'), 'error');
                 }
             });
         }
@@ -117,8 +119,8 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
             <div className="relative w-full max-w-2xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col h-full animate-slide-in">
                 <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 z-10">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{isEdit ? 'Edit Product' : 'Add New Product'}</h2>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Configure global product properties.</p>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{isEdit ? t('Edit Product') : t('Add New Product')}</h2>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('Configure global product properties.')}</p>
                     </div>
                     <button 
                         onClick={onClose} 
@@ -133,7 +135,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                         
                         {/* SECTION: Service Type */}
                         <div>
-                            <label className={`${labelClass} mb-3 block`}>Select Service Type</label>
+                            <label className={`${labelClass} mb-3 block`}>{t('Select Service Type')}</label>
                             <div className="flex overflow-x-auto gap-3 pb-2 scrollbar-none snap-x">
                                 {services.map(type => {
                                     const isSelected = data.service_id === type.id;
@@ -159,12 +161,12 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
                             <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
                                 <Box className="w-4 h-4 text-gray-400" />
-                                Master Data
+                                {t('Master Data')}
                             </h3>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div className="md:col-span-2">
-                                    <label className={labelClass}>Product Name</label>
+                                    <label className={labelClass}>{t('Product Name')}</label>
                                     <input 
                                         type="text" 
                                         className={inputClass}
@@ -177,7 +179,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                                 </div>
 
                                 <div>
-                                    <label className={labelClass}>Base Price (HPP)</label>
+                                    <label className={labelClass}>{t('Base Price (HPP)')}</label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                             <span className="text-gray-500 dark:text-gray-400 font-bold text-sm">Rp</span>
@@ -198,7 +200,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                                 </div>
 
                                 <div>
-                                    <label className={labelClass}>Min Selling Price</label>
+                                    <label className={labelClass}>{t('Min Selling Price')}</label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                             <span className="text-gray-500 dark:text-gray-400 font-bold text-sm">Rp</span>
@@ -218,7 +220,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                                 </div>
 
                                 <div className="md:col-span-2">
-                                    <label className={labelClass}>Status Note (Optional)</label>
+                                    <label className={labelClass}>{t('Status Note (Optional)')}</label>
                                     <input 
                                         type="text" 
                                         className={inputClass}
@@ -235,7 +237,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
                                 <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
                                     <Tag className="w-4 h-4 text-gray-400" />
-                                    {selectedService?.name} Specifications
+                                    {selectedService?.name} {t('Specifications')}
                                 </h3>
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -259,7 +261,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                                                         value={data.attributes?.[field.name] || ''}
                                                         onChange={e => handleAttributeChange(field.name, e.target.value)}
                                                     />
-                                                    <p className="text-[10px] text-gray-500 mt-1 ml-1 font-medium">Separate with commas (e.g., a, b, c)</p>
+                                                    <p className="text-[10px] text-gray-500 mt-1 ml-1 font-medium">{t('Separate with commas (e.g., a, b, c)')}</p>
                                                 </>
                                             ) : field.type === 'link_builder' ? (
                                                 <div className="flex flex-col gap-2">
@@ -267,7 +269,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                                                         <div key={i} className="flex gap-2 items-start">
                                                             <input 
                                                                 type="text" 
-                                                                placeholder="Label (e.g., Scopus)" 
+                                                                placeholder={t('Label (e.g., Scopus)')} 
                                                                 className={`${inputClass.replace('w-full', '')} w-1/3 text-xs`}
                                                                 value={linkObj.label || ''}
                                                                 onChange={e => {
@@ -301,7 +303,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                                                         newArr.push({label: '', url: ''});
                                                         handleAttributeChange(field.name, newArr);
                                                     }} className="text-xs font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 rounded-xl w-fit mt-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                                                        + Add Link
+                                                        + {t('Add Link')}
                                                     </button>
                                                 </div>
                                             ) : (
@@ -328,7 +330,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                         onClick={onClose} 
                         className="px-5 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
-                        Cancel
+                        {t('Cancel')}
                     </button>
                     <button 
                         type="submit" 
@@ -337,7 +339,7 @@ export default function ProductFormSlideOver({ isOpen, onClose, product, service
                         className="px-8 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm disabled:opacity-70 transition-colors"
                     >
                         <Save className="w-4 h-4" /> 
-                        {processing ? 'Saving...' : 'Save Product'}
+                        {processing ? t('Saving...') : t('Save Product')}
                     </button>
                 </div>
             </div>

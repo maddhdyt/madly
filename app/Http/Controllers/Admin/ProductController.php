@@ -39,15 +39,15 @@ class ProductController extends Controller
         if ($serviceId && $serviceId !== 'all') {
             $service = Service::find($serviceId);
             if ($service && !empty($service->product_schema)) {
-                $allProducts = Product::where('service_id', $serviceId)->get();
+                $allAttributes = Product::where('service_id', $serviceId)->pluck('attributes');
                 foreach ($service->product_schema as $field) {
                     if (!in_array($field['type'] ?? '', ['tags', 'label'])) {
                         continue;
                     }
                     $fieldName = $field['name'];
                     $values = [];
-                    foreach ($allProducts as $product) {
-                        $val = $product->attributes[$fieldName] ?? null;
+                    foreach ($allAttributes as $attributes) {
+                        $val = $attributes[$fieldName] ?? null;
                         if (!empty($val)) {
                             $parts = explode(',', (string)$val);
                             foreach ($parts as $part) {
@@ -68,7 +68,7 @@ class ProductController extends Controller
 
         return Inertia::render('Admin/Products/Index', [
             'products' => $products,
-            'services' => Service::orderBy('name')->get(),
+            'services' => \Illuminate\Support\Facades\Cache::remember('master_services', 86400, function() { return Service::orderBy('name')->get(); }),
             'activeFilters' => $activeFilters,
             'filterOptions' => $filterOptions
         ]);
@@ -79,10 +79,9 @@ class ProductController extends Controller
         if (!empty($validated['attributes']['hpp_usd'])) {
             $rate = \Illuminate\Support\Facades\Cache::remember('usd_to_idr', 43200, function () {
                 try {
-                    $json = @file_get_contents('https://open.er-api.com/v6/latest/USD');
-                    if ($json) {
-                        $data = json_decode($json, true);
-                        return $data['rates']['IDR'] ?? 16000;
+                    $response = \Illuminate\Support\Facades\Http::timeout(3)->get('https://open.er-api.com/v6/latest/USD');
+                    if ($response->successful()) {
+                        return $response->json('rates.IDR', 16000);
                     }
                 } catch (\Exception $e) {
                 }
@@ -130,10 +129,6 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        // Check if product is used in any pricelist before deleting
-        if ($product->prices()->count() > 0) {
-            return redirect()->back()->with('error', 'Cannot delete product because it is associated with a pricelist package.');
-        }
 
         $product->delete();
         return redirect()->back()->with('success', 'Product deleted successfully.');

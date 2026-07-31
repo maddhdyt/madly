@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, Box, MessageSquare, BookOpen, FileText, ChevronRight, Loader2 } from 'lucide-react';
 import { router } from '@inertiajs/react';
+import useTranslations from '../Hooks/useTranslations';
 
 export default function GlobalSearchModal({ isOpen, onClose }) {
+    const { t } = useTranslations();
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -89,7 +91,7 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
                         ref={inputRef}
                         type="text"
                         className="flex-1 bg-transparent border-none text-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 p-0"
-                        placeholder="Search products, snippets, pricelists..."
+                        placeholder={t("Search products, snippets, pricelists...")}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                     />
@@ -103,7 +105,7 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
                 <div className="max-h-[60vh] overflow-y-auto overscroll-contain">
                     {query && results.length === 0 && !loading && (
                         <div className="px-6 py-12 text-center">
-                            <p className="text-gray-500 dark:text-gray-400">No results found for "<span className="text-gray-900 dark:text-white font-semibold">{query}</span>"</p>
+                            <p className="text-gray-500 dark:text-gray-400">{t('No results found for')} "<span className="text-gray-900 dark:text-white font-semibold">{query}</span>"</p>
                         </div>
                     )}
 
@@ -133,7 +135,7 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
                                     </div>
                                     <div className="ml-4 flex items-center gap-3">
                                         <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                                            {item.type}
+                                            {item.type === 'Product' ? t('Product') : item.type === 'Snippet' ? t('Snippet') : item.type === 'Pricelist' ? t('Catalog') : t('Brochure')}
                                         </span>
                                         <ChevronRight className={`w-4 h-4 transition-colors ${activeIndex === index ? 'text-gray-900 dark:text-white' : 'text-gray-300 dark:text-gray-600'}`} />
                                     </div>
@@ -145,11 +147,11 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
                     {!query && (
                         <div className="px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400 flex flex-col items-center justify-center">
                             <Search className="w-8 h-8 text-gray-200 dark:text-gray-800 mb-3" />
-                            <p>Start typing to search across your workspace</p>
+                            <p>{t('Start typing to search across your workspace')}</p>
                             <div className="flex items-center gap-2 mt-4 text-xs font-semibold">
-                                <span className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">Products</span>
-                                <span className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">Snippets</span>
-                                <span className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">Catalogs</span>
+                                <span className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{t('Products')}</span>
+                                <span className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{t('Snippets')}</span>
+                                <span className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{t('Catalogs')}</span>
                             </div>
                         </div>
                     )}

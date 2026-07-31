@@ -5,8 +5,10 @@ import { Plus, Edit2, Trash2, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import BrandFormSlideOver from './BrandFormSlideOver';
 import Pagination from '../../../Components/Pagination';
+import useTranslations from '../../../Hooks/useTranslations';
 
 export default function Index({ brands, showToast }) {
+    const { t } = useTranslations();
     const { delete: destroy } = useForm();
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
     const [selectedBrand, setSelectedBrand] = useState(null);
@@ -46,8 +48,8 @@ export default function Index({ brands, showToast }) {
             {/* Header Area */}
             <div className="flex items-center justify-between px-8 py-8 border-b border-gray-100 dark:border-gray-800">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Brand Management</h1>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage all brands and their associated details.</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{t('Brand Management')}</h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('Manage all brands and their associated details.')}</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button 
@@ -55,14 +57,14 @@ export default function Index({ brands, showToast }) {
                         className="px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Dashboard
+                        {t('Back to Dashboard')}
                     </button>
                     <button 
                         onClick={openCreateForm}
                         className="px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm transition-colors"
                     >
                         <Plus className="w-4 h-4" />
-                        Add Brand
+                        {t('Add Brand')}
                     </button>
                 </div>
             </div>
@@ -72,17 +74,17 @@ export default function Index({ brands, showToast }) {
                 <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300">
                     <thead className="bg-gray-50/50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider font-bold border-b border-gray-200 dark:border-gray-800">
                         <tr>
-                            <th className="px-8 py-4">Brand Logo</th>
-                            <th className="px-8 py-4">Brand Name</th>
-                            <th className="px-8 py-4">Description</th>
-                            <th className="px-8 py-4 text-right">Actions</th>
+                            <th className="px-8 py-4">{t('Brand Logo')}</th>
+                            <th className="px-8 py-4">{t('Brand Name')}</th>
+                            <th className="px-8 py-4">{t('Description')}</th>
+                            <th className="px-8 py-4 text-right">{t('Actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
                         {brands.data.length === 0 ? (
                             <tr>
                                 <td colSpan="5" className="px-8 py-12 text-center text-gray-500 dark:text-gray-400">
-                                    No brands found. Create one to get started.
+                                    {t('No brands found. Create one to get started.')}
                                 </td>
                             </tr>
                         ) : (
@@ -186,4 +188,4 @@ export default function Index({ brands, showToast }) {
     );
 }
 
-Index.layout = page => <MainLayout children={page} />;
+Index.layout = page => <MainLayout title="Brands" children={page} />;
