@@ -11,8 +11,16 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
+        if (!$request->has('module')) {
+            return Inertia::render('Auth/ModuleSelector');
+        }
+
+        if ($request->module === 'marketing') {
+            return redirect()->route('marketing.login');
+        }
+
         return Inertia::render('Auth/Login');
     }
 

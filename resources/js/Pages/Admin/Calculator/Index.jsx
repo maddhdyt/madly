@@ -60,7 +60,7 @@ export default function Calculator({ products, brands, services }) {
         return products.filter(p => {
             const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
             const matchService = activeService === 'all' || p.service_id.toString() === activeService.toString();
-            
+
             let matchDynamic = true;
             for (const key in filterValues) {
                 if (filterValues[key]) {
@@ -70,7 +70,7 @@ export default function Calculator({ products, brands, services }) {
                     }
                 }
             }
-            
+
             return matchSearch && matchService && matchDynamic;
         });
     }, [products, searchQuery, activeService, filterValues]);
@@ -123,32 +123,32 @@ export default function Calculator({ products, brands, services }) {
         let text = `Journal Name: ${selectedProduct.name}\n`;
         if (attr.e_issn) text += `E-ISSN: ${attr.e_issn}\n`;
         text += `\nSubject area: ${attr.focus_scope || attr.subject_area || '-'}\n`;
-        
+
         let journalLink = '-';
         if (attr.links && attr.links.length > 0) {
             journalLink = attr.links[0].url;
         }
-        
+
         text += `\nJournal Link: ${journalLink}`;
         if (attr.scopus_link) text += `\nScopus Link: ${attr.scopus_link}`;
-        
+
         return text;
     }, [selectedProduct]);
 
     const snippet2 = useMemo(() => {
         if (!selectedProduct) return '';
         const attr = selectedProduct.attributes || {};
-        
+
         let text = `${t('Pricelist Spesial Promo Terbatas')}\n`;
         text += `🔥 ${attr.accreditation_type || 'SCOPUS'} 🔥\n\n`;
-        
+
         text += `${t('Terindeks :')} ${selectedProduct.status_note || 'Scopus'}\n`;
         text += `${t('Bidang :')} ${getPrimaryScope(attr.focus_scope || attr.subject_area)}\n\n`;
-        
+
         const coret = formatRupiah(genData.harga_coret);
         const diskon = formatRupiah(genData.harga_diskon);
         text += `~${coret}~${t(', Diskon Menjadi 👉')} ${diskon},-\n\n`;
-        
+
         if (genData.includes && genData.includes.length > 0) {
             text += `${t('Include:')}\n`;
             genData.includes.forEach(inc => {
@@ -156,9 +156,9 @@ export default function Calculator({ products, brands, services }) {
             });
             text += `\n`;
         }
-        
+
         text += `${t('Terimakasih')}\n✨ ${selectedBrand?.name || 'Agency'} ✨`;
-        
+
         return text;
     }, [selectedProduct, genData, selectedBrand]);
 
@@ -186,7 +186,7 @@ export default function Calculator({ products, brands, services }) {
             </div>
 
             <div className="flex flex-col lg:flex-row h-full w-full gap-4 lg:gap-6 pb-4">
-                
+
                 {/* LEFT PANEL: Catalog */}
                 <div className="flex-1 flex flex-col bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden transition-colors">
                     <div className="p-5 border-b border-gray-100 dark:border-gray-800 flex flex-col gap-4">
@@ -194,23 +194,23 @@ export default function Calculator({ products, brands, services }) {
                             <h2 className="text-xl font-bold font-display text-gray-900 dark:text-white tracking-tight">{t('Master Products')}</h2>
                             <span className="text-xs font-bold font-display text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">{filteredProducts.length} {t('Items')}</span>
                         </div>
-                        
+
                         {/* Filters */}
                         <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4">
                             <div className="relative w-full md:flex-1 md:max-w-md">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     placeholder={t('Search journals or products...')}
-                                    className="w-full h-[42px] bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl pl-9 pr-4 text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 transition-all"
+                                    className="w-full h-10.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl pl-9 pr-4 text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 transition-all"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
                             </div>
                             <div className="flex items-center gap-3 shrink-0">
                                 <div className="w-50">
-                                    <CustomSelect 
-                                        className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-[42px] pl-3 text-sm font-medium text-gray-700 dark:text-gray-300"
+                                    <CustomSelect
+                                        className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-10.5 pl-3 text-sm font-medium text-gray-700 dark:text-gray-300"
                                         value={activeService}
                                         onChange={(e) => setActiveService(e.target.value)}
                                         options={[
@@ -220,76 +220,76 @@ export default function Calculator({ products, brands, services }) {
                                         icon={<Filter className="w-4 h-4 text-gray-400" />}
                                     />
                                 </div>
-                            {filterableSchema.length > 0 && (
-                                <div className="relative">
-                                    <button 
-                                        onClick={() => setIsFilterPanelOpen(!isFilterPanelOpen)}
-                                        className={`h-[42px] px-4 rounded-xl font-bold text-sm flex items-center gap-2 border transition-all ${isFilterPanelOpen || Object.values(filterValues).some(v => v) ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white shadow-sm' : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'}`}
-                                    >
-                                        <Filter className="w-4 h-4" />
-                                        {Object.values(filterValues).filter(v => v).length > 0 && (
-                                            <span className="w-5 h-5 rounded-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-xs flex items-center justify-center font-bold">
-                                                {Object.values(filterValues).filter(v => v).length}
-                                            </span>
-                                        )}
-                                    </button>
+                                {filterableSchema.length > 0 && (
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => setIsFilterPanelOpen(!isFilterPanelOpen)}
+                                            className={`h-10.5 px-4 rounded-xl font-bold text-sm flex items-center gap-2 border transition-all ${isFilterPanelOpen || Object.values(filterValues).some(v => v) ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white shadow-sm' : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                                        >
+                                            <Filter className="w-4 h-4" />
+                                            {Object.values(filterValues).filter(v => v).length > 0 && (
+                                                <span className="w-5 h-5 rounded-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-xs flex items-center justify-center font-bold">
+                                                    {Object.values(filterValues).filter(v => v).length}
+                                                </span>
+                                            )}
+                                        </button>
 
-                                    {isFilterPanelOpen && (
-                                        <>
-                                            <div className="fixed inset-0 z-40" onClick={() => setIsFilterPanelOpen(false)}></div>
-                                            <div className="absolute right-0 top-[calc(100%+8px)] w-80 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 z-50 animate-scale-in origin-top-right">
-                                                <div className="p-4 bg-gray-50/80 dark:bg-gray-800/80 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between rounded-t-2xl">
-                                                    <h3 className="font-bold text-gray-900 dark:text-white">{t('Smart Filters')}</h3>
-                                                    {Object.values(filterValues).some(v => v) && (
-                                                        <button 
-                                                            onClick={() => setFilterValues({})}
-                                                            className="text-xs font-bold text-red-600 hover:text-red-700"
-                                                        >
-                                                            {t('Reset All')}
-                                                        </button>
-                                                    )}
+                                        {isFilterPanelOpen && (
+                                            <>
+                                                <div className="fixed inset-0 z-40" onClick={() => setIsFilterPanelOpen(false)}></div>
+                                                <div className="absolute right-0 top-[calc(100%+8px)] w-80 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 z-50 animate-scale-in origin-top-right">
+                                                    <div className="p-4 bg-gray-50/80 dark:bg-gray-800/80 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between rounded-t-2xl">
+                                                        <h3 className="font-bold text-gray-900 dark:text-white">{t('Smart Filters')}</h3>
+                                                        {Object.values(filterValues).some(v => v) && (
+                                                            <button
+                                                                onClick={() => setFilterValues({})}
+                                                                className="text-xs font-bold text-red-600 hover:text-red-700"
+                                                            >
+                                                                {t('Reset All')}
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                    <div className="p-4 flex flex-col gap-4">
+                                                        {filterableSchema.map(field => (
+                                                            <div key={field.name} className="flex flex-col gap-1.5">
+                                                                <label className="text-xs font-bold text-gray-600">{field.label}</label>
+                                                                {filterOptions[field.name] ? (
+                                                                    <CustomSelect
+                                                                        value={filterValues[field.name] || ''}
+                                                                        onChange={(e) => setFilterValues({ ...filterValues, [field.name]: e.target.value })}
+                                                                        options={[
+                                                                            { value: '', label: `All ${field.label}` },
+                                                                            ...filterOptions[field.name].map(opt => ({ value: opt, label: opt }))
+                                                                        ]}
+                                                                        placeholder={`All ${field.label}`}
+                                                                        className="py-2 px-3 text-sm font-medium border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm rounded-xl w-full"
+                                                                    />
+                                                                ) : (
+                                                                    <input
+                                                                        type="text"
+                                                                        placeholder={t('Search') + ` ${field.label}...`}
+                                                                        value={filterValues[field.name] || ''}
+                                                                        onChange={(e) => setFilterValues({ ...filterValues, [field.name]: e.target.value })}
+                                                                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 transition-all shadow-sm placeholder:text-gray-400"
+                                                                    />
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                                <div className="p-4 flex flex-col gap-4">
-                                                    {filterableSchema.map(field => (
-                                                        <div key={field.name} className="flex flex-col gap-1.5">
-                                                            <label className="text-xs font-bold text-gray-600">{field.label}</label>
-                                                            {filterOptions[field.name] ? (
-                                                                <CustomSelect
-                                                                    value={filterValues[field.name] || ''}
-                                                                    onChange={(e) => setFilterValues({...filterValues, [field.name]: e.target.value})}
-                                                                    options={[
-                                                                        { value: '', label: `All ${field.label}` },
-                                                                        ...filterOptions[field.name].map(opt => ({ value: opt, label: opt }))
-                                                                    ]}
-                                                                    placeholder={`All ${field.label}`}
-                                                                    className="py-2 px-3 text-sm font-medium border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm rounded-xl w-full"
-                                                                />
-                                                            ) : (
-                                                                <input 
-                                                                    type="text" 
-                                                                    placeholder={t('Search') + ` ${field.label}...`}
-                                                                    value={filterValues[field.name] || ''}
-                                                                    onChange={(e) => setFilterValues({...filterValues, [field.name]: e.target.value})}
-                                                                    className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 transition-all shadow-sm placeholder:text-gray-400"
-                                                                />
-                                                            )}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                            )}
-                        </div>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-5 bg-[#f8f9fa] dark:bg-black flex flex-col transition-colors">
                         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4 content-start flex-1">
                             {paginatedProducts.map(product => (
-                                <button 
-                                    key={product.id} 
+                                <button
+                                    key={product.id}
                                     onClick={() => handleSelectProduct(product)}
                                     className={`bg-white dark:bg-gray-900 border rounded-2xl p-4 text-left transition-all shadow-sm hover:shadow-md flex flex-col justify-between h-full ${selectedProduct?.id === product.id ? 'border-gray-900 dark:border-white ring-1 ring-gray-900 dark:ring-white' : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'}`}
                                 >
@@ -308,7 +308,7 @@ export default function Calculator({ products, brands, services }) {
                                             )}
                                         </div>
                                     </div>
-                                    
+
                                     <div className="mt-auto border-t border-gray-100 dark:border-gray-800 pt-3 flex justify-between items-end">
                                         <div>
                                             <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider mb-1">{t('Harga Standar')}</p>
@@ -356,7 +356,7 @@ export default function Calculator({ products, brands, services }) {
                 </div>
 
                 {/* RIGHT PANEL: Live WA Generator */}
-                <div className="w-full lg:w-100 xl:w-[450px] shrink-0 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col overflow-hidden relative transition-colors min-h-125">
+                <div className="w-full lg:w-100 xl:w-112.5 shrink-0 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col overflow-hidden relative transition-colors min-h-125">
                     {!selectedProduct ? (
                         <div className="h-full flex flex-col items-center justify-center text-center px-6">
                             <div className="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">
@@ -378,10 +378,10 @@ export default function Calculator({ products, brands, services }) {
                                 <div className="bg-white dark:bg-gray-900 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
                                     <div>
                                         <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">{t('1. Select Brand (For Footer)')}</label>
-                                        <CustomSelect 
+                                        <CustomSelect
                                             className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 py-2 pl-3 text-sm font-medium text-gray-900 dark:text-white"
                                             value={genData.brand_id}
-                                            onChange={(e) => setGenData({...genData, brand_id: e.target.value})}
+                                            onChange={(e) => setGenData({ ...genData, brand_id: e.target.value })}
                                             options={brands.map(b => ({ value: b.id, label: b.name }))}
                                         />
                                     </div>
@@ -391,11 +391,11 @@ export default function Calculator({ products, brands, services }) {
                                             <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">{t('Harga Coret (Normal)')}</label>
                                             <div className="relative">
                                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">Rp</span>
-                                                <input 
-                                                    type="text" 
+                                                <input
+                                                    type="text"
                                                     className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl pl-8 pr-3 py-2 text-sm font-bold font-display text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 transition-all"
                                                     value={genData.harga_coret ? Number(genData.harga_coret).toLocaleString('id-ID') : ''}
-                                                    onChange={(e) => setGenData({...genData, harga_coret: e.target.value.replace(/\D/g, '')})}
+                                                    onChange={(e) => setGenData({ ...genData, harga_coret: e.target.value.replace(/\D/g, '') })}
                                                 />
                                             </div>
                                         </div>
@@ -403,22 +403,22 @@ export default function Calculator({ products, brands, services }) {
                                             <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">{t('Harga Jual (Diskon)')}</label>
                                             <div className="relative">
                                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">Rp</span>
-                                                <input 
-                                                    type="text" 
+                                                <input
+                                                    type="text"
                                                     className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl pl-8 pr-3 py-2 text-sm font-bold font-display text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 transition-all"
                                                     value={genData.harga_diskon ? Number(genData.harga_diskon).toLocaleString('id-ID') : ''}
-                                                    onChange={(e) => setGenData({...genData, harga_diskon: e.target.value.replace(/\D/g, '')})}
+                                                    onChange={(e) => setGenData({ ...genData, harga_diskon: e.target.value.replace(/\D/g, '') })}
                                                 />
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <div className="flex items-center justify-end gap-1.5 mt-[-4px]">
+
+                                    <div className="flex items-center justify-end gap-1.5 -mt-1">
                                         <span className="text-[9px] font-bold text-gray-400 mr-1 uppercase tracking-wider">{t('Quick Markup:')}</span>
                                         {[15, 25, 40, 50].map(pct => (
-                                            <button 
+                                            <button
                                                 key={pct}
-                                                onClick={() => setGenData(prev => ({...prev, harga_coret: Math.round(Number(prev.harga_diskon) / (1 - pct/100)).toString()}))}
+                                                onClick={() => setGenData(prev => ({ ...prev, harga_coret: Math.round(Number(prev.harga_diskon) / (1 - pct / 100)).toString() }))}
                                                 className="px-2 py-0.5 rounded text-[9px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 border border-gray-200 dark:border-gray-700 transition-colors shadow-sm"
                                                 title={`Set markup ${pct}%`}
                                             >
@@ -432,8 +432,8 @@ export default function Calculator({ products, brands, services }) {
                                         <div className="bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-3 max-h-40 overflow-y-auto scrollbar-none space-y-2">
                                             {(selectedProduct.service?.includes || []).map((incName, idx) => (
                                                 <label key={idx} className="flex items-center gap-2 cursor-pointer group">
-                                                    <input 
-                                                        type="checkbox" 
+                                                    <input
+                                                        type="checkbox"
                                                         className="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-gray-900 dark:focus:ring-gray-500"
                                                         checked={genData.includes.includes(incName)}
                                                         onChange={() => toggleInclude(incName)}

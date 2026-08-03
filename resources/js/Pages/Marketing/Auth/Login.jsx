@@ -1,16 +1,16 @@
 import React from 'react';
 import { Head, useForm, usePage, Link } from '@inertiajs/react';
-import { Loader2, Star, Check, ArrowLeft } from 'lucide-react';
-import logoImg from '../../../img/pile_2.webp';
-import useTranslations from '../../Hooks/useTranslations';
+import { Check, Megaphone, Star, ArrowLeft } from 'lucide-react';
+import logoImg from '../../../../img/pile_2.webp';
+import useTranslations from '../../../Hooks/useTranslations';
 
-export default function Login() {
+export default function MarketingLogin() {
     const { t } = useTranslations();
     const { props } = usePage();
     const settings = props.global_settings || {};
     const companyName = settings.company_name || 'MADLY';
 
-    const { data, setData, post, processing, errors, clearErrors } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         email: '',
         password: '',
         remember: true,
@@ -18,12 +18,12 @@ export default function Login() {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('login'));
+        post(route('marketing.login'));
     };
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center items-center p-4 lg:p-8 font-sans transition-colors duration-300">
-            <Head title={t("Log in")} />
+            <Head title={t("Marketing Log in")} />
 
             <div className="max-w-6xl w-full p-8 lg:p-16 flex flex-col lg:flex-row gap-16 lg:gap-32 items-center">
                 
@@ -37,10 +37,10 @@ export default function Login() {
                     {/* Welcome Text */}
                     <div>
                         <h1 className="text-4xl lg:text-[44px] font-black text-gray-900 dark:text-white tracking-tight leading-[1.1]">
-                            {t('Welcome back to')}<br/><span className="font-display lowercase tracking-normal text-5xl lg:text-[52px]">{companyName}</span>!
+                            {t('Welcome to')}<br/><span className="font-display lowercase tracking-normal text-5xl lg:text-[52px]">{companyName}</span> Marketing!
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400 mt-5 text-[15px] font-medium max-w-md leading-relaxed">
-                            {t('Thank you for continuing your experience with us and always trusting the expertise of our team.')}
+                            Akses eksklusif divisi Digital Marketing. Kelola ROAS, budget iklan, dan link UTM dari satu tempat.
                         </p>
 
                         <div className="mt-12 pt-10 border-t border-gray-100 dark:border-gray-800">
@@ -80,6 +80,10 @@ export default function Login() {
                         <Link href={route('login')} className="inline-flex items-center gap-1.5 text-[11px] font-bold text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors mb-6 group">
                             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> {t('Back to Module Selection')}
                         </Link>
+                        <div className="flex items-center gap-2 mb-3">
+                            <Megaphone className="w-5 h-5 text-gray-900 dark:text-white" />
+                            <span className="text-[11px] font-bold text-gray-500 tracking-widest uppercase">Marketing Access</span>
+                        </div>
                         <h2 className="text-[26px] font-black text-gray-900 dark:text-white tracking-tight">{t('Log In')}</h2>
                         <p className="text-[14px] font-medium text-gray-500 dark:text-gray-400 mt-1.5">{t('Please enter your details to access your dashboard.')}</p>
                     </div>
@@ -92,7 +96,7 @@ export default function Login() {
                                 value={data.email}
                                 onChange={e => setData('email', e.target.value)}
                                 className={`w-full px-5 py-3.5 rounded-[16px] bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-[14px] font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white transition-all ${errors.email ? 'border-red-500 focus:ring-red-500' : ''}`}
-                                placeholder="Ex: admin@madly.com"
+                                placeholder="Ex: marketing@madly.com"
                             />
                             {errors.email && <p className="text-[12px] text-red-500 mt-2 font-medium">{errors.email}</p>}
                         </div>
@@ -142,7 +146,7 @@ export default function Login() {
                         >
                             {processing ? t('Signing in...') : t('Log In')}
                         </button>
-                        
+
                         <div className="pt-4">
                             <p className="text-[12px] font-medium text-gray-500 dark:text-gray-400 text-center">
                                 {t('New to the platform?')} <a href="#" onClick={(e) => {e.preventDefault(); alert('Please ask your Manager to create an account for you.')}} className="text-gray-900 dark:text-white font-bold hover:underline transition-all">{t('Create an account')}</a>

@@ -28,6 +28,10 @@ Route::post('language', function (\Illuminate\Http\Request $request) {
     return back();
 })->name('language.switch');
 
+// Marketing Login Routes
+Route::get('marketing/login', [\App\Http\Controllers\Marketing\AuthController::class, 'create'])->name('marketing.login')->middleware('guest');
+Route::post('marketing/login', [\App\Http\Controllers\Marketing\AuthController::class, 'store'])->middleware('guest');
+
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('home');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -56,5 +60,17 @@ Route::middleware('auth')->group(function () {
             Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
             Route::post('settings', [SettingController::class, 'store'])->name('settings.store');
         });
+    });
+
+    // Marketing Module
+    Route::prefix('marketing')->name('marketing.')->middleware('role:marketing')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Marketing\DashboardController::class, 'index'])->name('home');
+        Route::resource('ad-identities', \App\Http\Controllers\Marketing\AdIdentityController::class)->except(['create', 'show', 'edit']);
+        Route::resource('brands', \App\Http\Controllers\Marketing\MarketingBrandController::class)->except(['create', 'show', 'edit']);
+        Route::resource('utm-builder', \App\Http\Controllers\Marketing\UtmBuilderController::class)->only(['index', 'store', 'destroy']);
+        Route::get('roas-calculator', [\App\Http\Controllers\Marketing\RoasCalculatorController::class, 'index'])->name('roas-calculator.index');
+        Route::get('budget-allocator', [\App\Http\Controllers\Marketing\BudgetAllocatorController::class, 'index'])->name('budget-allocator.index');
+        Route::get('power-rank', [\App\Http\Controllers\Marketing\PowerRankController::class, 'index'])->name('power-rank.index');
+        Route::resource('daily-metrics', \App\Http\Controllers\Marketing\DailyMetricController::class)->only(['index', 'store', 'destroy']);
     });
 });

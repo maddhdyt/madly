@@ -8,23 +8,23 @@ export default function Welcome({ copyToClipboard, searchQuery = "", snippets = 
     const { t } = useTranslations();
     const { auth } = usePage().props;
     const user = auth?.user?.name || 'Admin';
-    
+
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-    
+
     // 1. DATA PROCESSING (Metrics)
     const query = searchQuery.toLowerCase();
-    
+
     const filteredSnippets = useMemo(() => {
-        return snippets.filter(snippet => 
-            snippet.title.toLowerCase().includes(query) || 
-            snippet.shortcut.toLowerCase().includes(query) || 
+        return snippets.filter(snippet =>
+            snippet.title.toLowerCase().includes(query) ||
+            snippet.shortcut.toLowerCase().includes(query) ||
             snippet.content_text.toLowerCase().includes(query)
         );
     }, [snippets, query]);
 
     // 2. STATE (Activity Log)
-    const [recentCopies, setRecentCopies] = useState([]); 
+    const [recentCopies, setRecentCopies] = useState([]);
     const [copiedSnippetIndex, setCopiedSnippetIndex] = useState(null);
 
     // Intercept copy action to log it
@@ -32,10 +32,10 @@ export default function Welcome({ copyToClipboard, searchQuery = "", snippets = 
         if (copyToClipboard) {
             copyToClipboard(text);
         }
-        
+
         const now = new Date();
         const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        
+
         setRecentCopies(prev => {
             const newLog = [{ id: Date.now(), text, time: timeString, type }, ...prev];
             return newLog.slice(0, 5); // Keep only last 5
@@ -49,7 +49,7 @@ export default function Welcome({ copyToClipboard, searchQuery = "", snippets = 
     return (
         <div className="flex flex-col font-sans bg-white dark:bg-gray-900 min-h-[calc(100vh-80px)] rounded-tl-3xl border-l border-t border-gray-100 dark:border-gray-800 overflow-y-auto transition-colors duration-300">
             <div className="w-full p-6 md:p-8 lg:p-10">
-                
+
                 {/* Dot Grid Banner & Actions */}
                 <div className="relative overflow-hidden bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-3xl p-6 sm:p-8 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group">
                     <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] group-hover:opacity-[0.05] dark:group-hover:opacity-[0.08] transition-opacity duration-500" style={{ backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)', backgroundSize: '16px 16px', color: 'currentColor' }}></div>
@@ -57,7 +57,7 @@ export default function Welcome({ copyToClipboard, searchQuery = "", snippets = 
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{greeting}, {user} 👋</h1>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
                     </div>
-                    
+
                     <div className="relative z-10 flex flex-col sm:flex-row items-center gap-3">
                         <Link href={route('admin.calculator.index')} className="w-full sm:w-auto px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2">
                             <Box className="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -81,7 +81,7 @@ export default function Welcome({ copyToClipboard, searchQuery = "", snippets = 
                         <div key={i} className="relative bg-white dark:bg-gray-900 px-5 py-5 rounded-2xl border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-sm transition-all overflow-hidden group">
                             {/* Decorative monochrome sparkline hint */}
                             <div className="absolute -bottom-2 -right-2 w-24 h-24 bg-gray-50 dark:bg-gray-800 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            
+
                             <div className="relative z-10 flex justify-between items-start mb-4">
                                 <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-400">
                                     <stat.icon className="w-4 h-4" />
@@ -101,13 +101,13 @@ export default function Welcome({ copyToClipboard, searchQuery = "", snippets = 
 
                 {/* Main Content Split */}
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                    
+
                     {/* Database View: Products (Left) */}
                     <div className="xl:col-span-2 flex flex-col min-h-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm overflow-hidden">
                         <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
                             <h2 className="text-sm font-bold text-gray-900 dark:text-white tracking-tight">{t('Recently Added Products')}</h2>
                         </div>
-                        
+
                         <div className="flex-1 overflow-x-auto">
                             {recentProducts.length === 0 ? (
                                 <div className="py-12 flex items-center justify-center text-sm text-gray-400 dark:text-gray-500">
@@ -147,14 +147,14 @@ export default function Welcome({ copyToClipboard, searchQuery = "", snippets = 
 
                     {/* Right Column: Snippets & Activity */}
                     <div className="flex flex-col gap-8">
-                        
+
                         {/* Snippets List */}
                         <div className="flex flex-col bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm overflow-hidden h-100">
                             <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
                                 <h2 className="text-sm font-bold text-gray-900 dark:text-white tracking-tight">{t('Quick Replies')}</h2>
                                 <Search className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                             </div>
-                            
+
                             <div className="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
                                 {filteredSnippets.length === 0 ? (
                                     <div className="py-12 flex items-center justify-center text-sm text-gray-400 dark:text-gray-500">
@@ -164,18 +164,17 @@ export default function Welcome({ copyToClipboard, searchQuery = "", snippets = 
                                     filteredSnippets.map((snippet, index) => {
                                         const isCopied = copiedSnippetIndex === index;
                                         return (
-                                            <div 
+                                            <div
                                                 key={index}
                                                 onClick={() => {
                                                     handleCopy(snippet.content_text, 'Snippet');
                                                     setCopiedSnippetIndex(index);
                                                     setTimeout(() => setCopiedSnippetIndex(null), 2000);
                                                 }}
-                                                className={`group cursor-pointer p-3 rounded-xl transition-all border ${
-                                                    isCopied 
-                                                    ? 'bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900 shadow-md' 
-                                                    : 'bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50 border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-600 shadow-sm'
-                                                } flex items-start gap-3`}
+                                                className={`group cursor-pointer p-3 rounded-xl transition-all border ${isCopied
+                                                        ? 'bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900 shadow-md'
+                                                        : 'bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50 border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-600 shadow-sm'
+                                                    } flex items-start gap-3`}
                                             >
                                                 <div className="mt-0.5 shrink-0">
                                                     {isCopied ? (
@@ -191,9 +190,8 @@ export default function Welcome({ copyToClipboard, searchQuery = "", snippets = 
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center justify-between gap-2 mb-0.5">
                                                         <span className={`text-sm font-bold truncate ${isCopied ? 'text-white dark:text-gray-900' : 'text-gray-900 dark:text-white'}`}>{snippet.title}</span>
-                                                        <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border shrink-0 ${
-                                                            isCopied ? 'bg-transparent border-gray-600 dark:border-gray-300 text-gray-300 dark:text-gray-600' : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400'
-                                                        }`}>{snippet.shortcut}</span>
+                                                        <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border shrink-0 ${isCopied ? 'bg-transparent border-gray-600 dark:border-gray-300 text-gray-300 dark:text-gray-600' : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400'
+                                                            }`}>{snippet.shortcut}</span>
                                                     </div>
                                                     <p className={`text-xs line-clamp-1 group-hover:line-clamp-none transition-all leading-relaxed ${isCopied ? 'text-gray-300 dark:text-gray-700' : 'text-gray-500 dark:text-gray-400'}`}>{snippet.content_text}</p>
                                                 </div>
@@ -205,12 +203,12 @@ export default function Welcome({ copyToClipboard, searchQuery = "", snippets = 
                         </div>
 
                         {/* Activity Timeline (Monochrome) */}
-                        <div className="flex flex-col bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm overflow-hidden flex-1 min-h-[250px]">
+                        <div className="flex flex-col bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm overflow-hidden flex-1 min-h-62.5">
                             <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
                                 <h2 className="text-sm font-bold text-gray-900 dark:text-white tracking-tight">{t('Recent Activity')}</h2>
                                 <History className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                             </div>
-                            
+
                             <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
                                 {recentCopies.length === 0 ? (
                                     <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 dark:text-gray-500">
@@ -221,7 +219,7 @@ export default function Welcome({ copyToClipboard, searchQuery = "", snippets = 
                                     <div className="space-y-4">
                                         {recentCopies.map((log, index) => (
                                             <div key={log.id} className={`relative pl-6 pb-4 ${index !== recentCopies.length - 1 ? 'border-l border-gray-200 dark:border-gray-700' : ''}`}>
-                                                <div className="absolute left-[-5px] top-1.5 w-2.5 h-2.5 rounded-full bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600"></div>
+                                                <div className="absolute -left-1.25 top-1.5 w-2.5 h-2.5 rounded-full bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600"></div>
                                                 <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">{log.time}</div>
                                                 <div className="text-sm font-medium text-gray-900 dark:text-white">
                                                     {t('Copied')} <span className="font-bold text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-1.5 rounded">{log.type}</span>

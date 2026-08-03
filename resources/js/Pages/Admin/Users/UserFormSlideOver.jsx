@@ -140,6 +140,7 @@ export default function UserFormSlideOver({ isOpen, onClose, user, showToast }) 
                                     onChange={e => setData('role', e.target.value)}
                                     options={[
                                         { value: 'sales', label: 'Sales' },
+                                        { value: 'marketing', label: 'Marketing' },
                                         { value: 'manager', label: 'Manager' },
                                         { value: 'admin', label: 'Admin' }
                                     ]}

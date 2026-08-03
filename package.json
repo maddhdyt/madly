@@ -23,6 +23,7 @@
         "@dnd-kit/utilities": "^3.2.2",
         "@inertiajs/react": "^3.6.1",
         "@vitejs/plugin-react": "^4.7.0",
+        "dayjs": "^1.11.21",
         "lucide-react": "^1.26.0",
         "react": "^19.2.8",
         "react-dom": "^19.2.8"
