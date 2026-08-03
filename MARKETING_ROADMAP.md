@@ -25,8 +25,8 @@ Ini adalah fitur-fitur yang harus kita kerjakan pada sesi/hari kerja berikutnya 
 - **Rencana:** Anda bisa mensimulasikan krisis. Misal: *"Bagaimana jika Meta Ads CPM naik 30% hari ini?"* atau *"Bagaimana jika CS Closing Rate turun drastis?"*. Sistem akan memprediksi kebocoran *budget* dan merekomendasikan manuver iklan.
 
 ### 3. Modul Data Sync (Pengganti Daily Metrics)
-- **Masalah:** Anda sudah menggunakan *trackorderflow* untuk pencatatan harian, sehingga menginput data metrik secara manual ke Madly menjadi pekerjaan berulang (*repatisi*).
-- **Rencana:** Menyulap halaman "Daily Metrics" yang lama menjadi halaman **Data Sync / Import**. Nantinya, Anda cukup melempar *file* CSV/Excel dari *trackorderflow* ke sini, dan Madly akan otomatis menarik angkanya untuk memberi makan AI Budget Allocator dan grafik Dashboard.
+- **Masalah:** Anda sudah menggunakan *trackorderflow* untuk pencatatan harian, sehingga menginput data metrik secara manual ke Zeasy menjadi pekerjaan berulang (*repatisi*).
+- **Rencana:** Menyulap halaman "Daily Metrics" yang lama menjadi halaman **Data Sync / Import**. Nantinya, Anda cukup melempar *file* CSV/Excel dari *trackorderflow* ke sini, dan Zeasy akan otomatis menarik angkanya untuk memberi makan AI Budget Allocator dan grafik Dashboard.
 
 ### 4. Menghidupkan Grafik Utama Dashboard
 - **Masalah:** Saat ini *Bar Chart* dan *Stat Cards* di halaman depan `/marketing` masih menggunakan *dummy data*.

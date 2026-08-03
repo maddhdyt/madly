@@ -1,4 +1,4 @@
-# Madly (Sales Module MVP)
+# Zeasy (Sales Module MVP)
 
 A minimalist, Notion-esque B2B internal SaaS application designed for sales operational assistants. Focused on solving repetitive tasks: finding prices, copying product descriptions, and replying to chats. 
 

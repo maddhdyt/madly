@@ -1,7 +1,10 @@
-# Madly Project Context
+# Zeasy Project Context
 
 ## Overview
-Madly is a premium, SaaS-like web application designed to help Sales teams manage product knowledge, quickly answer customer queries using chat snippets, and generate quick quotations. It is built with **Laravel 11, React, Inertia.js, and Tailwind CSS**.
+Zeasy (formerly known as "Madly") is a premium, SaaS-like web application designed to help Sales teams manage product knowledge, quickly answer customer queries using chat snippets, and generate quick quotations. It is built with **Laravel 11, React, Inertia.js, and Tailwind CSS**.
+
+> [!NOTE]  
+> **Rebranding History:** On August 3, 2026, the application was officially rebranded from **Madly** to **Zeasy** to better reflect its pivot towards an AI & Strategy Command Center.
 
 ## UI/UX Highlights
 - **Premium Aesthetics**: Glassmorphism, smooth animations, customized color palettes, and a dedicated Dark Mode toggle with a catchy sliding animation.
