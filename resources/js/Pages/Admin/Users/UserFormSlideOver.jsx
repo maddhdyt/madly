@@ -124,7 +124,7 @@ export default function UserFormSlideOver({ isOpen, onClose, user, showToast }) 
                                     <input 
                                         type="email" 
                                         className={`${inputClass} pl-10`}
-                                        placeholder={t('e.g. john@madly.com')}
+                                        placeholder={t('e.g. john@zeasy.com')}
                                         value={data.email}
                                         onChange={e => setData('email', e.target.value)}
                                         required

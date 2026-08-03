@@ -23,7 +23,7 @@ class UsersTableSeeder extends Seeder
             array (
                 'id' => 1,
                 'name' => 'Super Admin',
-                'email' => 'admin@madly.com',
+                'email' => 'admin@zeasy.com',
                 'avatar' => NULL,
                 'role' => 'admin',
                 'email_verified_at' => NULL,
@@ -36,7 +36,7 @@ class UsersTableSeeder extends Seeder
             array (
                 'id' => 2,
                 'name' => 'Manager',
-                'email' => 'manager@madly.com',
+                'email' => 'manager@zeasy.com',
                 'avatar' => NULL,
                 'role' => 'manager',
                 'email_verified_at' => NULL,
@@ -49,7 +49,7 @@ class UsersTableSeeder extends Seeder
             array (
                 'id' => 3,
                 'name' => 'Sales',
-                'email' => 'sales@madly.com',
+                'email' => 'sales@zeasy.com',
                 'avatar' => NULL,
                 'role' => 'sales',
                 'email_verified_at' => NULL,
@@ -62,7 +62,7 @@ class UsersTableSeeder extends Seeder
             array (
                 'id' => 4,
                 'name' => 'Digital Marketing',
-                'email' => 'marketing@madly.com',
+                'email' => 'marketing@zeasy.com',
                 'avatar' => NULL,
                 'role' => 'marketing',
                 'email_verified_at' => NULL,

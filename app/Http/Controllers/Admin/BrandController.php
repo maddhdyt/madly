@@ -41,7 +41,7 @@ class BrandController extends Controller
 
         Brand::create($validated);
 
-        return redirect()->route('admin.brands.index')->with('success', 'Brand created successfully.');
+        return redirect()->back()->with('success', 'Brand created successfully.');
     }
 
     public function update(Request $request, Brand $brand)
@@ -71,7 +71,7 @@ class BrandController extends Controller
 
         $brand->update($validated);
 
-        return redirect()->route('admin.brands.index')->with('success', 'Brand updated successfully.');
+        return redirect()->back()->with('success', 'Brand updated successfully.');
     }
 
     public function destroy(Brand $brand)

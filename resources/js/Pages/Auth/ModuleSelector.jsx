@@ -8,7 +8,7 @@ export default function ModuleSelector() {
     const { t } = useTranslations();
     const { props } = usePage();
     const settings = props.global_settings || {};
-    const companyName = settings.company_name || 'MADLY';
+    const companyName = settings.company_name || 'Zeasy';
 
     return (
         <div className="min-h-screen bg-[#F7F7F5] dark:bg-[#191919] flex flex-col justify-center items-center p-4 lg:p-8 font-sans transition-colors duration-300">
@@ -18,12 +18,12 @@ export default function ModuleSelector() {
                 
                 {/* Logo */}
                 <div className="w-14 h-14 mb-8 flex items-center justify-center">
-                    <img src={logoImg} alt="Madly Logo" className="w-full h-full object-contain" />
+                    <img src={logoImg} alt="Zeasy Logo" className="w-full h-full object-contain" />
                 </div>
                 
                 {/* Welcome Text */}
                 <h1 className="text-3xl lg:text-[44px] font-black text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-4">
-                    <span className="font-display tracking-normal lowercase">{companyName}</span> workspace
+                    <span className="font-display tracking-normal">{companyName}</span> workspace
                 </h1>
                 <p className="text-gray-500 dark:text-gray-400 text-[15px] font-medium max-w-md leading-relaxed mb-12">
                     {t('Please select the module you want to access. Your login credentials will determine your access level.')}

@@ -207,9 +207,9 @@ export default function MainLayout({ children, title = "Dashboard" }) {
                         {/* Logo */}
                         <div className="mb-10 px-3 flex items-center gap-3">
                             <div className="w-9 h-9 flex items-center justify-center cursor-pointer transition-transform hover:scale-105">
-                                <img src={logoImg} alt="Madly Logo" className="w-full h-full object-contain" />
+                                <img src={logoImg} alt="Zeasy Logo" className="w-full h-full object-contain" />
                             </div>
-                            <span className="font-display font-extrabold text-[26px] tracking-normal text-gray-900 dark:text-white">{settings.company_name || 'Madly'}</span>
+                            <span className="font-display font-extrabold text-[26px] tracking-normal text-gray-900 dark:text-white">{settings.company_name || 'Zeasy'}</span>
                         </div>
 
                         {/* Navigation */}

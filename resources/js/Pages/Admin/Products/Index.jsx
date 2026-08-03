@@ -283,12 +283,12 @@ export default function Index({ products, brands, services, activeFilters = {}, 
     return (
         <div className="flex flex-col h-full w-full bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden transition-colors duration-300">
             {/* Header Area */}
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between px-8 py-8 border-b border-gray-100 dark:border-gray-800 gap-4">
+            <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between px-8 py-8 border-b border-gray-100 dark:border-gray-800 gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{t('Product Management (Master Data)')}</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{t('Products')}</h1>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('Manage global product catalog and their base HPP.')}</p>
                 </div>
-                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 w-full md:w-auto mt-4 md:mt-0">
+                <div className="flex flex-col md:flex-row flex-wrap items-stretch md:items-center justify-start xl:justify-end gap-3 w-full xl:w-auto mt-4 xl:mt-0">
                     
                     {/* Mobile: Row 3, Desktop: Left */}
                     <div className="flex items-center justify-between gap-3 w-full md:w-auto order-3 md:order-1">
@@ -302,28 +302,28 @@ export default function Index({ products, brands, services, activeFilters = {}, 
                         
                         <button 
                             onClick={openCreateForm}
-                            className="px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm transition-colors flex-1 md:flex-none justify-center"
+                            className="px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 flex items-center gap-2 shadow-sm transition-colors flex-1 md:flex-none justify-center whitespace-nowrap"
                         >
-                            <Plus className="w-4 h-4" />
+                            <Plus className="w-4 h-4 shrink-0" />
                             {t('Add Product')}
                         </button>
                     </div>
 
                     {/* Mobile: Row 1, Desktop: Middle */}
-                    <div className="relative w-full md:w-auto order-1 md:order-2">
+                    <div className="relative w-full md:w-auto order-1 md:order-2 flex-grow md:flex-grow-0">
                         <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input 
                             type="text"
                             placeholder={t('Search products...')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 focus:bg-white transition-all w-full md:w-64"
+                            className="pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500 focus:bg-white transition-all w-full md:min-w-[200px]"
                         />
                     </div>
                     
                     {/* Mobile: Row 2, Desktop: Right */}
                     <div className="flex items-center gap-3 w-full md:w-auto order-2 md:order-3">
-                        <div className="flex-1 md:flex-none">
+                        <div className="flex-1 md:flex-none min-w-[200px]">
                             <CustomSelect
                                 value={selectedServiceFilter}
                                 onChange={handleFilterChange}

@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title inertia><?php echo e(config('app.name', 'Madly')); ?></title>
+        <title inertia><?php echo e(config('app.name', 'Zeasy')); ?></title>
         <link rel="icon" href="/favicon.webp" type="image/webp">
         
         <!-- Google Fonts: Plus Jakarta Sans for exact reference matching -->

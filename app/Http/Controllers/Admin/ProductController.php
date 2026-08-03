@@ -106,7 +106,7 @@ class ProductController extends Controller
         $this->calculateHppFromUsd($validated);
         Product::create($validated);
 
-        return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
+        return redirect()->back()->with('success', 'Product created successfully.');
     }
 
     public function update(Request $request, Product $product)
@@ -124,7 +124,7 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
+        return redirect()->back()->with('success', 'Product updated successfully.');
     }
 
     public function destroy(Product $product)
