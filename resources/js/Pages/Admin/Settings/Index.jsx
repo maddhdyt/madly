@@ -192,7 +192,7 @@ export default function Settings({ settings, showToast }) {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label className={labelClass}>{t('Brand Name')}</label>
-                                        <input type="text" value={data.company_name} onChange={e => setData('company_name', e.target.value)} className={inputClass} placeholder="MADLY" />
+                                        <input type="text" value={data.company_name} onChange={e => setData('company_name', e.target.value)} className={inputClass} placeholder="Zeasy" />
                                     </div>
                                     <div>
                                         <label className={labelClass}>{t('Tagline (Optional)')}</label>

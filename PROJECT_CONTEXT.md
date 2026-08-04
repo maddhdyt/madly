@@ -1,7 +1,7 @@
-# MASTER BRIEF: MADLY (SALES MODULE MVP)
+# MASTER BRIEF: ZEASY (SALES MODULE MVP)
 
 ## 1. PROJECT CONTEXT & OBJECTIVE
-- **App Name:** Madly (Sales Module)
+- **App Name:** Zeasy (Sales Module)
 - **Description:** Aplikasi SaaS B2B internal bergaya minimalis (Notion-esque) untuk asisten operasional sales. Fokus utama memecahkan pain point repetitif: mencari harga, menyalin deskripsi produk, dan membalas chat.
 - **Target Device:** Desktop/Web-based (Dioptimalkan untuk split-screen berdampingan dengan WhatsApp Web) dan bisa juga diakses melalui smartphone.
 
@@ -25,15 +25,15 @@
 
 ## 5. LAYOUT ARCHITECTURE (UI STRUCTURE)
 - CSS Grid untuk 2 area absolut (tanpa header tebal di atas):
-  - **Area Kiri (Sidebar):** Lebar tetap (ex: `w-64`). Logo "Madly", list Brand/Kategori, menu "Pricelist", menu "Chat Snippets".
+  - **Area Kiri (Sidebar):** Lebar tetap (ex: `w-64`). Logo "Zeasy", list Brand/Kategori, menu "Pricelist", menu "Chat Snippets".
   - **Area Kanan (Main Content):** Sisa layar, scrollable.
     - **Search Bar:** Sticky di atas ("Press / to search").
     - **Data View:** List bertingkat (bukan kartu/grid).
 - **Click-to-Copy Action:** Baris harga/teks di-klik -> copy ke clipboard via Vanilla JS.
 
 ## 6. CORE USER FLOW (COPY-PASTE ENGINE)
-1. Split-screen: WA (kiri) & Madly (kanan).
-2. Sales cari produk di Search Bar Madly.
+1. Split-screen: WA (kiri) & Zeasy (kanan).
+2. Sales cari produk di Search Bar Zeasy.
 3. Klik baris data ("Produk A - Paket Basic - Rp150.000").
 4. Sistem otomatis copy & memunculkan toast "Tersalin!".
 5. Sales paste (Ctrl+V) di WA.

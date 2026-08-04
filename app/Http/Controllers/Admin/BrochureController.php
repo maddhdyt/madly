@@ -43,7 +43,7 @@ class BrochureController extends Controller
             'file_type' => $fileType,
         ]);
 
-        return redirect()->route('admin.brochures.index')->with('success', 'Brochure uploaded successfully.');
+        return redirect()->back()->with('success', 'Brochure uploaded successfully.');
     }
 
     public function update(Request $request, Brochure $brochure)
@@ -75,7 +75,7 @@ class BrochureController extends Controller
 
         $brochure->update($data);
 
-        return redirect()->route('admin.brochures.index')->with('success', 'Brochure updated successfully.');
+        return redirect()->back()->with('success', 'Brochure updated successfully.');
     }
 
     public function destroy(Brochure $brochure)

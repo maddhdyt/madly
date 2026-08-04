@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, useForm, usePage, Link } from '@inertiajs/react';
-import { Loader2, Star, Check, ArrowLeft } from 'lucide-react';
+import { Loader2, Star, Check, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import logoImg from '../../../img/pile_2.webp';
 import useTranslations from '../../Hooks/useTranslations';
 
@@ -8,7 +8,8 @@ export default function Login() {
     const { t } = useTranslations();
     const { props } = usePage();
     const settings = props.global_settings || {};
-    const companyName = settings.company_name || 'MADLY';
+    const companyName = settings.company_name || 'Zeasy';
+    const [showPassword, setShowPassword] = useState(false);
 
     const { data, setData, post, processing, errors, clearErrors } = useForm({
         email: '',
@@ -31,13 +32,13 @@ export default function Login() {
                 <div className="flex-1 space-y-8 w-full">
                     {/* Logo */}
                     <div className="w-14 h-14 flex items-center justify-center">
-                        <img src={logoImg} alt="Madly Logo" className="w-full h-full object-contain" />
+                        <img src={logoImg} alt="Zeasy Logo" className="w-full h-full object-contain" />
                     </div>
                     
                     {/* Welcome Text */}
                     <div>
                         <h1 className="text-4xl lg:text-[44px] font-black text-gray-900 dark:text-white tracking-tight leading-[1.1]">
-                            {t('Welcome back to')}<br/><span className="font-display lowercase tracking-normal text-5xl lg:text-[52px]">{companyName}</span>!
+                            {t('Welcome back to')}<br/><span className="font-display tracking-normal text-5xl lg:text-[52px]">{companyName}</span>!
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400 mt-5 text-[15px] font-medium max-w-md leading-relaxed">
                             {t('Thank you for continuing your experience with us and always trusting the expertise of our team.')}
@@ -92,7 +93,7 @@ export default function Login() {
                                 value={data.email}
                                 onChange={e => setData('email', e.target.value)}
                                 className={`w-full px-5 py-3.5 rounded-[16px] bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-[14px] font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white transition-all ${errors.email ? 'border-red-500 focus:ring-red-500' : ''}`}
-                                placeholder="Ex: admin@madly.com"
+                                placeholder="Ex: admin@zeasy.com"
                             />
                             {errors.email && <p className="text-[12px] text-red-500 mt-2 font-medium">{errors.email}</p>}
                         </div>
@@ -102,13 +103,22 @@ export default function Login() {
                                 <label className="block text-[12px] font-bold text-gray-700 dark:text-gray-300">{t('Password')}</label>
                                 <a href="#" onClick={e => e.preventDefault()} className="text-[11px] font-bold text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">{t('Forgot password?')}</a>
                             </div>
-                            <input
-                                type="password"
-                                value={data.password}
-                                onChange={e => setData('password', e.target.value)}
-                                className={`w-full px-5 py-3.5 rounded-[16px] bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-[14px] font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white transition-all ${errors.password ? 'border-red-500 focus:ring-red-500' : ''}`}
-                                placeholder="••••••••"
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={data.password}
+                                    onChange={e => setData('password', e.target.value)}
+                                    className={`w-full px-5 py-3.5 pr-12 rounded-[16px] bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-[14px] font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white transition-all ${errors.password ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                    placeholder="••••••••"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                                >
+                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
+                            </div>
                             {errors.password && <p className="text-[12px] text-red-500 mt-2 font-medium">{errors.password}</p>}
                         </div>
 

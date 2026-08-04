@@ -1,4 +1,4 @@
-# Context Handoff for Madly Project
+# Context Handoff for Zeasy Project
 
 ## What we have built so far (Session Summary)
 

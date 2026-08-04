@@ -39,7 +39,7 @@ class AdIdentityController extends Controller
 
         AdIdentity::create($validated);
 
-        return redirect()->route('marketing.ad-identities.index')
+        return redirect()->back()
             ->with('success', 'Identitas Iklan berhasil ditambahkan.');
     }
 
@@ -55,7 +55,7 @@ class AdIdentityController extends Controller
 
         $adIdentity->update($validated);
 
-        return redirect()->route('marketing.ad-identities.index')
+        return redirect()->back()
             ->with('success', 'Identitas Iklan berhasil diperbarui.');
     }
 
@@ -63,7 +63,7 @@ class AdIdentityController extends Controller
     {
         $adIdentity->delete();
 
-        return redirect()->route('marketing.ad-identities.index')
+        return redirect()->back()
             ->with('success', 'Identitas Iklan berhasil dihapus.');
     }
 }

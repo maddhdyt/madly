@@ -45,7 +45,7 @@ class ChatSnippetController extends Controller
 
         ChatSnippet::create($validated);
 
-        return redirect()->route('admin.chat-snippets.index')->with('success', 'Chat snippet created successfully.');
+        return redirect()->back()->with('success', 'Chat snippet created successfully.');
     }
 
     /**
@@ -61,7 +61,7 @@ class ChatSnippetController extends Controller
 
         $chatSnippet->update($validated);
 
-        return redirect()->route('admin.chat-snippets.index')->with('success', 'Chat snippet updated successfully.');
+        return redirect()->back()->with('success', 'Chat snippet updated successfully.');
     }
 
     /**
@@ -71,6 +71,6 @@ class ChatSnippetController extends Controller
     {
         $chatSnippet->delete();
 
-        return redirect()->route('admin.chat-snippets.index')->with('success', 'Chat snippet deleted successfully.');
+        return redirect()->back()->with('success', 'Chat snippet deleted successfully.');
     }
 }
