@@ -92,7 +92,7 @@ class PricelistController extends Controller
 
         DB::beginTransaction();
         try {
-                
+            foreach ($products as $product) {
                 $attrs = $product->attributes ?? [];
                 $targetField = $validated['target_field'];
                 
