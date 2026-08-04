@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Moon, Sun, PanelLeftClose, PanelLeftOpen, Search, CheckCircle2, TrendingUp, Link as LinkIcon, Calculator, Zap, Users, Megaphone, Briefcase } from 'lucide-react';
+import { LayoutGrid, Moon, Sun, PanelLeftClose, PanelLeftOpen, Search, CheckCircle2, TrendingUp, Link as LinkIcon, Calculator, Zap, Users, Megaphone, Briefcase, LineChart, Target, Fingerprint, Building2 } from 'lucide-react';
 import { Head, router } from '@inertiajs/react';
 import useCopyToClipboard from '../Hooks/useCopyToClipboard';
 import GlobalSearchModal from '../Components/GlobalSearchModal';
@@ -157,13 +157,15 @@ export default function MarketingLayout({ children, title = "Digital Marketing" 
         {
             title: t('DATA & METRICS'),
             items: [
-                { name: t('Ad Identities'), icon: Megaphone, href: route('marketing.ad-identities.index'), active: url.startsWith('/marketing/ad-identities') },
-                { name: t('Brands Setup'), icon: Briefcase, href: route('marketing.brands.index'), active: url.startsWith('/marketing/brands') },
+                { name: t('Ad Identities'), icon: Fingerprint, href: route('marketing.ad-identities.index'), active: url.startsWith('/marketing/ad-identities') },
+                { name: t('Brands Setup'), icon: Building2, href: route('marketing.brands.index'), active: url.startsWith('/marketing/brands') },
+                { name: t('Revenue Log'), icon: LineChart, href: route('marketing.revenue-logs.index'), active: url.startsWith('/marketing/revenue-logs') },
             ]
         },
         {
             title: t('MARKETING TOOLS'),
             items: [
+                { name: t('Marketing Planner'), icon: Target, href: route('marketing.marketing-plans.index'), active: url.startsWith('/marketing/marketing-plans') },
                 { name: t('ROAS Calculator'), icon: Calculator, href: route('marketing.roas-calculator.index'), active: url.startsWith('/marketing/roas-calculator') },
                 { name: t('UTM Builder'), icon: LinkIcon, href: route('marketing.utm-builder.index'), active: url.startsWith('/marketing/utm-builder') },
                 { name: t('Budget Allocator'), icon: Zap, href: route('marketing.budget-allocator.index'), active: url.startsWith('/marketing/budget-allocator') },

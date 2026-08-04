@@ -15,6 +15,21 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\GlobalSearchController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Marketing\DashboardController as MarketingDashboardController;
+use App\Http\Controllers\Marketing\AdIdentityController;
+use App\Http\Controllers\Marketing\BrandController as MarketingBrandController;
+use App\Http\Controllers\Marketing\QuotationController as MarketingQuotationController;
+use App\Http\Controllers\Marketing\SettingController as MarketingSettingController;
+use App\Http\Controllers\Marketing\RoasCalculatorController;
+use App\Http\Controllers\Marketing\UtmBuilderController;
+use App\Http\Controllers\Marketing\BudgetAllocatorController;
+use App\Http\Controllers\Marketing\DailyMetricController;
+use App\Http\Controllers\Marketing\PowerRankController;
+use App\Http\Controllers\Marketing\CompetitorController;
+use App\Http\Controllers\Marketing\BattlecardController;
+use App\Http\Controllers\Marketing\AdSwipeController;
+use App\Http\Controllers\Marketing\MarketingPlanController;
+use App\Http\Controllers\Marketing\RevenueLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 
@@ -81,5 +96,9 @@ Route::middleware('auth')->group(function () {
 
         // Ad Swipes
         Route::resource('ad-swipes', \App\Http\Controllers\Marketing\AdSwipeController::class)->except(['create', 'edit', 'show']);
+
+        // Planner & Logs
+        Route::resource('marketing-plans', \App\Http\Controllers\Marketing\MarketingPlanController::class)->except(['create', 'edit', 'show']);
+        Route::resource('revenue-logs', \App\Http\Controllers\Marketing\RevenueLogController::class)->except(['create', 'edit', 'show']);
     });
 });
