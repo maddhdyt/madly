@@ -167,6 +167,8 @@ export default function MarketingLayout({ children, title = "Digital Marketing" 
                 { name: t('ROAS Calculator'), icon: Calculator, href: route('marketing.roas-calculator.index'), active: url.startsWith('/marketing/roas-calculator') },
                 { name: t('UTM Builder'), icon: LinkIcon, href: route('marketing.utm-builder.index'), active: url.startsWith('/marketing/utm-builder') },
                 { name: t('Budget Allocator'), icon: Zap, href: route('marketing.budget-allocator.index'), active: url.startsWith('/marketing/budget-allocator') },
+                { name: t('Competitor Research'), icon: Users, href: route('marketing.competitors.index'), active: url.startsWith('/marketing/competitors') },
+                { name: t('Ad Swipe File'), icon: LayoutGrid, href: route('marketing.ad-swipes.index'), active: url.startsWith('/marketing/ad-swipes') },
             ]
         }
     ];

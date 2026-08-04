@@ -72,5 +72,14 @@ Route::middleware('auth')->group(function () {
         Route::get('budget-allocator', [\App\Http\Controllers\Marketing\BudgetAllocatorController::class, 'index'])->name('budget-allocator.index');
         Route::get('power-rank', [\App\Http\Controllers\Marketing\PowerRankController::class, 'index'])->name('power-rank.index');
         Route::resource('daily-metrics', \App\Http\Controllers\Marketing\DailyMetricController::class)->only(['index', 'store', 'destroy']);
+        
+        // Competitor Research
+        Route::resource('competitors', \App\Http\Controllers\Marketing\CompetitorController::class)->except(['create', 'edit', 'show']);
+        Route::post('competitors/{competitor}/battlecards', [\App\Http\Controllers\Marketing\CompetitorController::class, 'storeBattlecard'])->name('competitors.battlecards.store');
+        Route::put('battlecards/{battlecard}', [\App\Http\Controllers\Marketing\CompetitorController::class, 'updateBattlecard'])->name('battlecards.update');
+        Route::delete('battlecards/{battlecard}', [\App\Http\Controllers\Marketing\CompetitorController::class, 'destroyBattlecard'])->name('battlecards.destroy');
+
+        // Ad Swipes
+        Route::resource('ad-swipes', \App\Http\Controllers\Marketing\AdSwipeController::class)->except(['create', 'edit', 'show']);
     });
 });
