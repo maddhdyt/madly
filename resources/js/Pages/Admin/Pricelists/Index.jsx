@@ -372,7 +372,13 @@ export default function Index({ products, services, activeFilters = {}, filterOp
                                             value="harga_jual_minimum_info" 
                                             className="sr-only"
                                             checked={data.target_field === 'harga_jual_minimum_info'}
-                                            onChange={() => setData('target_field', 'harga_jual_minimum_info')}
+                                            onChange={() => {
+                                                setData(data => ({
+                                                    ...data,
+                                                    target_field: 'harga_jual_minimum_info',
+                                                    base_field: 'hpp'
+                                                }));
+                                            }}
                                         />
                                         <span className="font-bold text-sm text-gray-900 dark:text-white">Harga Jual Minimum</span>
                                         <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-1 text-center">Batas bawah harga</span>
