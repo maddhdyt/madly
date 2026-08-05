@@ -71,7 +71,7 @@ export default function AdSwipes({ swipes, brands }) {
     };
 
     return (
-        <MarketingLayout title="Ad Swipe File">
+        <>
             <div className="flex flex-col h-[calc(100vh-80px)] overflow-y-auto font-sans bg-white dark:bg-gray-900 rounded-tl-3xl border-l border-t border-gray-100 dark:border-gray-800 transition-colors duration-300 p-6 md:p-8 lg:p-10">
                 
                 <div className="flex justify-between items-end mb-8">
@@ -212,6 +212,8 @@ export default function AdSwipes({ swipes, brands }) {
                     </div>, document.body
                 )}
             </div>
-        </MarketingLayout>
+        </>
     );
 }
+
+AdSwipes.layout = page => <MarketingLayout title="Ad Swipe File">{page}</MarketingLayout>;

@@ -21,7 +21,10 @@ class ProductController extends Controller
                 return $query->where('service_id', $serviceId);
             })
             ->when($search, function($query) use ($search) {
-                return $query->where('name', 'like', '%' . $search . '%');
+                return $query->where(function($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('attributes', 'like', '%' . $search . '%');
+                });
             })
             ->when(!empty($activeFilters) && is_array($activeFilters), function($query) use ($activeFilters) {
                 foreach ($activeFilters as $key => $value) {

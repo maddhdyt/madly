@@ -79,7 +79,7 @@ export default function Plans({ plans, copyToClipboard, showToast }) {
     };
 
     return (
-        <MarketingLayout title={t('Marketing Planner')}>
+        <>
             <Head title={t('Marketing Planner')} />
             
             <div className="max-w-7xl mx-auto">
@@ -195,6 +195,8 @@ export default function Plans({ plans, copyToClipboard, showToast }) {
                     </div>, document.body
                 )}
             </div>
-        </MarketingLayout>
+        </>
     );
 }
+
+Plans.layout = page => <MarketingLayout title="Marketing Planner">{page}</MarketingLayout>;

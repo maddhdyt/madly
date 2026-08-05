@@ -87,7 +87,7 @@ export default function BudgetAllocator({ brands }) {
     }, [totalBudget, brandMetrics, brands]);
 
     return (
-        <MarketingLayout title="Smart Budget Allocator">
+        <>
             <div className="flex flex-col h-[calc(100vh-80px)] overflow-y-auto font-sans bg-[#f4f5f5] dark:bg-gray-950 rounded-tl-3xl border-l border-t border-gray-100 dark:border-gray-800 transition-colors duration-300">
                 
                 <div className="flex-1 w-full p-6 md:p-8 lg:p-10">
@@ -269,6 +269,8 @@ export default function BudgetAllocator({ brands }) {
                     </div>
                 </div>
             </div>
-        </MarketingLayout>
+        </>
     );
 }
+
+BudgetAllocator.layout = page => <MarketingLayout title="Smart Budget Allocator">{page}</MarketingLayout>;

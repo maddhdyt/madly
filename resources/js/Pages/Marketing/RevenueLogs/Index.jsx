@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Head, router, useForm } from '@inertiajs/react';
 import MarketingLayout from '../../../Layouts/MarketingLayout';
@@ -18,6 +18,31 @@ export default function RevenueLogs({ logs, copyToClipboard, showToast }) {
         trend: 'stable', // up, down, stable
         reason: ''
     });
+
+    // Auto-calculate trend when revenue amount or date changes
+    useEffect(() => {
+        if (!form.data.revenue_amount || logs.length === 0) return;
+
+        // Find the log that comes IMMEDIATELY before the selected date
+        const previousLog = logs
+            .filter(log => dayjs(log.date).isBefore(dayjs(form.data.date)))
+            .sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())[0];
+            
+        if (previousLog && previousLog.revenue_amount) {
+            const current = parseFloat(form.data.revenue_amount);
+            const prev = parseFloat(previousLog.revenue_amount);
+            let newTrend = form.data.trend;
+            
+            if (current > prev) newTrend = 'up';
+            else if (current < prev) newTrend = 'down';
+            else newTrend = 'stable';
+            
+            // Only update if it actually changed to avoid unnecessary renders
+            if (newTrend !== form.data.trend) {
+                form.setData('trend', newTrend);
+            }
+        }
+    }, [form.data.revenue_amount, form.data.date]);
 
     const openModal = (log = null) => {
         setEditingLog(log);
@@ -74,7 +99,7 @@ export default function RevenueLogs({ logs, copyToClipboard, showToast }) {
     };
 
     return (
-        <MarketingLayout title={t('Revenue Fluctuation Log')}>
+        <>
             <Head title={t('Revenue Fluctuation Log')} />
             
             <div className="max-w-4xl mx-auto">
@@ -183,6 +208,8 @@ export default function RevenueLogs({ logs, copyToClipboard, showToast }) {
                     </div>, document.body
                 )}
             </div>
-        </MarketingLayout>
+        </>
     );
 }
+
+RevenueLogs.layout = page => <MarketingLayout title="Revenue Fluctuation Log">{page}</MarketingLayout>;

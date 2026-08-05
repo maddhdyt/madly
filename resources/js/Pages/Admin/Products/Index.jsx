@@ -10,7 +10,7 @@ import Pagination from '../../../Components/Pagination';
 import useTranslations from '../../../Hooks/useTranslations';
 
 // Specs Modal Component
-const SpecsModal = ({ isOpen, onClose, product, service, t }) => {
+const SpecsModal = ({ isOpen, onClose, product, service, t, onTagClick }) => {
     if (!isOpen || !product) return null;
 
     const attributes = product.attributes || {};
@@ -61,17 +61,26 @@ const SpecsModal = ({ isOpen, onClose, product, service, t }) => {
             );
         }
         
-        if (type === 'tags') {
-            const tags = val.split(',').map(t => t.trim()).filter(t => t);
+        if (type === 'tags' || type === 'label') {
+            const tags = typeof val === 'string' 
+                ? val.split(',').map(t => t.trim()).filter(t => t) 
+                : (Array.isArray(val) ? val : [val]);
             if (tags.length === 0) return val;
             
             return (
                 <div className="flex flex-wrap gap-2">
-                    {tags.map((tag, i) => (
-                        <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm">
-                            {tag}
-                        </span>
-                    ))}
+                    {tags.map((tag, i) => {
+                        const isClickable = !!onTagClick;
+                        return (
+                            <span 
+                                key={i} 
+                                onClick={() => isClickable && onTagClick(tag)}
+                                className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm ${isClickable ? 'cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 transition-colors' : ''}`}
+                            >
+                                {tag}
+                            </span>
+                        );
+                    })}
                 </div>
             );
         }
@@ -531,6 +540,10 @@ export default function Index({ products, brands, services, activeFilters = {}, 
                 product={viewSpecsProduct}
                 service={viewSpecsProduct ? services.find(s => s.id === viewSpecsProduct.service_id) : null}
                 t={t}
+                onTagClick={(tag) => {
+                    setSearchQuery(tag);
+                    setIsSpecsModalOpen(false);
+                }}
             />
 
             <ConfirmModal 

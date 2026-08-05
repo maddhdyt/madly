@@ -33,17 +33,19 @@ export default function Dashboard({ stats = {}, quickStats = {}, chartData = { l
     }
 
     return (
-        <MarketingLayout title="Marketing Dashboard">
+        <>
             <div className="flex flex-col font-sans bg-white dark:bg-gray-900 min-h-[calc(100vh-80px)] rounded-tl-3xl border-l border-t border-gray-100 dark:border-gray-800 overflow-y-auto transition-colors duration-300">
                 <div className="w-full p-6 md:p-8 lg:p-10 space-y-8">
                     
                     {/* Header Banner */}
-                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
                         <div>
-                            <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">{greeting}, {user} 👋</h1>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Pusat komando Digital Marketing Anda. Seluruh metrik ditampilkan secara real-time.</p>
+                            <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">{greeting}, {user} 👋</h2>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium">
+                                Pusat komando Digital Marketing Anda.
+                            </p>
                         </div>
-                        <Link href={route('marketing.daily-metrics.index')} className="shrink-0 px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-bold rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors shadow-sm flex items-center gap-2">
+                        <Link href={route('marketing.daily-metrics.index')} className="shrink-0 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors shadow-sm flex items-center gap-2">
                             <TrendingUp className="w-4 h-4" />
                             Input Daily Metrics
                         </Link>
@@ -57,20 +59,17 @@ export default function Dashboard({ stats = {}, quickStats = {}, chartData = { l
                             { label: 'Avg ROAS (7D)', value: `${roas}x`, icon: TrendingUp, trend: 'Daily' },
                             { label: 'Avg CPA (7D)', value: formatCurrency(cpa), icon: MousePointerClick, trend: 'Daily' },
                         ].map((stat, i) => (
-                            <div key={i} className="relative bg-white dark:bg-gray-900 px-6 py-6 rounded-3xl border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-sm transition-all overflow-hidden group">
-                                <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-gray-100 dark:bg-gray-800 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div key={i} className="relative bg-white dark:bg-gray-900 px-6 py-6 rounded-3xl border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgb(255,255,255,0.02)] transition-all duration-300 overflow-hidden group">
+                                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-gray-100 dark:bg-gray-800 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                 
                                 <div className="relative z-10 flex justify-between items-start mb-6">
-                                    <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-400 group-hover:bg-gray-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-gray-900 transition-colors">
+                                    <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 group-hover:bg-gray-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-gray-900 transition-colors duration-300">
                                         <stat.icon className="w-5 h-5" />
-                                    </div>
-                                    <div className="flex items-center gap-1 text-[11px] font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
-                                        {stat.trend}
                                     </div>
                                 </div>
                                 <div className="relative z-10">
-                                    <div className="text-2xl font-black text-gray-900 dark:text-white tracking-tight leading-none mb-2 truncate" title={stat.value}>{stat.value || 0}</div>
-                                    <div className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">{stat.label}</div>
+                                    <div className="text-3xl lg:text-4xl font-black text-gray-900 dark:text-white tracking-tight leading-none mb-2 truncate" title={stat.value}>{stat.value || 0}</div>
+                                    <div className="text-[11px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">{stat.label}</div>
                                 </div>
                             </div>
                         ))}
@@ -116,49 +115,54 @@ export default function Dashboard({ stats = {}, quickStats = {}, chartData = { l
                             </div>
                         </div>
 
-                        {/* Quick Tools (Right - 1 Column Stack) */}
                         <div className="xl:col-span-1 flex flex-col gap-4">
-                            <h2 className="text-sm font-bold text-gray-900 dark:text-white tracking-tight px-1 uppercase">Quick Tools</h2>
+                            <h2 className="text-xs font-bold text-gray-400 dark:text-gray-500 tracking-wider px-1 uppercase">Quick Tools</h2>
                             
-                            <div className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-3xl p-6 hover:shadow-lg transition-all flex flex-col group relative overflow-hidden">
-                                <div className="absolute -right-10 -top-10 w-32 h-32 bg-white/10 dark:bg-black/5 rounded-full blur-2xl"></div>
-                                <div className="relative z-10 flex items-center justify-between mb-4">
+                            <Link href={route('marketing.roas-calculator.index')} className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-3xl p-5 md:p-6 hover:shadow-xl transition-all duration-300 flex flex-col group relative overflow-hidden transform hover:-translate-y-1 cursor-pointer">
+                                <div className="absolute -right-10 -top-10 w-32 h-32 bg-white/10 dark:bg-black/5 rounded-full blur-2xl transition-transform duration-500 group-hover:scale-150"></div>
+                                <div className="relative z-10 flex items-center justify-between mb-3 md:mb-4">
                                     <div className="w-10 h-10 rounded-xl bg-white/10 dark:bg-black/5 flex items-center justify-center">
                                         <Calculator className="w-5 h-5 text-white dark:text-gray-900" />
                                     </div>
+                                    <ArrowRight className="w-5 h-5 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                                 </div>
-                                <h3 className="relative z-10 text-lg font-bold mb-1">ROAS Calculator</h3>
-                                <p className="relative z-10 text-xs opacity-80 mb-4 line-clamp-2">Hitung BEP ROAS & kelayakan scale-up.</p>
-                                <button className="relative z-10 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider group-hover:opacity-70 transition-opacity w-fit">
-                                    Buka Kalkulator <ArrowRight className="w-4 h-4" />
-                                </button>
-                            </div>
+                                <h3 className="relative z-10 text-lg font-bold">ROAS Calculator</h3>
+                                <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-300">
+                                    <div className="overflow-hidden">
+                                        <p className="relative z-10 text-xs opacity-70 mt-2">Hitung BEP ROAS & kelayakan scale-up.</p>
+                                    </div>
+                                </div>
+                            </Link>
 
-                            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-sm transition-all flex flex-col group">
-                                <div className="flex items-center justify-between mb-4">
+                            <Link href={route('marketing.utm-builder.index')} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-5 md:p-6 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-xl transition-all duration-300 flex flex-col group transform hover:-translate-y-1 cursor-pointer">
+                                <div className="flex items-center justify-between mb-3 md:mb-4">
                                     <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center group-hover:bg-gray-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-gray-900 transition-colors">
                                         <LinkIcon className="w-5 h-5" />
                                     </div>
+                                    <ArrowRight className="w-5 h-5 text-gray-400 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-gray-900 dark:group-hover:text-white transition-all duration-300" />
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">UTM Builder</h3>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 line-clamp-2">Generate tracking link standar operasional.</p>
-                                <button className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white group-hover:text-gray-500 transition-colors w-fit">
-                                    Buat Link <ArrowRight className="w-4 h-4" />
-                                </button>
-                            </div>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">UTM Builder</h3>
+                                <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-300">
+                                    <div className="overflow-hidden">
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Generate tracking link standar operasional.</p>
+                                    </div>
+                                </div>
+                            </Link>
 
-                            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-sm transition-all flex flex-col group">
-                                <div className="flex items-center justify-between mb-4">
+                            <Link href={route('marketing.budget-allocator.index')} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-5 md:p-6 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-xl transition-all duration-300 flex flex-col group transform hover:-translate-y-1 cursor-pointer">
+                                <div className="flex items-center justify-between mb-3 md:mb-4">
                                     <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center group-hover:bg-gray-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-gray-900 transition-colors">
                                         <Users className="w-5 h-5" />
                                     </div>
+                                    <ArrowRight className="w-5 h-5 text-gray-400 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-gray-900 dark:group-hover:text-white transition-all duration-300" />
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Budget Allocator</h3>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 line-clamp-2">Distribusi budget ke tahapan TOFU/MOFU.</p>
-                                <button className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white group-hover:text-gray-500 transition-colors w-fit">
-                                    Atur Budget <ArrowRight className="w-4 h-4" />
-                                </button>
-                            </div>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Budget Allocator</h3>
+                                <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-300">
+                                    <div className="overflow-hidden">
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Distribusi budget ke tahapan TOFU/MOFU.</p>
+                                    </div>
+                                </div>
+                            </Link>
                         </div>
 
                     </div>
@@ -284,6 +288,8 @@ export default function Dashboard({ stats = {}, quickStats = {}, chartData = { l
                     </div>
                 </div>
             </div>
-        </MarketingLayout>
+        </>
     );
 }
+
+Dashboard.layout = page => <MarketingLayout title="Marketing Dashboard">{page}</MarketingLayout>;

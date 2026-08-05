@@ -12,7 +12,7 @@ export default function PowerRank({ leaderboard = [] }) {
     };
 
     return (
-        <MarketingLayout title="Power Rank">
+        <>
             <div className="flex flex-col font-sans bg-white dark:bg-gray-900 min-h-[calc(100vh-80px)] rounded-tl-3xl border-l border-t border-gray-100 dark:border-gray-800 overflow-y-auto transition-colors duration-300">
                 <div className="w-full p-6 md:p-8 lg:p-10 space-y-8">
                     
@@ -118,6 +118,8 @@ export default function PowerRank({ leaderboard = [] }) {
 
                 </div>
             </div>
-        </MarketingLayout>
+        </>
     );
 }
+
+PowerRank.layout = page => <MarketingLayout title="Power Rank">{page}</MarketingLayout>;

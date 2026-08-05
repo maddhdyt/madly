@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import MainLayout from '../../../Layouts/MainLayout';
 import { useForm, router, Head } from '@inertiajs/react';
-import { Settings2, ArrowLeft, Search, Filter, Save, X } from 'lucide-react';
+import { Settings2, ArrowLeft, Search, Filter, Save, X, Trash2 } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import Pagination from '../../../Components/Pagination';
 import CustomSelect from '../../../Components/CustomSelect';
 import useTranslations from '../../../Hooks/useTranslations';
@@ -349,8 +350,8 @@ export default function Index({ products, services, activeFilters = {}, filterOp
             </div>
 
             {/* Bulk Edit Modal */}
-            {isBulkModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
+            {isBulkModalOpen && createPortal(
+                <div className="fixed inset-0 z-[110] flex items-center justify-center">
                     <div className="absolute inset-0 bg-gray-900/30 dark:bg-black/60 backdrop-blur-sm" onClick={() => setIsBulkModalOpen(false)}></div>
                     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md relative z-10 animate-fade-in-up">
                         <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
@@ -400,7 +401,7 @@ export default function Index({ products, services, activeFilters = {}, filterOp
                             
                             <div>
                                 <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Adjustment Type</label>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-3 gap-3">
                                     <label className={`border rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer transition-all ${data.update_type === 'percentage' ? 'border-gray-900 dark:border-white bg-gray-50 dark:bg-gray-800' : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
                                         <input 
                                             type="radio" 
@@ -410,7 +411,7 @@ export default function Index({ products, services, activeFilters = {}, filterOp
                                             checked={data.update_type === 'percentage'}
                                             onChange={() => setData('update_type', 'percentage')}
                                         />
-                                        <span className="font-bold text-sm text-gray-900 dark:text-white">% Markup</span>
+                                        <span className="font-bold text-sm text-gray-900 dark:text-white text-center">% Markup</span>
                                         <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-1 text-center">Dari harga dasar</span>
                                     </label>
                                     <label className={`border rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer transition-all ${data.update_type === 'fixed' ? 'border-gray-900 dark:border-white bg-gray-50 dark:bg-gray-800' : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
@@ -422,13 +423,28 @@ export default function Index({ products, services, activeFilters = {}, filterOp
                                             checked={data.update_type === 'fixed'}
                                             onChange={() => setData('update_type', 'fixed')}
                                         />
-                                        <span className="font-bold text-sm text-gray-900 dark:text-white">Fixed Price</span>
+                                        <span className="font-bold text-sm text-gray-900 dark:text-white text-center">Fixed Price</span>
                                         <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-1 text-center">Exact Amount</span>
+                                    </label>
+                                    <label className={`border rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer transition-all ${data.update_type === 'remove' ? 'border-red-600 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
+                                        <input 
+                                            type="radio" 
+                                            name="update_type" 
+                                            value="remove" 
+                                            className="sr-only"
+                                            checked={data.update_type === 'remove'}
+                                            onChange={() => setData('update_type', 'remove')}
+                                        />
+                                        <div className="flex items-center gap-1">
+                                            <Trash2 className={`w-3.5 h-3.5 ${data.update_type === 'remove' ? 'text-red-600' : 'text-gray-400'}`} />
+                                            <span className={`font-bold text-sm ${data.update_type === 'remove' ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'} text-center`}>Hapus</span>
+                                        </div>
+                                        <span className={`text-[10px] mt-1 text-center ${data.update_type === 'remove' ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}>Kosongkan nilai</span>
                                     </label>
                                 </div>
                             </div>
 
-                            {data.update_type === 'percentage' ? (
+                            {data.update_type === 'percentage' && (
                                 <div className="space-y-3">
                                     <div>
                                         <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Markup Base</label>
@@ -456,7 +472,9 @@ export default function Index({ products, services, activeFilters = {}, filterOp
                                         />
                                     </div>
                                 </div>
-                            ) : (
+                            )}
+
+                            {data.update_type === 'fixed' && (
                                 <div>
                                     <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Fixed Selling Price (Rp)</label>
                                     <input 
@@ -467,6 +485,13 @@ export default function Index({ products, services, activeFilters = {}, filterOp
                                         onChange={e => setData('fixed_price', e.target.value)}
                                         required
                                     />
+                                </div>
+                            )}
+
+                            {data.update_type === 'remove' && (
+                                <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-xl text-sm font-medium border border-red-100 dark:border-red-900/50 flex flex-col gap-1">
+                                    <span className="font-bold">Peringatan:</span>
+                                    <span>Nilai pada kolom <b className="font-black">{data.target_field === 'harga_jual_minimum_info' ? 'Harga Jual Minimum' : 'Harga Jual Standar'}</b> akan dihapus (dikosongkan) pada {selectedIds.length} jurnal yang dipilih.</span>
                                 </div>
                             )}
 
@@ -490,7 +515,7 @@ export default function Index({ products, services, activeFilters = {}, filterOp
                         </form>
                     </div>
                 </div>
-            )}
+            , document.body)}
         </div>
     );
 }

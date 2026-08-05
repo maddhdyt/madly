@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Moon, Sun, PanelLeftClose, PanelLeftOpen, Search, CheckCircle2, TrendingUp, Link as LinkIcon, Calculator, Zap, Users, Megaphone, Briefcase, LineChart, Target, Fingerprint, Building2 } from 'lucide-react';
+import { LayoutGrid, Moon, Sun, PanelLeftClose, PanelLeftOpen, Search, CheckCircle2, TrendingUp, Link as LinkIcon, Calculator, Zap, Users, Megaphone, Briefcase, LineChart, Target, Fingerprint, Building2, ChevronDown } from 'lucide-react';
 import { Head, router } from '@inertiajs/react';
 import useCopyToClipboard from '../Hooks/useCopyToClipboard';
 import GlobalSearchModal from '../Components/GlobalSearchModal';
@@ -17,30 +17,98 @@ export default function MarketingLayout({ children, title = "Digital Marketing" 
     const [toast, setToast] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(typeof window !== 'undefined' ? window.innerWidth >= 768 : true);
     const [searchQuery, setSearchQuery] = useState("");
-    const [isDarkMode, setIsDarkMode] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        }
+        return false;
+    });
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
+    const menuGroups = [
+        {
+            title: 'General',
+            items: [
+                { name: t('Dashboard'), icon: LayoutGrid, href: route('marketing.home'), active: url === '/marketing' || url === '/marketing/dashboard' },
+                { name: t('Power Rank'), icon: TrendingUp, href: route('marketing.power-rank.index'), active: url.startsWith('/marketing/power-rank') },
+            ]
+        },
+        {
+            title: 'Data & Metrics',
+            items: [
+                { name: t('Ads'), icon: Fingerprint, href: route('marketing.ad-identities.index'), active: url.startsWith('/marketing/ad-identities') },
+                { name: t('Brands'), icon: Building2, href: route('marketing.brands.index'), active: url.startsWith('/marketing/brands') },
+                { name: t('Revenue'), icon: LineChart, href: route('marketing.revenue-logs.index'), active: url.startsWith('/marketing/revenue-logs') },
+            ]
+        },
+        {
+            title: 'Marketing Tools',
+            items: [
+                { name: t('Planner'), icon: Target, href: route('marketing.marketing-plans.index'), active: url.startsWith('/marketing/marketing-plans') },
+                { name: t('ROAS Calc'), icon: Calculator, href: route('marketing.roas-calculator.index'), active: url.startsWith('/marketing/roas-calculator') },
+                { name: t('UTM Links'), icon: LinkIcon, href: route('marketing.utm-builder.index'), active: url.startsWith('/marketing/utm-builder') },
+                { name: t('Budget'), icon: Zap, href: route('marketing.budget-allocator.index'), active: url.startsWith('/marketing/budget-allocator') },
+                { name: t('Competitors'), icon: Users, href: route('marketing.competitors.index'), active: url.startsWith('/marketing/competitors') },
+                { name: t('Ad Swipes'), icon: LayoutGrid, href: route('marketing.ad-swipes.index'), active: url.startsWith('/marketing/ad-swipes') },
+            ]
+        }
+    ];
+
+    const [openGroups, setOpenGroups] = useState(() => {
+        const initialGroups = [];
+        menuGroups.forEach((group, idx) => {
+            if (group.items.some(item => item.active)) {
+                initialGroups.push(idx);
+            }
+        });
+        return initialGroups.length > 0 ? initialGroups : [0];
+    });
+
+    const toggleGroup = (idx) => {
+        setOpenGroups(prev => 
+            prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
+        );
+    };
+
     const activeLinkRef = React.useRef(null);
     const navRef = React.useRef(null);
-    const [indicatorStyle, setIndicatorStyle] = useState({ transform: 'translateY(0)', height: 0, opacity: 0 });
+    const indicatorRef = React.useRef(null);
 
     useEffect(() => {
+        const activeGroupIdx = menuGroups.findIndex(group => group.items.some(item => item.active));
+        const isActiveGroupOpen = openGroups.includes(activeGroupIdx);
+
         const updateIndicator = () => {
-            if (activeLinkRef.current && navRef.current) {
-                setIndicatorStyle({
-                    transform: `translateY(${activeLinkRef.current.offsetTop}px)`,
-                    height: activeLinkRef.current.offsetHeight,
-                    opacity: 1
-                });
+            if (activeLinkRef.current && indicatorRef.current && navRef.current) {
+                let offsetTop = 0;
+                let el = activeLinkRef.current;
+                while (el && el !== navRef.current) {
+                    offsetTop += el.offsetTop;
+                    el = el.offsetParent;
+                }
+
+                indicatorRef.current.style.transform = `translateY(${offsetTop}px)`;
+                indicatorRef.current.style.height = `${activeLinkRef.current.offsetHeight}px`;
+                indicatorRef.current.style.opacity = '1';
+                indicatorRef.current.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease';
             }
         };
 
-        requestAnimationFrame(() => {
-            requestAnimationFrame(updateIndicator);
-        });
+        // Track animation frames when accordions open/close
+        let frameId;
+        const trackAnimation = () => {
+            updateIndicator();
+            frameId = requestAnimationFrame(trackAnimation);
+        };
+        trackAnimation();
+        
+        // Stop tracking after transition duration (300ms) + buffer
+        const timeoutId = setTimeout(() => {
+            cancelAnimationFrame(frameId);
+        }, 350);
 
         if (typeof window !== 'undefined' && window.innerWidth < 768) {
             setIsSidebarOpen(false);
@@ -58,15 +126,21 @@ export default function MarketingLayout({ children, title = "Digital Marketing" 
         window.addEventListener('resize', handleResize);
 
         return () => {
+            cancelAnimationFrame(frameId);
+            clearTimeout(timeoutId);
             window.removeEventListener('resize', updateIndicator);
             window.removeEventListener('resize', handleResize);
         };
-    }, [url]);
+    }, [url, openGroups]);
 
     useEffect(() => {
         const isDark = localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
         setIsDarkMode(isDark);
-        if (isDark) document.documentElement.classList.add('dark');
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
 
         const handleKeyDown = (e) => {
             if ((e.key === '/' || (e.ctrlKey && e.key === 'k')) && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
@@ -146,35 +220,6 @@ export default function MarketingLayout({ children, title = "Digital Marketing" 
         });
     };
 
-    const menuGroups = [
-        {
-            title: t('GENERAL'),
-            items: [
-                { name: t('Dashboard'), icon: LayoutGrid, href: route('marketing.home'), active: url === '/marketing' || url === '/marketing/dashboard' },
-                { name: t('Power Rank'), icon: TrendingUp, href: route('marketing.power-rank.index'), active: url.startsWith('/marketing/power-rank') },
-            ]
-        },
-        {
-            title: t('DATA & METRICS'),
-            items: [
-                { name: t('Ad Identities'), icon: Fingerprint, href: route('marketing.ad-identities.index'), active: url.startsWith('/marketing/ad-identities') },
-                { name: t('Brands Setup'), icon: Building2, href: route('marketing.brands.index'), active: url.startsWith('/marketing/brands') },
-                { name: t('Revenue Log'), icon: LineChart, href: route('marketing.revenue-logs.index'), active: url.startsWith('/marketing/revenue-logs') },
-            ]
-        },
-        {
-            title: t('MARKETING TOOLS'),
-            items: [
-                { name: t('Marketing Planner'), icon: Target, href: route('marketing.marketing-plans.index'), active: url.startsWith('/marketing/marketing-plans') },
-                { name: t('ROAS Calculator'), icon: Calculator, href: route('marketing.roas-calculator.index'), active: url.startsWith('/marketing/roas-calculator') },
-                { name: t('UTM Builder'), icon: LinkIcon, href: route('marketing.utm-builder.index'), active: url.startsWith('/marketing/utm-builder') },
-                { name: t('Budget Allocator'), icon: Zap, href: route('marketing.budget-allocator.index'), active: url.startsWith('/marketing/budget-allocator') },
-                { name: t('Competitor Research'), icon: Users, href: route('marketing.competitors.index'), active: url.startsWith('/marketing/competitors') },
-                { name: t('Ad Swipe File'), icon: LayoutGrid, href: route('marketing.ad-swipes.index'), active: url.startsWith('/marketing/ad-swipes') },
-            ]
-        }
-    ];
-
     const getGreeting = () => {
         const hour = new Date().getHours();
         if (hour < 12) return t('Good morning');
@@ -203,43 +248,66 @@ export default function MarketingLayout({ children, title = "Digital Marketing" 
                             <div className="w-9 h-9 flex items-center justify-center cursor-pointer transition-transform hover:scale-105">
                                 <img src={logoImg} alt="Zeasy Logo" className="w-full h-full object-contain" />
                             </div>
-                            <span className="font-display font-extrabold text-[26px] tracking-normal text-gray-900 dark:text-white">Marketing</span>
+                            <span className="font-display font-extrabold text-[26px] tracking-normal text-gray-900 dark:text-white">Zeasy</span>
                         </div>
 
                         <nav ref={navRef} className="flex-1 overflow-y-auto relative space-y-1 px-1 mt-2 pb-4">
                             <div
+                                ref={indicatorRef}
                                 className="absolute left-1 right-1 rounded-xl bg-gray-900 dark:bg-white shadow-md z-0 pointer-events-none"
                                 style={{
-                                    ...indicatorStyle,
-                                    transition: 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease',
+                                    transition: 'opacity 0.3s ease',
                                     willChange: 'transform, height'
                                 }}
                             ></div>
 
-                            {menuGroups.map((group, idx) => (
+                            {menuGroups.map((group, idx) => {
+                                const isOpen = openGroups.includes(idx);
+                                return (
                                 <div key={idx} className="z-10">
-                                    <div className="pt-6 pb-1 first:pt-0 relative z-10">
-                                        <p className="px-4 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase">{group.title}</p>
+                                    <button 
+                                        ref={group.items.some(i => i.active) ? activeLinkRef : null}
+                                        onClick={() => toggleGroup(idx)}
+                                        className={`relative z-10 w-full flex items-center justify-between py-2.5 px-4 group focus:outline-none rounded-xl transition-colors ${group.items.some(i => i.active) ? '' : 'hover:bg-gray-100/50 dark:hover:bg-gray-800/30'}`}
+                                    >
+                                        <p className={`relative z-10 text-[11px] font-bold tracking-wider uppercase transition-colors ${group.items.some(i => i.active) ? 'text-white dark:text-gray-900' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300'}`}>{group.title}</p>
+                                        <ChevronDown className={`relative z-10 w-4 h-4 transition-transform duration-300 ${group.items.some(i => i.active) ? 'text-white dark:text-gray-900' : 'text-gray-400 dark:text-gray-500'} ${isOpen ? 'rotate-180' : ''}`} />
+                                    </button>
+                                    
+                                    <div className={`grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                                        <div className="overflow-hidden">
+                                            <div className="pt-0 pb-1 flex flex-col relative">
+                                                {/* Connect to header */}
+                                                <div className="absolute left-[26px] top-0 h-1 w-[2px] bg-gray-200 dark:bg-gray-800"></div>
+
+                                                {group.items.map((item, itemIdx) => (
+                                                    <Link
+                                                        key={itemIdx}
+                                                        href={item.href}
+                                                        className={`relative z-10 flex items-center py-1.5 pl-[48px] pr-4 text-[13.5px] transition-colors duration-300 rounded-xl group/item ${item.active ? 'font-semibold text-gray-900 dark:text-white' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50'}`}
+                                                    >
+                                                        {/* L-Curve for this item */}
+                                                        <div className={`absolute left-[26px] top-0 w-[12px] h-1/2 border-l-[2px] border-b-[2px] rounded-bl-lg bg-transparent transition-colors ${item.active ? 'border-gray-900 dark:border-white' : 'border-gray-200 dark:border-gray-800 group-hover/item:border-gray-300 dark:group-hover/item:border-gray-700'}`}></div>
+
+                                                        {/* Line connecting to the next item */}
+                                                        {itemIdx < group.items.length - 1 && (
+                                                            <div className="absolute left-[26px] top-1/2 bottom-0 w-[2px] transition-colors bg-gray-200 dark:bg-gray-800 group-hover/item:bg-gray-300 dark:group-hover/item:bg-gray-700"></div>
+                                                        )}
+
+                                                        <span className="relative z-10">{item.name}</span>
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        </div>
                                     </div>
-                                    {group.items.map((item, itemIdx) => (
-                                        <Link
-                                            key={itemIdx}
-                                            href={item.href}
-                                            ref={item.active ? activeLinkRef : null}
-                                            className={`relative z-10 flex items-center gap-3 px-4 py-2.5 text-sm transition-colors duration-300 rounded-xl ${item.active ? 'font-semibold text-white dark:text-gray-900' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'}`}
-                                        >
-                                            <item.icon className={`w-5 h-5 relative z-10 transition-colors duration-300 ${item.active ? 'text-white dark:text-gray-900' : 'text-gray-500'}`} strokeWidth={item.active ? 2 : 1.5} />
-                                            <span className="relative z-10">{item.name}</span>
-                                        </Link>
-                                    ))}
                                 </div>
-                            ))}
+                            )})}
                         </nav>
 
                         <div className="mt-auto pt-6 px-3">
                             <div className="relative bg-[#e4e5e4] dark:bg-gray-800 rounded-full flex flex-col items-center gap-1.5 p-1.5 w-fit transition-colors">
                                 <div
-                                    className={`absolute left-1.5 right-1.5 top-1.5 h-10 rounded-full bg-white dark:bg-gray-700 shadow-sm transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isDarkMode ? 'translate-y-0' : 'translate-y-11.5'}`}
+                                    className={`absolute left-1.5 right-1.5 top-1.5 h-10 rounded-full bg-white dark:bg-gray-700 shadow-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isDarkMode ? 'translate-y-0' : 'translate-y-[46px]'}`}
                                 ></div>
 
                                 <button
@@ -278,14 +346,11 @@ export default function MarketingLayout({ children, title = "Digital Marketing" 
                                 )}
                             </button>
                             <div className={`transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSidebarOpen ? 'ml-2' : 'ml-1'}`}>
-                                <h1 className="text-xl md:text-[28px] font-bold font-display text-gray-900 dark:text-white tracking-tight leading-tight">
-                                    {t(title)}
-                                </h1>
-                                <div className="flex flex-wrap items-center gap-1 md:gap-2 mt-0.5 text-[11px] md:text-[13px] font-semibold text-gray-500 dark:text-gray-400">
-                                    <span>{getGreeting()}, {user.name.split(' ')[0]} 👋</span>
-                                    <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700"></span>
-                                    <span>{new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                                </div>
+                                {title !== 'Marketing Dashboard' && (
+                                    <h1 className="text-xl md:text-2xl font-bold font-display text-gray-900 dark:text-white tracking-tight leading-tight">
+                                        {t(title)}
+                                    </h1>
+                                )}
                             </div>
                         </div>
 

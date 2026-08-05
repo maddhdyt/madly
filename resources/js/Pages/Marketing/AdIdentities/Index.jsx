@@ -30,7 +30,7 @@ export default function Index({ identities, brands, salesUsers, showToast }) {
     };
 
     return (
-        <MarketingLayout title={t('Ad Identities')}>
+        <>
             <Head title={t('Ad Identities')} />
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -129,6 +129,8 @@ export default function Index({ identities, brands, salesUsers, showToast }) {
                 salesUsers={salesUsers}
                 showToast={showToast}
             />
-        </MarketingLayout>
+        </>
     );
 }
+
+Index.layout = page => <MarketingLayout title="Ad Identities">{page}</MarketingLayout>;

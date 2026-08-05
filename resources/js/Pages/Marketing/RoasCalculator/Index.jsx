@@ -68,7 +68,7 @@ export default function RoasCalculator() {
     }, [inputs]);
 
     return (
-        <MarketingLayout title="ROAS Calculator">
+        <>
             <div className="flex flex-col h-[calc(100vh-80px)] overflow-y-auto font-sans bg-white dark:bg-gray-900 rounded-tl-3xl border-l border-t border-gray-100 dark:border-gray-800 transition-colors duration-300">
                 
                 <div className="flex-1 w-full p-6 md:p-8 lg:p-10">
@@ -325,6 +325,8 @@ export default function RoasCalculator() {
                     </div>
                 </div>
             </div>
-        </MarketingLayout>
+        </>
     );
 }
+
+RoasCalculator.layout = page => <MarketingLayout title="ROAS Calculator">{page}</MarketingLayout>;

@@ -80,7 +80,7 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
     if (!isOpen) return null;
 
     return createPortal(
-        <div className="fixed inset-0 z-200 flex items-start justify-center pt-24 sm:pt-32 px-4">
+        <div className="fixed inset-0 z-[200] flex items-start justify-center pt-24 sm:pt-32 px-4">
             <div className="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
             
             <div className="relative w-full max-w-2xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800 animate-in fade-in zoom-in-95 duration-200">

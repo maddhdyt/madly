@@ -48,7 +48,17 @@ Route::get('marketing/login', [\App\Http\Controllers\Marketing\AuthController::c
 Route::post('marketing/login', [\App\Http\Controllers\Marketing\AuthController::class, 'store'])->middleware('guest');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])->name('home');
+    Route::get('/', function () {
+        if (auth()->user()->role === 'marketing') {
+            return redirect()->route('marketing.home');
+        }
+        return redirect()->route('sales.home');
+    })->name('home');
+
+    Route::prefix('sales')->name('sales.')->group(function () {
+        Route::get('/', [DashboardController::class, 'index'])->name('home');
+    });
+    
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::prefix('admin')->name('admin.')->group(function () {

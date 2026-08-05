@@ -36,7 +36,7 @@ class DashboardController extends Controller
             $dateStr = Carbon::now()->subDays($i)->format('Y-m-d');
             $dates[] = Carbon::now()->subDays($i)->format('M d');
             
-            $dayMetrics = $metrics->where('date', $dateStr);
+            $dayMetrics = $metrics->filter(fn($m) => $m->date->format('Y-m-d') === $dateStr);
             $chartData[] = $dayMetrics->sum('revenue');
         }
 

@@ -82,7 +82,7 @@ class PricelistController extends Controller
             'product_ids' => 'required|array',
             'product_ids.*' => 'exists:products,id',
             'target_field' => 'required|in:harga_jual_minimum_info,harga_jual_standar',
-            'update_type' => 'required|in:fixed,percentage',
+            'update_type' => 'required|in:fixed,percentage,remove',
             'base_field' => 'nullable|in:hpp,harga_jual_minimum_info',
             'fixed_price' => 'nullable|numeric|min:0',
             'percentage_increase' => 'nullable|numeric',
@@ -96,7 +96,9 @@ class PricelistController extends Controller
                 $attrs = $product->attributes ?? [];
                 $targetField = $validated['target_field'];
                 
-                if ($validated['update_type'] === 'fixed') {
+                if ($validated['update_type'] === 'remove') {
+                    $attrs[$targetField] = null;
+                } else if ($validated['update_type'] === 'fixed') {
                     $attrs[$targetField] = $validated['fixed_price'];
                 } else if ($validated['update_type'] === 'percentage') {
                     $baseAmount = 0;

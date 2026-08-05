@@ -1,9 +1,184 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import MainLayout from '../../../Layouts/MainLayout';
 import { Head, usePage } from '@inertiajs/react';
-import { Search, Copy, Receipt, Filter, ChevronLeft, ChevronRight, CheckCircle2, Link as LinkIcon } from 'lucide-react';
+import { Search, Copy, Receipt, Filter, ChevronLeft, ChevronRight, CheckCircle2, Link as LinkIcon, ExternalLink, Eye, X, Tag } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import useTranslations from '../../../Hooks/useTranslations';
 import CustomSelect from '../../../Components/CustomSelect';
+
+// Specs Modal Component
+const SpecsModal = ({ isOpen, onClose, product, service, t, onTagClick }) => {
+    if (!isOpen || !product) return null;
+
+    const attributes = product.attributes || {};
+    const hasAttributes = Object.keys(attributes).length > 0;
+    
+    // We use the service schema to order and label things if available
+    const schema = service?.product_schema || [];
+
+    const renderValue = (val, type) => {
+        if (!val) return null;
+        
+        if (type === 'link_builder' && Array.isArray(val)) {
+            if (val.length === 0) return <span className="text-gray-400 italic">No links available</span>;
+            return (
+                <div className="flex flex-col gap-2">
+                    {val.map((link, i) => (
+                        <div key={i} className="flex flex-col gap-0.5">
+                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{link.label}</span>
+                            <a href={link.url} target="_blank" rel="noreferrer" className="inline-flex items-start gap-1.5 text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 font-bold transition-colors underline-offset-4 underline hover:no-underline w-fit text-sm break-all">
+                                {link.url}
+                                <svg className="w-3.5 h-3.5 opacity-70 shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            </a>
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+
+        if (type === 'url' || (typeof val === 'string' && val.includes('http'))) {
+            if (typeof val !== 'string') return <span className="text-gray-400 italic">Invalid URL format</span>;
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const parts = val.split(urlRegex);
+            
+            return (
+                <div className="text-sm font-semibold text-gray-900 dark:text-white wrap-break-word leading-relaxed whitespace-pre-wrap flex flex-col gap-1.5">
+                    {parts.map((part, i) => {
+                        if (part.match(urlRegex)) {
+                            return (
+                                <a key={i} href={part} target="_blank" rel="noreferrer" className="inline-flex items-start gap-1.5 text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 font-bold transition-colors underline-offset-4 underline hover:no-underline w-fit break-all">
+                                    {part}
+                                    <svg className="w-3.5 h-3.5 opacity-70 shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                </a>
+                            );
+                        }
+                        // Render plain text parts if they are not empty spaces
+                        return part.trim() ? <span key={i} className="text-gray-600 dark:text-gray-400 font-medium">{part}</span> : null;
+                    })}
+                </div>
+            );
+        }
+        
+        if (type === 'tags' || type === 'label') {
+            const tags = typeof val === 'string' 
+                ? val.split(',').map(t => t.trim()).filter(t => t) 
+                : (Array.isArray(val) ? val : [val]);
+            if (tags.length === 0) return val;
+            
+            return (
+                <div className="flex flex-wrap gap-2">
+                    {tags.map((tag, i) => {
+                        const isClickable = !!onTagClick;
+                        return (
+                            <span 
+                                key={i} 
+                                onClick={() => isClickable && onTagClick(tag)}
+                                className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm ${isClickable ? 'cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 transition-colors' : ''}`}
+                            >
+                                {tag}
+                            </span>
+                        );
+                    })}
+                </div>
+            );
+        }
+        
+        // Fallback for objects/arrays that slipped through
+        let displayVal = val;
+        if (typeof val === 'object') {
+            try {
+                displayVal = JSON.stringify(val);
+            } catch (e) {
+                displayVal = String(val);
+            }
+        }
+        
+        return (
+            <span className="text-sm font-semibold text-gray-900 dark:text-white wrap-break-word leading-relaxed whitespace-pre-wrap">
+                {displayVal}
+            </span>
+        );
+    };
+
+    return createPortal(
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity animate-fade-in" onClick={onClose}></div>
+            
+            <div className="relative w-full max-w-lg bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden animate-scale-in">
+                <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                            <Tag className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">
+                                {t('Product Specifications')}
+                            </h3>
+                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-0.5">{product.name}</p>
+                        </div>
+                    </div>
+                    <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+                
+                <div className="p-0 max-h-[60vh] overflow-y-auto scrollbar-none">
+                    {!hasAttributes ? (
+                        <div className="text-center py-12 text-gray-500 dark:text-gray-400 italic text-sm">
+                            {t('No custom specifications for this product.')}
+                        </div>
+                    ) : (
+                        <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                            {/* Priority render based on Schema */}
+                            {schema.length > 0 ? (
+                                schema.map(field => {
+                                    const val = attributes[field.name];
+                                    if (!val) return null;
+                                    return (
+                                        <div key={field.name} className="flex flex-col gap-2 px-4 lg:px-8 py-4 lg:py-5 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
+                                            <span className="font-bold text-[11px] uppercase tracking-widest text-gray-500 dark:text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+                                                {field.label}
+                                            </span>
+                                            {renderValue(val, field.type)}
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                /* Fallback if no schema is defined but attributes exist */
+                                Object.entries(attributes).map(([key, val]) => {
+                                    if (!val) return null;
+                                    const formattedKey = key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                                    return (
+                                        <div key={key} className="flex flex-col gap-2 px-4 lg:px-8 py-4 lg:py-5 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
+                                            <span className="font-bold text-[11px] uppercase tracking-widest text-gray-500 dark:text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+                                                {formattedKey}
+                                            </span>
+                                            {renderValue(val, 'text')}
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+                    )}
+                </div>
+                
+                <div className="px-4 lg:px-8 py-4 lg:py-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 flex justify-end">
+                    <button onClick={onClose} className="px-4 py-2.5 bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl font-bold text-sm hover:bg-black dark:hover:bg-gray-200 transition-colors">
+                        {t('Close')}
+                    </button>
+                </div>
+            </div>
+            
+            <style>{`
+                @keyframes scaleIn { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                .animate-scale-in { animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+                .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
+            `}</style>
+        </div>,
+        document.body
+    );
+};
 
 export default function Calculator({ products, brands, services }) {
     const { t } = useTranslations();
@@ -15,6 +190,9 @@ export default function Calculator({ products, brands, services }) {
 
     const [filterValues, setFilterValues] = useState({});
     const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+
+    const [isSpecsModalOpen, setIsSpecsModalOpen] = useState(false);
+    const [viewSpecsProduct, setViewSpecsProduct] = useState(null);
 
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [genData, setGenData] = useState({
@@ -44,7 +222,20 @@ export default function Calculator({ products, brands, services }) {
         const options = {};
         if (filterableSchema.length > 0) {
             filterableSchema.forEach(field => {
-                options[field.name] = [...new Set(products.map(p => p.attributes?.[field.name]).filter(Boolean))].sort();
+                let allVals = [];
+                products.forEach(p => {
+                    const val = p.attributes?.[field.name];
+                    if (val) {
+                        if (typeof val === 'string' && val.includes(',')) {
+                            allVals.push(...val.split(',').map(s => s.trim()).filter(Boolean));
+                        } else if (Array.isArray(val)) {
+                            allVals.push(...val);
+                        } else {
+                            allVals.push(val);
+                        }
+                    }
+                });
+                options[field.name] = [...new Set(allVals)].sort();
             });
         }
         return options;
@@ -58,15 +249,45 @@ export default function Calculator({ products, brands, services }) {
     // Filtering Products
     const filteredProducts = useMemo(() => {
         return products.filter(p => {
-            const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+            const query = searchQuery.toLowerCase();
+            let matchSearch = p.name.toLowerCase().includes(query);
+            
+            if (!matchSearch && p.attributes) {
+                // Search inside attributes
+                for (const key in p.attributes) {
+                    const attrVal = p.attributes[key];
+                    if (attrVal && typeof attrVal === 'string' && attrVal.toLowerCase().includes(query)) {
+                        matchSearch = true;
+                        break;
+                    }
+                }
+            }
             const matchService = activeService === 'all' || p.service_id.toString() === activeService.toString();
 
             let matchDynamic = true;
             for (const key in filterValues) {
                 if (filterValues[key]) {
-                    if (p.attributes?.[key] !== filterValues[key]) {
+                    const productVal = p.attributes?.[key];
+                    if (!productVal) {
                         matchDynamic = false;
                         break;
+                    }
+                    if (typeof productVal === 'string' && productVal.includes(',')) {
+                        const splitVals = productVal.split(',').map(s => s.trim());
+                        if (!splitVals.includes(filterValues[key])) {
+                            matchDynamic = false;
+                            break;
+                        }
+                    } else if (Array.isArray(productVal)) {
+                        if (!productVal.includes(filterValues[key])) {
+                            matchDynamic = false;
+                            break;
+                        }
+                    } else {
+                        if (productVal !== filterValues[key]) {
+                            matchDynamic = false;
+                            break;
+                        }
                     }
                 }
             }
@@ -92,6 +313,17 @@ export default function Calculator({ products, brands, services }) {
     };
 
     const handleSelectProduct = (product) => {
+        if (selectedProduct?.id === product.id) {
+            setSelectedProduct(null);
+            setGenData({
+                brand_id: brands.length > 0 ? brands[0].id : '',
+                harga_coret: '',
+                harga_diskon: '',
+                includes: []
+            });
+            return;
+        }
+
         setSelectedProduct(product);
         const standardPrice = parseFloat(product.attributes?.harga_jual_standar || product.attributes?.harga_jual_minimum_info || product.hpp || 0);
         setGenData({
@@ -185,7 +417,7 @@ export default function Calculator({ products, brands, services }) {
                 </div>
             </div>
 
-            <div className="flex flex-col lg:flex-row h-full w-full gap-4 lg:gap-6 pb-4">
+            <div className={`flex flex-col lg:flex-row h-full w-full pb-4 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${selectedProduct ? 'gap-4 lg:gap-6' : 'gap-0'}`}>
 
                 {/* LEFT PANEL: Catalog */}
                 <div className="flex-1 flex flex-col bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden transition-colors">
@@ -288,38 +520,75 @@ export default function Calculator({ products, brands, services }) {
                     <div className="flex-1 overflow-y-auto p-5 bg-[#f8f9fa] dark:bg-black flex flex-col transition-colors">
                         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4 content-start flex-1">
                             {paginatedProducts.map(product => (
-                                <button
+                                <div
                                     key={product.id}
-                                    onClick={() => handleSelectProduct(product)}
-                                    className={`bg-white dark:bg-gray-900 border rounded-2xl p-4 text-left transition-all shadow-sm hover:shadow-md flex flex-col justify-between h-full ${selectedProduct?.id === product.id ? 'border-gray-900 dark:border-white ring-1 ring-gray-900 dark:ring-white' : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'}`}
+                                    className={`bg-white dark:bg-gray-900 border rounded-2xl p-4 transition-all shadow-sm flex flex-col justify-between h-full group/card ${selectedProduct?.id === product.id ? 'border-gray-900 dark:border-white ring-1 ring-gray-900 dark:ring-white' : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-md'}`}
                                 >
                                     <div className="mb-4">
                                         <h3 className="font-bold font-display text-gray-900 dark:text-white text-sm line-clamp-2 leading-tight mb-2">{product.name}</h3>
-                                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                                        
+                                        {/* Focus & Scope preview if available */}
+                                        {(product.attributes?.focus_scope || product.attributes?.subject_area) && (
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mb-2 font-medium">
+                                                {product.attributes?.focus_scope || product.attributes?.subject_area}
+                                            </p>
+                                        )}
+                                        
+                                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
                                             {product.attributes?.accreditation_type && (
-                                                <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded text-[10px] font-bold border border-gray-200 dark:border-gray-700">
+                                                <span className="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-0.5 rounded text-[10px] font-bold border border-blue-100 dark:border-blue-800/50">
                                                     {product.attributes.accreditation_type}
                                                 </span>
                                             )}
                                             {product.service && (
-                                                <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded text-[10px] font-bold border border-gray-200 dark:border-gray-700">
+                                                <span className="bg-gray-50 text-gray-600 dark:bg-gray-800 dark:text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold border border-gray-200 dark:border-gray-700">
                                                     {product.service.name}
                                                 </span>
                                             )}
                                         </div>
                                     </div>
 
-                                    <div className="mt-auto border-t border-gray-100 dark:border-gray-800 pt-3 flex justify-between items-end">
-                                        <div>
-                                            <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider mb-1">{t('Harga Standar')}</p>
-                                            <p className="text-sm font-black font-display text-gray-900 dark:text-white">{product.attributes?.harga_jual_standar ? formatRupiah(product.attributes.harga_jual_standar) : (product.attributes?.harga_jual_minimum_info ? formatRupiah(product.attributes.harga_jual_minimum_info) : '-')}</p>
+                                    <div className="mt-auto">
+                                        <div className="border-t border-gray-100 dark:border-gray-800 pt-3 flex justify-between items-end mb-4">
+                                            <div>
+                                                <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider mb-0.5">{t('Harga Standar')}</p>
+                                                <p className="text-sm font-black font-display text-gray-900 dark:text-white">{product.attributes?.harga_jual_standar ? formatRupiah(product.attributes.harga_jual_standar) : (product.attributes?.harga_jual_minimum_info ? formatRupiah(product.attributes.harga_jual_minimum_info) : '-')}</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-[9px] text-gray-400 dark:text-gray-500 uppercase font-bold tracking-wider mb-0.5">{t('Min. Price')}</p>
+                                                <p className="text-xs font-semibold text-gray-400">{product.attributes?.harga_jual_minimum_info ? formatRupiah(product.attributes.harga_jual_minimum_info) : '-'}</p>
+                                            </div>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="text-[9px] text-gray-400 dark:text-gray-500 uppercase font-bold tracking-wider mb-0.5">{t('Min. Price')}</p>
-                                            <p className="text-xs font-semibold text-gray-400">{product.attributes?.harga_jual_minimum_info ? formatRupiah(product.attributes.harga_jual_minimum_info) : '-'}</p>
+
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    setViewSpecsProduct(product);
+                                                    setIsSpecsModalOpen(true);
+                                                }}
+                                                className="flex-1 flex justify-center items-center gap-1.5 py-2 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-bold text-xs hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700 shadow-sm"
+                                            >
+                                                <Eye className="w-3.5 h-3.5" />
+                                                {t('Details')}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    handleSelectProduct(product);
+                                                }}
+                                                className={`flex-1 flex justify-center items-center gap-1.5 py-2 rounded-xl font-bold text-xs transition-colors border shadow-sm ${selectedProduct?.id === product.id ? 'bg-gray-900 text-white border-gray-900 dark:bg-white dark:text-gray-900 dark:border-white' : 'bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'}`}
+                                            >
+                                                <CheckCircle2 className={`w-3.5 h-3.5 ${selectedProduct?.id === product.id ? 'opacity-100' : 'opacity-50'}`} />
+                                                {selectedProduct?.id === product.id ? t('Selected') : t('Select')}
+                                            </button>
                                         </div>
                                     </div>
-                                </button>
+                                </div>
                             ))}
                             {filteredProducts.length === 0 && (
                                 <div className="col-span-full py-12 flex flex-col items-center justify-center text-gray-400">
@@ -356,22 +625,19 @@ export default function Calculator({ products, brands, services }) {
                 </div>
 
                 {/* RIGHT PANEL: Live WA Generator */}
-                <div className="w-full lg:w-100 xl:w-112.5 shrink-0 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col overflow-hidden relative transition-colors min-h-125">
-                    {!selectedProduct ? (
-                        <div className="h-full flex flex-col items-center justify-center text-center px-6">
-                            <div className="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">
-                                <Receipt className="w-8 h-8 text-gray-300 dark:text-gray-600" />
-                            </div>
-                            <h3 className="font-bold font-display text-gray-900 dark:text-white text-lg mb-2">{t('Live WA Generator')}</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{t('Select a product from the catalog on the left to instantly generate WhatsApp quotation snippets.')}</p>
+                <div 
+                    className={`shrink-0 bg-white dark:bg-gray-900 rounded-3xl flex flex-col relative transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden ${
+                        selectedProduct 
+                            ? 'w-full lg:w-100 xl:w-112.5 opacity-100 border border-gray-200 dark:border-gray-800 shadow-sm' 
+                            : 'w-0 opacity-0 border-0'
+                    }`}
+                >
+                    <div className="flex flex-col h-full w-[calc(100vw-2rem)] lg:w-100 xl:w-112.5">
+                        {/* Header */}
+                        <div className="p-5 border-b border-gray-100 dark:border-gray-800 bg-gray-900 dark:bg-black text-white shrink-0 transition-opacity">
+                            <h2 className="text-lg font-bold font-display tracking-tight mb-1">{t('WA Generator')}</h2>
+                            <p className="text-xs text-gray-400 font-medium line-clamp-1">{selectedProduct?.name || '-'}</p>
                         </div>
-                    ) : (
-                        <div className="flex flex-col h-full">
-                            {/* Header */}
-                            <div className="p-5 border-b border-gray-100 dark:border-gray-800 bg-gray-900 dark:bg-black text-white shrink-0">
-                                <h2 className="text-lg font-bold font-display tracking-tight mb-1">{t('WA Generator')}</h2>
-                                <p className="text-xs text-gray-400 font-medium line-clamp-1">{selectedProduct.name}</p>
-                            </div>
 
                             <div className="flex-1 overflow-y-auto p-5 scrollbar-none bg-[#f8f9fa] dark:bg-black space-y-5">
                                 {/* Controller Area */}
@@ -430,7 +696,7 @@ export default function Calculator({ products, brands, services }) {
                                     <div>
                                         <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">{t('Custom Includes')}</label>
                                         <div className="bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-3 max-h-40 overflow-y-auto scrollbar-none space-y-2">
-                                            {(selectedProduct.service?.includes || []).map((incName, idx) => (
+                                            {(selectedProduct?.service?.includes || []).map((incName, idx) => (
                                                 <label key={idx} className="flex items-center gap-2 cursor-pointer group">
                                                     <input
                                                         type="checkbox"
@@ -441,7 +707,7 @@ export default function Calculator({ products, brands, services }) {
                                                     <span className="text-xs font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">{incName}</span>
                                                 </label>
                                             ))}
-                                            {(selectedProduct.service?.includes || []).length === 0 && (
+                                            {(selectedProduct?.service?.includes || []).length === 0 && (
                                                 <p className="text-xs text-gray-400 dark:text-gray-500 italic">{t('No includes defined in this service type.')}</p>
                                             )}
                                         </div>
@@ -476,10 +742,24 @@ export default function Calculator({ products, brands, services }) {
 
                             </div>
                         </div>
-                    )}
+                    </div>
                 </div>
-
-            </div>
+            
+            <SpecsModal 
+                isOpen={isSpecsModalOpen} 
+                onClose={() => {
+                    setIsSpecsModalOpen(false);
+                    setTimeout(() => setViewSpecsProduct(null), 200);
+                }} 
+                product={viewSpecsProduct}
+                service={viewSpecsProduct?.service}
+                t={t}
+                onTagClick={(tag) => {
+                    setSearchQuery(tag);
+                    setIsSpecsModalOpen(false);
+                    setTimeout(() => setViewSpecsProduct(null), 200);
+                }}
+            />
         </>
     );
 }

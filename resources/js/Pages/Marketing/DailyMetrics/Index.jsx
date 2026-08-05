@@ -47,7 +47,7 @@ export default function DailyMetricsIndex({ brands, metrics }) {
     };
 
     return (
-        <MarketingLayout title="Daily Metrics">
+        <>
             <div className="flex flex-col h-[calc(100vh-80px)] overflow-y-auto font-sans bg-white dark:bg-gray-900 rounded-tl-3xl border-l border-t border-gray-100 dark:border-gray-800 transition-colors duration-300">
                 
                 <div className="flex-1 w-full p-6 md:p-8 lg:p-10">
@@ -261,6 +261,8 @@ export default function DailyMetricsIndex({ brands, metrics }) {
                     </div>
                 </div>
             </div>
-        </MarketingLayout>
+        </>
     );
 }
+
+DailyMetricsIndex.layout = page => <MarketingLayout title="Daily Metrics">{page}</MarketingLayout>;
