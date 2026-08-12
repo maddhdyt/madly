@@ -3,15 +3,22 @@
 namespace App\Http\Controllers\Marketing;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Services\Marketing\BudgetAllocatorService;
+use Inertia\Inertia;
 
 class BudgetAllocatorController extends Controller
 {
+    protected BudgetAllocatorService $budgetAllocatorService;
+
+    public function __construct(BudgetAllocatorService $budgetAllocatorService)
+    {
+        $this->budgetAllocatorService = $budgetAllocatorService;
+    }
+
     public function index()
     {
-        $brands = \App\Models\MarketingBrand::where('is_active', true)->get();
-        return inertia('Marketing/BudgetAllocator/Index', [
-            'brands' => $brands
+        return Inertia::render('Marketing/BudgetAllocator/Index', [
+            'brands' => $this->budgetAllocatorService->getActiveBrands()
         ]);
     }
 }

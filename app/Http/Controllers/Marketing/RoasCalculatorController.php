@@ -3,12 +3,20 @@
 namespace App\Http\Controllers\Marketing;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Services\Marketing\RoasService;
+use Inertia\Inertia;
 
 class RoasCalculatorController extends Controller
 {
+    protected RoasService $roasService;
+
+    public function __construct(RoasService $roasService)
+    {
+        $this->roasService = $roasService;
+    }
+
     public function index()
     {
-        return inertia('Marketing/RoasCalculator/Index');
+        return Inertia::render('Marketing/RoasCalculator/Index', $this->roasService->getRoasPageData());
     }
 }

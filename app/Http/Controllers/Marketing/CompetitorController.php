@@ -3,90 +3,62 @@
 namespace App\Http\Controllers\Marketing;
 
 use App\Http\Controllers\Controller;
-use App\Models\Competitor;
+use App\Http\Requests\Marketing\BattlecardRequest;
+use App\Http\Requests\Marketing\CompetitorRequest;
 use App\Models\Battlecard;
-use Illuminate\Http\Request;
+use App\Models\Competitor;
+use App\Services\Marketing\CompetitorService;
 use Inertia\Inertia;
 
 class CompetitorController extends Controller
 {
+    protected CompetitorService $competitorService;
+
+    public function __construct(CompetitorService $competitorService)
+    {
+        $this->competitorService = $competitorService;
+    }
+
     public function index()
     {
-        $competitors = Competitor::with('battlecards')->orderBy('name')->get();
         return Inertia::render('Marketing/Competitors/Index', [
-            'competitors' => $competitors
+            'competitors' => $this->competitorService->getAllCompetitorsWithBattlecards(),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(CompetitorRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'strengths' => 'nullable|string',
-            'weaknesses' => 'nullable|string',
-            'website_url' => 'nullable|url|max:255',
-            'instagram_url' => 'nullable|url|max:255',
-            'tiktok_url' => 'nullable|url|max:255',
-            'tier' => 'nullable|string|max:50',
-            'service_type' => 'nullable|string|max:255',
-            'specific_services' => 'nullable|string',
-        ]);
-
-        Competitor::create($validated);
+        $this->competitorService->createCompetitor($request->validated());
         return back()->with('success', 'Kompetitor berhasil ditambahkan.');
     }
 
-    public function update(Request $request, Competitor $competitor)
+    public function update(CompetitorRequest $request, Competitor $competitor)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'strengths' => 'nullable|string',
-            'weaknesses' => 'nullable|string',
-            'website_url' => 'nullable|url|max:255',
-            'instagram_url' => 'nullable|url|max:255',
-            'tiktok_url' => 'nullable|url|max:255',
-            'tier' => 'nullable|string|max:50',
-            'service_type' => 'nullable|string|max:255',
-            'specific_services' => 'nullable|string',
-        ]);
-
-        $competitor->update($validated);
+        $this->competitorService->updateCompetitor($competitor, $request->validated());
         return back()->with('success', 'Kompetitor berhasil diperbarui.');
     }
 
     public function destroy(Competitor $competitor)
     {
-        $competitor->delete();
+        $this->competitorService->deleteCompetitor($competitor);
         return back()->with('success', 'Kompetitor berhasil dihapus.');
     }
 
-    public function storeBattlecard(Request $request, Competitor $competitor)
+    public function storeBattlecard(BattlecardRequest $request, Competitor $competitor)
     {
-        $validated = $request->validate([
-            'category' => 'nullable|string|max:255',
-            'objection' => 'required|string',
-            'response' => 'required|string',
-        ]);
-
-        $competitor->battlecards()->create($validated);
+        $this->competitorService->createBattlecard($competitor, $request->validated());
         return back()->with('success', 'Battlecard berhasil ditambahkan.');
     }
 
-    public function updateBattlecard(Request $request, Battlecard $battlecard)
+    public function updateBattlecard(BattlecardRequest $request, Battlecard $battlecard)
     {
-        $validated = $request->validate([
-            'category' => 'nullable|string|max:255',
-            'objection' => 'required|string',
-            'response' => 'required|string',
-        ]);
-
-        $battlecard->update($validated);
+        $this->competitorService->updateBattlecard($battlecard, $request->validated());
         return back()->with('success', 'Battlecard berhasil diperbarui.');
     }
 
     public function destroyBattlecard(Battlecard $battlecard)
     {
-        $battlecard->delete();
+        $this->competitorService->deleteBattlecard($battlecard);
         return back()->with('success', 'Battlecard berhasil dihapus.');
     }
 }

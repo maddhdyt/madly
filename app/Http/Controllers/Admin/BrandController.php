@@ -3,86 +3,47 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\BrandRequest;
 use App\Models\Brand;
-use Illuminate\Http\Request;
+use App\Services\Admin\BrandService;
 use Inertia\Inertia;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 
 class BrandController extends Controller
 {
+    protected BrandService $brandService;
+
+    public function __construct(BrandService $brandService)
+    {
+        $this->brandService = $brandService;
+    }
+
     public function index()
     {
-        $brands = Brand::latest()->paginate(15)->withQueryString();
+        $brands = $this->brandService->getPaginatedBrands();
 
         return Inertia::render('Admin/Brands/Index', [
             'brands' => $brands,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(BrandRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'logo' => 'nullable|image|max:2048',
-        ]);
-
-        $validated['slug'] = Str::slug($validated['name']);
-
-        if (Brand::where('slug', $validated['slug'])->exists()) {
-            return redirect()->back()->withErrors(['name' => 'Brand with this name already exists.'])->withInput();
-        }
-
-        if ($request->hasFile('logo')) {
-            $path = $request->file('logo')->store('brands', 'public');
-            $validated['logo'] = '/storage/' . $path;
-        }
-
-        Brand::create($validated);
+        $this->brandService->createBrand($request->validated(), $request->file('logo'));
 
         return redirect()->back()->with('success', 'Brand created successfully.');
     }
 
-    public function update(Request $request, Brand $brand)
+    public function update(BrandRequest $request, Brand $brand)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'logo' => 'nullable|image|max:2048',
-        ]);
-
-        $validated['slug'] = Str::slug($validated['name']);
-
-        if (Brand::where('slug', $validated['slug'])->where('id', '!=', $brand->id)->exists()) {
-            return redirect()->back()->withErrors(['name' => 'Brand with this name already exists.'])->withInput();
-        }
-
-        if ($request->hasFile('logo')) {
-            if ($brand->logo) {
-                $oldPath = str_replace('/storage/', '', $brand->logo);
-                Storage::disk('public')->delete($oldPath);
-            }
-            $path = $request->file('logo')->store('brands', 'public');
-            $validated['logo'] = '/storage/' . $path;
-        } else {
-            unset($validated['logo']);
-        }
-
-        $brand->update($validated);
+        $this->brandService->updateBrand($brand, $request->validated(), $request->file('logo'));
 
         return redirect()->back()->with('success', 'Brand updated successfully.');
     }
 
     public function destroy(Brand $brand)
     {
-        
-        if ($brand->logo) {
-            $oldPath = str_replace('/storage/', '', $brand->logo);
-            Storage::disk('public')->delete($oldPath);
-        }
-        
-        $brand->delete();
+        $this->brandService->deleteBrand($brand);
+
         return redirect()->back()->with('success', 'Brand deleted successfully.');
     }
 }

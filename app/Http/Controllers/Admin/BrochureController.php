@@ -3,88 +3,46 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\BrochureRequest;
 use App\Models\Brochure;
-use App\Models\Brand;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Services\Admin\BrochureService;
 use Inertia\Inertia;
 
 class BrochureController extends Controller
 {
+    protected BrochureService $brochureService;
+
+    public function __construct(BrochureService $brochureService)
+    {
+        $this->brochureService = $brochureService;
+    }
+
     public function index()
     {
-        $brochures = Brochure::with('brand')->latest()->paginate(15)->withQueryString();
-        $brands = \Illuminate\Support\Facades\Cache::remember('master_brands', 86400, function() { return Brand::orderBy('name')->get(); });
-
         return Inertia::render('Admin/Brochures/Index', [
-            'brochures' => $brochures,
-            'brands' => $brands,
+            'brochures' => $this->brochureService->getPaginatedBrochures(),
+            'brands' => $this->brochureService->getMasterBrands(),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(BrochureRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'brand_id' => 'nullable|exists:brands,id',
-            'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // max 10MB
-        ]);
-
-        $file = $request->file('file');
-        $extension = $file->getClientOriginalExtension();
-        $fileType = in_array(strtolower($extension), ['pdf']) ? 'pdf' : 'image';
-        
-        $path = $file->store('brochures', 'public');
-
-        Brochure::create([
-            'title' => $validated['title'],
-            'brand_id' => $validated['brand_id'],
-            'file_path' => $path,
-            'file_type' => $fileType,
-        ]);
+        $this->brochureService->createBrochure($request->validated(), $request->file('file'));
 
         return redirect()->back()->with('success', 'Brochure uploaded successfully.');
     }
 
-    public function update(Request $request, Brochure $brochure)
+    public function update(BrochureRequest $request, Brochure $brochure)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'brand_id' => 'nullable|exists:brands,id',
-            'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
-        ]);
-
-        $data = [
-            'title' => $validated['title'],
-            'brand_id' => $validated['brand_id'],
-        ];
-
-        if ($request->hasFile('file')) {
-            // Delete old file
-            if (Storage::disk('public')->exists($brochure->file_path)) {
-                Storage::disk('public')->delete($brochure->file_path);
-            }
-
-            $file = $request->file('file');
-            $extension = $file->getClientOriginalExtension();
-            $fileType = in_array(strtolower($extension), ['pdf']) ? 'pdf' : 'image';
-            
-            $data['file_path'] = $file->store('brochures', 'public');
-            $data['file_type'] = $fileType;
-        }
-
-        $brochure->update($data);
+        $this->brochureService->updateBrochure($brochure, $request->validated(), $request->file('file'));
 
         return redirect()->back()->with('success', 'Brochure updated successfully.');
     }
 
     public function destroy(Brochure $brochure)
     {
-        if (Storage::disk('public')->exists($brochure->file_path)) {
-            Storage::disk('public')->delete($brochure->file_path);
-        }
-        
-        $brochure->delete();
+        $this->brochureService->deleteBrochure($brochure);
+
         return redirect()->back()->with('success', 'Brochure deleted successfully.');
     }
 }

@@ -3,49 +3,42 @@
 namespace App\Http\Controllers\Marketing;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Marketing\RevenueLogRequest;
 use App\Models\RevenueLog;
-use Illuminate\Http\Request;
+use App\Services\Marketing\RevenueLogService;
 use Inertia\Inertia;
 
 class RevenueLogController extends Controller
 {
+    protected RevenueLogService $revenueLogService;
+
+    public function __construct(RevenueLogService $revenueLogService)
+    {
+        $this->revenueLogService = $revenueLogService;
+    }
+
     public function index()
     {
-        $logs = RevenueLog::orderBy('date', 'desc')->get();
         return Inertia::render('Marketing/RevenueLogs/Index', [
-            'logs' => $logs
+            'logs' => $this->revenueLogService->getAllLogs()
         ]);
     }
 
-    public function store(Request $request)
+    public function store(RevenueLogRequest $request)
     {
-        $validated = $request->validate([
-            'date' => 'required|date',
-            'revenue_amount' => 'nullable|numeric',
-            'trend' => 'required|string|in:up,down,stable',
-            'reason' => 'required|string',
-        ]);
-
-        RevenueLog::create($validated);
+        $this->revenueLogService->createLog($request->validated());
         return back()->with('success', 'Revenue Log created successfully.');
     }
 
-    public function update(Request $request, RevenueLog $revenueLog)
+    public function update(RevenueLogRequest $request, RevenueLog $revenueLog)
     {
-        $validated = $request->validate([
-            'date' => 'required|date',
-            'revenue_amount' => 'nullable|numeric',
-            'trend' => 'required|string|in:up,down,stable',
-            'reason' => 'required|string',
-        ]);
-
-        $revenueLog->update($validated);
+        $this->revenueLogService->updateLog($revenueLog, $request->validated());
         return back()->with('success', 'Revenue Log updated successfully.');
     }
 
     public function destroy(RevenueLog $revenueLog)
     {
-        $revenueLog->delete();
+        $this->revenueLogService->deleteLog($revenueLog);
         return back()->with('success', 'Revenue Log deleted.');
     }
 }

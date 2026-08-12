@@ -3,60 +3,34 @@
 namespace App\Http\Controllers\Marketing;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Marketing\DailyMetricRequest;
 use App\Models\DailyMetric;
-use App\Models\MarketingBrand;
-use Illuminate\Http\Request;
+use App\Services\Marketing\DailyMetricService;
 use Inertia\Inertia;
-use Carbon\Carbon;
 
 class DailyMetricController extends Controller
 {
-    public function index(Request $request)
-    {
-        $brands = MarketingBrand::where('is_active', true)->orderBy('name')->get();
-        
-        // Fetch recent metrics to display in a table
-        $metrics = DailyMetric::with('marketingBrand')
-            ->orderBy('date', 'desc')
-            ->take(50)
-            ->get();
+    protected DailyMetricService $dailyMetricService;
 
-        return Inertia::render('Marketing/DailyMetrics/Index', [
-            'brands' => $brands,
-            'metrics' => $metrics,
-        ]);
+    public function __construct(DailyMetricService $dailyMetricService)
+    {
+        $this->dailyMetricService = $dailyMetricService;
     }
 
-    public function store(Request $request)
+    public function index()
     {
-        $validated = $request->validate([
-            'marketing_brand_id' => 'required|exists:marketing_brands,id',
-            'date' => 'required|date',
-            'ad_spend' => 'required|numeric|min:0',
-            'clicks' => 'required|integer|min:0',
-            'leads' => 'required|integer|min:0',
-            'revenue' => 'required|numeric|min:0',
-        ]);
+        return Inertia::render('Marketing/DailyMetrics/Index', $this->dailyMetricService->getDailyMetricPageData());
+    }
 
-        DailyMetric::updateOrCreate(
-            [
-                'marketing_brand_id' => $validated['marketing_brand_id'],
-                'date' => $validated['date'],
-            ],
-            [
-                'ad_spend' => $validated['ad_spend'],
-                'clicks' => $validated['clicks'],
-                'leads' => $validated['leads'],
-                'revenue' => $validated['revenue'],
-            ]
-        );
-
+    public function store(DailyMetricRequest $request)
+    {
+        $this->dailyMetricService->upsertMetric($request->validated());
         return back()->with('success', 'Metrik harian berhasil disimpan.');
     }
 
     public function destroy(DailyMetric $dailyMetric)
     {
-        $dailyMetric->delete();
+        $this->dailyMetricService->deleteMetric($dailyMetric);
         return back()->with('success', 'Metrik harian berhasil dihapus.');
     }
 }

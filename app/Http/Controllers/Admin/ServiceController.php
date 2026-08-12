@@ -3,90 +3,46 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ServiceRequest;
 use App\Models\Service;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use App\Services\Admin\ServiceTypeService;
 use Inertia\Inertia;
 
 class ServiceController extends Controller
 {
+    protected ServiceTypeService $serviceTypeService;
+
+    public function __construct(ServiceTypeService $serviceTypeService)
+    {
+        $this->serviceTypeService = $serviceTypeService;
+    }
+
     public function index()
     {
-        $services = Service::orderBy('name')->paginate(15)->withQueryString();
+        $services = $this->serviceTypeService->getPaginatedServices();
         return Inertia::render('Admin/Services/Index', [
             'services' => $services
         ]);
     }
 
-    public function store(Request $request)
+    public function store(ServiceRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'icon' => 'required|string|max:50',
-            'form_config' => 'required|array',
-            'form_config.includes_label' => 'required|string',
-            'form_config.includes_placeholder' => 'required|string',
-            'form_config.promo_header_label' => 'required|string',
-            'form_config.promo_header_placeholder' => 'required|string',
-            'form_config.footer_text_label' => 'required|string',
-            'form_config.footer_text_placeholder' => 'required|string',
-            'product_schema' => 'nullable|array',
-            'product_schema.*.name' => 'required|string',
-            'product_schema.*.label' => 'required|string',
-            'product_schema.*.type' => 'required|string',
-            'product_schema.*.placeholder' => 'nullable|string',
-            'includes' => 'nullable|array',
-            'includes.*' => 'nullable|string'
-        ]);
-
-        $validated['slug'] = Str::slug($validated['name']);
-
-        if (isset($validated['includes']) && is_array($validated['includes'])) {
-            $validated['includes'] = array_values(array_filter($validated['includes']));
-        }
-
-        Service::create($validated);
+        $this->serviceTypeService->createService($request->validated());
 
         return redirect()->back()->with('success', 'Service template created successfully.');
     }
 
-    public function update(Request $request, Service $service)
+    public function update(ServiceRequest $request, Service $service)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'icon' => 'required|string|max:50',
-            'form_config' => 'required|array',
-            'form_config.includes_label' => 'required|string',
-            'form_config.includes_placeholder' => 'required|string',
-            'form_config.promo_header_label' => 'required|string',
-            'form_config.promo_header_placeholder' => 'required|string',
-            'form_config.footer_text_label' => 'required|string',
-            'form_config.footer_text_placeholder' => 'required|string',
-            'product_schema' => 'nullable|array',
-            'product_schema.*.name' => 'required|string',
-            'product_schema.*.label' => 'required|string',
-            'product_schema.*.type' => 'required|string',
-            'product_schema.*.placeholder' => 'nullable|string',
-            'includes' => 'nullable|array',
-            'includes.*' => 'nullable|string'
-        ]);
-
-        $validated['slug'] = Str::slug($validated['name']);
-        
-        if (isset($validated['includes']) && is_array($validated['includes'])) {
-            $validated['includes'] = array_values(array_filter($validated['includes']));
-        }
-
-        $service->update($validated);
+        $this->serviceTypeService->updateService($service, $request->validated());
 
         return redirect()->back()->with('success', 'Service template updated successfully.');
     }
 
     public function destroy(Service $service)
     {
-        $service->delete();
+        $this->serviceTypeService->deleteService($service);
+
         return redirect()->back()->with('success', 'Service template deleted successfully.');
     }
 }

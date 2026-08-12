@@ -3,96 +3,42 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\Brand;
-use App\Models\Service;
-use App\Models\Quotation;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\QuotationRequest;
+use App\Services\Admin\QuotationService;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\DB;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class CalculatorController extends Controller
 {
-    public function index()
-    {
-        $products = Product::with(['service'])->orderBy('name')->get();
-        $brands = \Illuminate\Support\Facades\Cache::remember('master_brands', 86400, function() { return Brand::orderBy('name')->get(); });
-        $services = \Illuminate\Support\Facades\Cache::remember('master_services', 86400, function() { return Service::orderBy('name')->get(); });
+    protected QuotationService $quotationService;
 
-        return Inertia::render('Admin/Calculator/Index', [
-            'products' => $products,
-            'brands' => $brands,
-            'services' => $services
-        ]);
+    public function __construct(QuotationService $quotationService)
+    {
+        $this->quotationService = $quotationService;
     }
 
-    public function store(Request $request)
+    public function index()
     {
-        $validated = $request->validate([
-            'client_name' => 'nullable|string|max:255',
-            'client_email' => 'nullable|email|max:255',
-            'client_phone' => 'nullable|string|max:255',
-            'discount' => 'numeric|min:0',
-            'notes' => 'nullable|string',
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.product_price_id' => 'required|exists:product_prices,id',
-            'items.*.item_name' => 'required|string',
-            'items.*.package_name' => 'nullable|string',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.unit_price' => 'required|numeric|min:0',
-            'items.*.subtotal' => 'required|numeric|min:0',
-        ]);
+        $data = $this->quotationService->getCalculatorData();
 
+        return Inertia::render('Admin/Calculator/Index', $data);
+    }
+
+    public function store(QuotationRequest $request)
+    {
         try {
-            DB::beginTransaction();
-
-            $subtotal = collect($validated['items'])->sum('subtotal');
-            $discount = $validated['discount'];
-            $total = max(0, $subtotal - $discount);
-
-            $quotation = Quotation::create([
-                'client_name' => $validated['client_name'],
-                'client_email' => $validated['client_email'],
-                'client_phone' => $validated['client_phone'],
-                'subtotal' => $subtotal,
-                'discount' => $discount,
-                'total_amount' => $total,
-                'status' => 'draft',
-                'notes' => $validated['notes'],
-            ]);
-
-            foreach ($validated['items'] as $item) {
-                $quotation->items()->create([
-                    'product_id' => $item['product_id'],
-                    'product_price_id' => $item['product_price_id'],
-                    'item_name' => $item['item_name'],
-                    'package_name' => $item['package_name'],
-                    'quantity' => $item['quantity'],
-                    'unit_price' => $item['unit_price'],
-                    'subtotal' => $item['subtotal'],
-                ]);
-            }
-
-            DB::commit();
+            $quotation = $this->quotationService->createQuotation($request->validated());
 
             return redirect()->back()->with([
                 'success' => 'Quotation drafted successfully!',
-                'quotation_id' => $quotation->id
+                'quotation_id' => $quotation->id,
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
             return redirect()->back()->withErrors(['error' => 'Failed to save quotation. ' . $e->getMessage()]);
         }
     }
 
     public function generatePdf($id)
     {
-        $quotation = Quotation::with('items.product')->findOrFail($id);
-
-        $pdf = Pdf::loadView('pdf.quotation', compact('quotation'));
-        
-        return $pdf->download('Quotation-' . str_pad($quotation->id, 5, '0', STR_PAD_LEFT) . '.pdf');
+        return $this->quotationService->downloadPdf((int)$id);
     }
 }
