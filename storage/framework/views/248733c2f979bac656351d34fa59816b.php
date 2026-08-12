@@ -21,4 +21,4 @@
         <?php $__inertiaSsrResponse = app(\Inertia\Ssr\SsrState::class)->setPage($page)->dispatch();  if ($__inertiaSsrResponse) { echo $__inertiaSsrResponse->body; } else { ?><script data-page="app" type="application/json"><?php echo json_encode($page); ?></script><div id="app"></div><?php } ?>
     </body>
 </html>
-<?php /**PATH C:\laragon\www\madly\resources\views/app.blade.php ENDPATH**/ ?>
+<?php /**PATH D:\Work\Aksara Nusa Mediatama\Projects\madly\resources\views/app.blade.php ENDPATH**/ ?>
