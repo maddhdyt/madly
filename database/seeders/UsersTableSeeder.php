@@ -71,6 +71,19 @@ class UsersTableSeeder extends Seeder
                 'created_at' => '2026-07-31 03:00:28',
                 'updated_at' => '2026-07-31 03:00:28',
             ),
+            4 => 
+            array (
+                'id' => 5,
+                'name' => 'Accounting',
+                'email' => 'accounting@zeasy.com',
+                'avatar' => NULL,
+                'role' => 'accounting',
+                'email_verified_at' => NULL,
+                'password' => '$2y$12$3B/vSkrXAlhPMjJHvGB.WuD2UmGfltgVtxGhKX6HcbxeA/tfFBjWe',
+                'remember_token' => NULL,
+                'created_at' => '2026-07-31 03:00:28',
+                'updated_at' => '2026-07-31 03:00:28',
+            ),
         ));
         
         

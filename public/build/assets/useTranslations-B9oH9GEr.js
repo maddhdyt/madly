@@ -1,1 +1,0 @@
-import{c as e}from"./app-DqpRKi3f.js";function i(){const{translations:r,locale:a}=e().props;return{t:(n,s={})=>{let t=r?.[n]||n;return Object.keys(s).forEach(o=>{t=t.replace(new RegExp(":"+o,"g"),s[o])}),t},locale:a}}export{i as u};

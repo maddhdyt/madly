@@ -21,6 +21,10 @@ class AuthController extends Controller
             return redirect()->route('marketing.login');
         }
 
+        if ($request->module === 'accounting') {
+            return redirect()->route('accounting.login');
+        }
+
         return Inertia::render('Auth/Login');
     }
 

@@ -30,7 +30,7 @@ export default function ModuleSelector() {
                 </p>
 
                 {/* Module Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-2xl text-left">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full max-w-4xl text-left">
                     
                     {/* Sales Module Card */}
                     <Link 
@@ -71,6 +71,27 @@ export default function ModuleSelector() {
 
                         <div className="mt-auto flex items-center gap-2 text-[12px] font-bold text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors uppercase tracking-wider">
                             {t('Log in to Marketing')} <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                        </div>
+                    </Link>
+
+                    {/* Accounting Module Card */}
+                    <Link 
+                        href={route('login', { module: 'accounting' })}
+                        className="group flex flex-col p-7 bg-white dark:bg-[#202020] rounded-[20px] border border-gray-200/80 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-none transition-all duration-300"
+                    >
+                        <div className="w-16 h-16 mb-5 rounded-full bg-[#ECFDF5] dark:bg-[#064E3B] overflow-hidden flex items-center justify-center border border-emerald-50 dark:border-gray-800/50">
+                            <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Jack&backgroundColor=ECFDF5" alt="Accounting Avatar" className="w-full h-full object-cover dark:opacity-80" />
+                        </div>
+                        
+                        <h2 className="text-[20px] font-bold text-gray-900 dark:text-white tracking-tight mb-2">
+                            Accounting
+                        </h2>
+                        <p className="text-gray-500 dark:text-gray-400 text-[13px] font-medium mb-8 leading-relaxed flex-1">
+                            {t('Access for Financial Recording, Closings, and Reporting.')}
+                        </p>
+
+                        <div className="mt-auto flex items-center gap-2 text-[12px] font-bold text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors uppercase tracking-wider">
+                            {t('Log in to Accounting')} <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                         </div>
                     </Link>
 

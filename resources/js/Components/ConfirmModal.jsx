@@ -22,7 +22,7 @@ export default function ConfirmModal({ isOpen, title = 'Confirm Action', message
     return createPortal(
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
             <div 
-                className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity animate-fade-in" 
+                className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity animate-fade-in"
                 onClick={onClose}
             ></div>
             

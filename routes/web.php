@@ -30,6 +30,8 @@ use App\Http\Controllers\Marketing\BattlecardController;
 use App\Http\Controllers\Marketing\AdSwipeController;
 use App\Http\Controllers\Marketing\MarketingPlanController;
 use App\Http\Controllers\Marketing\RevenueLogController;
+use App\Http\Controllers\Accounting\CashAccountController;
+use App\Http\Controllers\Accounting\ReportController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 
@@ -47,10 +49,17 @@ Route::post('language', function (\Illuminate\Http\Request $request) {
 Route::get('marketing/login', [\App\Http\Controllers\Marketing\AuthController::class, 'create'])->name('marketing.login')->middleware('guest');
 Route::post('marketing/login', [\App\Http\Controllers\Marketing\AuthController::class, 'store'])->middleware('guest');
 
+// Accounting Login Routes
+Route::get('accounting/login', [\App\Http\Controllers\Accounting\AuthController::class, 'create'])->name('accounting.login')->middleware('guest');
+Route::post('accounting/login', [\App\Http\Controllers\Accounting\AuthController::class, 'store'])->middleware('guest');
+
 Route::middleware('auth')->group(function () {
     Route::get('/', function () {
         if (auth()->user()->role === 'marketing') {
             return redirect()->route('marketing.home');
+        }
+        if (auth()->user()->role === 'accounting') {
+            return redirect()->route('accounting.home');
         }
         return redirect()->route('sales.home');
     })->name('home');
@@ -110,5 +119,21 @@ Route::middleware('auth')->group(function () {
         // Planner & Logs
         Route::resource('marketing-plans', \App\Http\Controllers\Marketing\MarketingPlanController::class)->except(['create', 'edit', 'show']);
         Route::resource('revenue-logs', \App\Http\Controllers\Marketing\RevenueLogController::class)->except(['create', 'edit', 'show']);
+    });
+    // Accounting Module
+    Route::prefix('accounting')->name('accounting.')->middleware('role:accounting')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Accounting\DashboardController::class, 'index'])->name('home');
+        Route::get('/dashboard', [\App\Http\Controllers\Accounting\DashboardController::class, 'index'])->name('dashboard');
+        
+        Route::resource('projects', \App\Http\Controllers\Accounting\ProjectController::class);
+        Route::resource('revenues', \App\Http\Controllers\Accounting\RevenueController::class);
+        Route::resource('expenses', \App\Http\Controllers\Accounting\ExpenseController::class);
+        Route::resource('cash-accounts', CashAccountController::class)->except(['create', 'edit', 'show']);
+        Route::resource('rules', \App\Http\Controllers\Accounting\RuleController::class)->except(['create', 'edit', 'show']);
+        
+        Route::get('/closing', [\App\Http\Controllers\Accounting\ClosingController::class, 'index'])->name('closing.index');
+        Route::post('/closing', [\App\Http\Controllers\Accounting\ClosingController::class, 'store'])->name('closing.store');
+        Route::get('/closing/{closing}', [\App\Http\Controllers\Accounting\ClosingController::class, 'show'])->name('closing.show');
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     });
 });
