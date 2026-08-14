@@ -45,28 +45,31 @@ export default function Index({ rules = [], categories = [] }) {
         <AccountingLayout title={t('Calculation Rules')}>
             <Head title={t('Calculation Rules')} />
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
-                        {t('Calculation Rules')}
-                    </h1>
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {t('Manage dynamic expense rules like Advertising %, Bonus %, etc.')}
-                    </p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className="relative">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input type="text" placeholder={t('Search rules...')} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full md:w-64 pl-10 pr-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all dark:text-white" />
+            <div className="flex flex-col h-full w-full bg-[#f8f9fa] dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 overflow-hidden transition-colors duration-300 relative">
+                <div className="flex flex-col md:flex-row md:items-center justify-between px-8 py-8 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 gap-4 shrink-0">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+                            {t('Calculation Rules')}
+                        </h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            {t('Manage dynamic expense rules like Advertising %, Bonus %, etc.')}
+                        </p>
                     </div>
-                    <button onClick={handleCreate}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition-all shadow-sm shadow-emerald-500/20 whitespace-nowrap">
-                        <Plus className="w-4 h-4" />
-                        <span className="hidden sm:inline">{t('New Rule')}</span>
-                    </button>
+                    <div className="flex items-center gap-3 mt-4 sm:mt-0">
+                        <div className="relative">
+                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <input type="text" placeholder={t('Search rules...')} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full md:w-64 pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-all dark:text-white" />
+                        </div>
+                        <button onClick={handleCreate}
+                            className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-sm font-bold shadow-sm hover:bg-black dark:hover:bg-gray-200 transition-colors whitespace-nowrap">
+                            <Plus className="w-4 h-4" />
+                            <span className="hidden sm:inline">{t('New Rule')}</span>
+                        </button>
+                    </div>
                 </div>
-            </div>
+
+                <div className="flex-1 overflow-y-auto bg-[#f8f9fa] dark:bg-black p-8">
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredRules.map((rule) => {
@@ -76,10 +79,10 @@ export default function Index({ rules = [], categories = [] }) {
                     return (
                         <div key={rule.id} className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow relative group">
                             <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onClick={() => handleEdit(rule)} className="p-1.5 text-gray-400 hover:text-emerald-500 bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                                <button onClick={() => handleEdit(rule)} className="p-1.5 text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                                     <Edit2 className="w-4 h-4" />
                                 </button>
-                                <button onClick={() => handleDelete(rule)} className="p-1.5 text-gray-400 hover:text-rose-500 bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                                <button onClick={() => handleDelete(rule)} className="p-1.5 text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                                     <Trash2 className="w-4 h-4" />
                                 </button>
                             </div>
@@ -87,12 +90,12 @@ export default function Index({ rules = [], categories = [] }) {
                             <div className="flex items-start gap-4 mb-4">
                                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center border shrink-0 ${
                                     isPercentage 
-                                        ? 'bg-violet-50 dark:bg-violet-900/30 border-violet-100 dark:border-violet-800/50' 
-                                        : 'bg-amber-50 dark:bg-amber-900/30 border-amber-100 dark:border-amber-800/50'
+                                        ? 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700' 
+                                        : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
                                 }`}>
                                     {isPercentage 
-                                        ? <Percent className="w-6 h-6 text-violet-600 dark:text-violet-400" />
-                                        : <DollarSign className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                                        ? <Percent className="w-6 h-6 text-gray-900 dark:text-white" />
+                                        : <DollarSign className="w-6 h-6 text-gray-900 dark:text-white" />
                                     }
                                 </div>
                                 <div className="min-w-0">
@@ -104,7 +107,7 @@ export default function Index({ rules = [], categories = [] }) {
                                             {rule.expense_category?.name || 'N/A'}
                                         </span>
                                         {rule.is_active ? (
-                                            <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                                            <span className="flex items-center gap-1 text-[10px] font-bold text-gray-900 dark:text-white">
                                                 <ToggleRight className="w-3.5 h-3.5" /> {t('Active')}
                                             </span>
                                         ) : (
@@ -150,6 +153,7 @@ export default function Index({ rules = [], categories = [] }) {
                         <p className="text-gray-500 dark:text-gray-400">{t('Create your first calculation rule to get started.')}</p>
                     </div>
                 )}
+                </div>
             </div>
 
             <RuleFormSlideOver isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} rule={selectedRule} categories={categories} />
@@ -161,8 +165,9 @@ export default function Index({ rules = [], categories = [] }) {
                 title={t('Delete Rule')}
                 message={t('Are you sure you want to delete this calculation rule? This action cannot be undone.')}
                 confirmText={t('Delete')}
-                isDestructive={true}
+                type="danger"
             />
+        </div>
         </AccountingLayout>
     );
 }

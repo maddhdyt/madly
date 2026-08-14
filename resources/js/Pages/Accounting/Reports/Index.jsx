@@ -58,23 +58,28 @@ export default function Index({ closings = [], summary = {} }) {
         <AccountingLayout title={t('Reports')}>
             <Head title={t('Reports')} />
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
-                        {t('Reports')}
-                    </h1>
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {t('Daily closing snapshots and ready-to-copy financial reports.')}
-                    </p>
+
+
+            <div className="flex flex-col h-full w-full bg-[#f8f9fa] dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 overflow-hidden transition-colors duration-300 relative">
+                <div className="flex flex-col md:flex-row md:items-center justify-between px-8 py-8 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 gap-4 shrink-0">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+                            {t('Reports')}
+                        </h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            {t('Daily closing snapshots and ready-to-copy financial reports.')}
+                        </p>
+                    </div>
                 </div>
-                <div className="flex items-center gap-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl px-4 py-3 shadow-sm">
+
+            <div className="flex-1 overflow-y-auto bg-[#f8f9fa] dark:bg-[#0a0a0a] p-8 space-y-8">
+                <div className="flex items-center gap-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl px-4 py-3 shadow-sm w-max">
                     <CalendarRange className="w-5 h-5 text-gray-500" />
                     <div>
                         <div className="text-[11px] font-bold uppercase tracking-wider text-gray-400">{t('Current Period')}</div>
                         <div className="font-black text-gray-900 dark:text-white">{summary.period_label}</div>
                     </div>
                 </div>
-            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
                 {[
@@ -100,32 +105,32 @@ export default function Index({ closings = [], summary = {} }) {
 
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm whitespace-nowrap">
-                        <thead className="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
+                        <thead className="bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-widest font-extrabold border-b border-gray-100 dark:border-gray-800 sticky top-0 z-10">
                             <tr>
-                                <th className="px-6 py-4 font-bold text-gray-900 dark:text-white">{t('Date')}</th>
-                                <th className="px-6 py-4 font-bold text-gray-900 dark:text-white text-right">{t('Revenue')}</th>
-                                <th className="px-6 py-4 font-bold text-gray-900 dark:text-white text-right">{t('Expense')}</th>
-                                <th className="px-6 py-4 font-bold text-gray-900 dark:text-white text-right">{t('Settlement')}</th>
-                                <th className="px-6 py-4 font-bold text-gray-900 dark:text-white">{t('Closed By')}</th>
-                                <th className="px-6 py-4 font-bold text-gray-900 dark:text-white text-right">{t('Actions')}</th>
+                                <th className="px-8 py-4">{t('Date')}</th>
+                                <th className="px-8 py-4 text-right">{t('Revenue')}</th>
+                                <th className="px-8 py-4 text-right">{t('Expense')}</th>
+                                <th className="px-8 py-4 text-right">{t('Settlement')}</th>
+                                <th className="px-8 py-4">{t('Closed By')}</th>
+                                <th className="px-8 py-4 text-right">{t('Actions')}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
                             {closings.map((closing) => (
                                 <tr key={closing.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
-                                    <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
+                                    <td className="px-8 py-4 font-bold text-gray-900 dark:text-white">
                                         {formatDate(closing.closing_date)}
                                     </td>
-                                    <td className="px-6 py-4 text-right text-emerald-600 dark:text-emerald-400 font-bold">{formatIDR(closing.total_revenue)}</td>
-                                    <td className="px-6 py-4 text-right text-rose-600 dark:text-rose-400 font-bold">{formatIDR(closing.total_expense)}</td>
-                                    <td className="px-6 py-4 text-right font-black text-gray-900 dark:text-white">{formatIDR(closing.daily_settlement)}</td>
-                                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{closing.closed_by_user?.name || closing.closed_by || '—'}</td>
-                                    <td className="px-6 py-4 text-right">
+                                    <td className="px-8 py-4 text-right text-gray-900 dark:text-white font-bold">{formatIDR(closing.total_revenue)}</td>
+                                    <td className="px-8 py-4 text-right text-gray-900 dark:text-white font-bold">{formatIDR(closing.total_expense)}</td>
+                                    <td className="px-8 py-4 text-right font-black text-gray-900 dark:text-white">{formatIDR(closing.daily_settlement)}</td>
+                                    <td className="px-8 py-4 text-gray-600 dark:text-gray-400">{closing.closed_by?.name || (typeof closing.closed_by === 'object' ? '—' : closing.closed_by) || '—'}</td>
+                                    <td className="px-8 py-4 text-right">
                                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button onClick={() => copyReport(closing)} className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors" title={t('Copy Report')}>
                                                 <Copy className="w-4 h-4" />
                                             </button>
-                                            <Link href={route('accounting.closing.show', closing.id)} className="p-1.5 text-gray-400 hover:text-emerald-500 transition-colors" title={t('View Detail')}>
+                                            <Link href={route('accounting.closing.show', closing.id)} className="p-1.5 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" title={t('View Detail')}>
                                                 <Eye className="w-4 h-4" />
                                             </Link>
                                         </div>
@@ -135,7 +140,7 @@ export default function Index({ closings = [], summary = {} }) {
 
                             {closings.length === 0 && (
                                 <tr>
-                                    <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                    <td colSpan="6" className="px-8 py-12 text-center text-gray-500 dark:text-gray-400">
                                         {t('No closing reports found.')}
                                     </td>
                                 </tr>
@@ -143,6 +148,8 @@ export default function Index({ closings = [], summary = {} }) {
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
             </div>
         </AccountingLayout>
     );

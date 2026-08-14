@@ -16,13 +16,19 @@ import {
     FileText,
     Wallet,
     ChevronDown,
+    Users,
+    Network,
+    Calendar,
+    Layers,
+    Tag,
+    Route,
 } from 'lucide-react';
 import GlobalSearchModal from '../Components/GlobalSearchModal';
 import ProfileModal from '../Components/ProfileModal';
 import ConfirmModal from '../Components/ConfirmModal';
 import logoImg from '../../img/pile_2.webp';
 import useTranslations from '../Hooks/useTranslations';
-
+import Sidebar from '../Components/Sidebar';
 export default function AccountingLayout({ children, title = 'Accounting' }) {
     const { t, locale } = useTranslations();
     const { url, props } = usePage();
@@ -59,55 +65,23 @@ export default function AccountingLayout({ children, title = 'Accounting' }) {
             title: 'Finance & Settings',
             items: [
                 { name: t('Cash Accounts'), icon: Wallet, href: route('accounting.cash-accounts.index'), active: url.startsWith('/accounting/cash-accounts') },
-                { name: t('Rules'), icon: Percent, href: route('accounting.rules.index'), active: url.startsWith('/accounting/rules') },
+                { name: t('Expense Categories'), icon: Tag, href: route('accounting.expense-categories.index'), active: url.startsWith('/accounting/expense-categories') },
+                { name: t('Calculation Rules'), icon: Percent, href: route('accounting.rules.index'), active: url.startsWith('/accounting/rules') },
+                { name: t('Allocation Rules'), icon: Route, href: route('accounting.allocation-rules.index'), active: url.startsWith('/accounting/allocation-rules') },
+                { name: t('Participants'), icon: Users, href: route('accounting.profit-participants.index'), active: url.startsWith('/accounting/profit-participants') },
+                { name: t('Profit Sharing'), icon: Network, href: route('accounting.profit-sharing-schemes.index'), active: url.startsWith('/accounting/profit-sharing-schemes') },
             ],
         },
         {
             title: 'Closing & Reports',
             items: [
-                { name: t('Daily Closing'), icon: LockKeyhole, href: route('accounting.closing.index'), active: url.startsWith('/accounting/closing') },
+                { name: t('Daily Closing'), icon: LockKeyhole, href: route('accounting.closing.index'), active: url.startsWith('/accounting/closing') && !url.startsWith('/accounting/period-closings') },
+                { name: t('Period Closing'), icon: Calendar, href: route('accounting.period-closings.index'), active: url.startsWith('/accounting/period-closings') },
                 { name: t('Reports'), icon: History, href: route('accounting.reports.index'), active: url.startsWith('/accounting/reports') },
             ],
         },
     ];
 
-    const [openGroups, setOpenGroups] = useState(() => {
-        const initialGroups = [];
-        menuGroups.forEach((group, idx) => {
-            if (group.items.some(item => item.active)) {
-                initialGroups.push(idx);
-            }
-        });
-        return initialGroups.length > 0 ? initialGroups : [0];
-    });
-
-    const toggleGroup = (idx) => {
-        setOpenGroups(prev => (
-            prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
-        ));
-    };
-
-    const navRef = React.useRef(null);
-
-    useEffect(() => {
-        if (typeof window !== 'undefined' && window.innerWidth < 768) {
-            setIsSidebarOpen(false);
-        }
-
-        const handleResize = () => {
-            if (window.innerWidth < 768) {
-                setIsSidebarOpen(false);
-            } else {
-                setIsSidebarOpen(true);
-            }
-        };
-
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, [url]);
 
     useEffect(() => {
         if (typeof window === 'undefined') {
@@ -204,6 +178,13 @@ export default function AccountingLayout({ children, title = 'Accounting' }) {
         });
     };
 
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return t('Good morning');
+        if (hour < 18) return t('Good afternoon');
+        return t('Good evening');
+    };
+
     return (
         <>
             <Head title={title} />
@@ -217,83 +198,15 @@ export default function AccountingLayout({ children, title = 'Accounting' }) {
                     />
                 )}
 
-                <aside
-                    className={`fixed inset-y-0 left-0 md:relative z-50 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] bg-white dark:bg-gray-900 border-r border-transparent dark:border-gray-800 overflow-hidden ${isSidebarOpen ? 'translate-x-0 w-70 opacity-100 shadow-2xl md:shadow-none' : '-translate-x-full md:translate-x-0 md:w-0 opacity-0 md:invisible'}`}
-                >
-                    <div className="flex flex-col py-8 px-5 w-70 h-full">
-                        <div className="mb-10 px-3 flex items-center gap-3">
-                            <div className="w-9 h-9 flex items-center justify-center cursor-pointer transition-transform hover:scale-105">
-                                <img src={logoImg} alt="Zeasy Logo" className="w-full h-full object-contain" />
-                            </div>
-                            <span className="font-display font-extrabold text-[26px] tracking-normal text-gray-900 dark:text-white">Zeasy</span>
-                        </div>
-
-                        <nav ref={navRef} className="flex-1 overflow-y-auto relative space-y-1 px-1 mt-2 pb-4">
-
-                            {menuGroups.map((group, idx) => {
-                                const isOpen = openGroups.includes(idx);
-                                return (
-                                    <div key={idx} className="z-10">
-                                        <button
-                                            onClick={() => toggleGroup(idx)}
-                                            className={`relative z-10 w-full flex items-center justify-between py-2.5 px-4 group focus:outline-none rounded-xl transition-colors ${group.items.some(i => i.active) ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-800/30 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                                        >
-                                            <p className="relative z-10 text-[11px] font-bold tracking-wider uppercase">{group.title}</p>
-                                            <ChevronDown className={`relative z-10 w-4 h-4 transition-transform duration-300 ${group.items.some(i => i.active) ? 'text-white dark:text-gray-900' : 'text-gray-400 dark:text-gray-500'} ${isOpen ? 'rotate-180' : ''}`} />
-                                        </button>
-
-                                        <div className={`grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-                                            <div className="overflow-hidden">
-                                                <div className="pt-0 pb-1 flex flex-col relative">
-                                                    <div className="absolute left-[26px] top-0 h-1 w-[2px] bg-gray-200 dark:bg-gray-800" />
-
-                                                    {group.items.map((item, itemIdx) => {
-                                                        const isActive = item.active;
-                                                        const Icon = item.icon;
-
-                                                        return (
-                                                            <Link
-                                                                key={itemIdx}
-                                                                href={item.href}
-                                                                className={`relative z-10 flex items-center gap-3 py-2 px-4 ml-2 mr-1 text-[13.5px] transition-colors duration-300 rounded-xl group/item ${isActive ? 'font-semibold text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-800/60' : 'font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50'}`}
-                                                            >
-                                                                <Icon className={`w-[18px] h-[18px] shrink-0 transition-colors duration-200 ${isActive ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'}`} />
-                                                                <span className="relative z-10 truncate">{item.name}</span>
-                                                            </Link>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </nav>
-
-                        <div className="mt-auto pt-6 px-3">
-                            <div className="relative bg-[#e4e5e4] dark:bg-gray-800 rounded-full flex flex-col items-center gap-1.5 p-1.5 w-fit transition-colors">
-                                <div
-                                    className={`absolute left-1.5 right-1.5 top-1.5 h-10 rounded-full bg-white dark:bg-gray-700 shadow-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isDarkMode ? 'translate-y-0' : 'translate-y-[46px]'}`}
-                                />
-
-                                <button
-                                    onClick={(e) => toggleDark(true, e)}
-                                    className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-500 ${isDarkMode ? 'text-gray-900 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                                    title="Dark Mode"
-                                >
-                                    <Moon className={`w-5 h-5 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isDarkMode ? '-rotate-12 scale-110' : 'rotate-0 scale-100'}`} strokeWidth={isDarkMode ? 2 : 1.5} />
-                                </button>
-                                <button
-                                    onClick={(e) => toggleDark(false, e)}
-                                    className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-500 ${!isDarkMode ? 'text-gray-900 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                                    title="Light Mode"
-                                >
-                                    <Sun className={`w-5 h-5 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${!isDarkMode ? 'rotate-90 scale-110' : 'rotate-0 scale-100'}`} strokeWidth={!isDarkMode ? 2 : 1.5} />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </aside>
+                {/* Sidebar Component */}
+                <Sidebar 
+                    menuGroups={menuGroups}
+                    isSidebarOpen={isSidebarOpen}
+                    setIsSidebarOpen={setIsSidebarOpen}
+                    settings={{ company_name: 'Zeasy' }}
+                    isDarkMode={isDarkMode}
+                    toggleDark={toggleDark}
+                />
 
                 <main className="flex-1 flex flex-col h-full overflow-hidden p-6 md:p-8 lg:px-10 relative z-[60] dark:bg-gray-950">
                     <header className="mb-6 flex items-center justify-between shrink-0">
@@ -311,11 +224,14 @@ export default function AccountingLayout({ children, title = 'Accounting' }) {
                             </button>
 
                             <div className={`transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSidebarOpen ? 'ml-2' : 'ml-1'}`}>
-                                {title !== 'Accounting Dashboard' && (
-                                    <h1 className="text-xl md:text-2xl font-bold font-display text-gray-900 dark:text-white tracking-tight leading-tight">
-                                        {t(title)}
-                                    </h1>
-                                )}
+                                <h1 className="text-xl md:text-[28px] font-bold font-display text-gray-900 dark:text-white tracking-tight leading-tight">
+                                    {t(title)}
+                                </h1>
+                                <div className="flex flex-wrap items-center gap-1 md:gap-2 mt-0.5 text-[11px] md:text-[13px] font-semibold text-gray-500 dark:text-gray-400">
+                                    <span>{getGreeting()}, {user.name.split(' ')[0]} 👋</span>
+                                    <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700"></span>
+                                    <span>{new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                </div>
                             </div>
                         </div>
 
@@ -399,7 +315,12 @@ export default function AccountingLayout({ children, title = 'Accounting' }) {
                     </header>
 
                     <div className="flex-1 w-full overflow-y-auto pb-10">
-                        {children}
+                        {React.Children.map(children, child => {
+                            if (React.isValidElement(child)) {
+                                return React.cloneElement(child, { showToast });
+                            }
+                            return child;
+                        })}
                     </div>
                 </main>
 

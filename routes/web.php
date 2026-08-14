@@ -129,11 +129,19 @@ Route::middleware('auth')->group(function () {
         Route::resource('revenues', \App\Http\Controllers\Accounting\RevenueController::class);
         Route::resource('expenses', \App\Http\Controllers\Accounting\ExpenseController::class);
         Route::resource('cash-accounts', CashAccountController::class)->except(['create', 'edit', 'show']);
+        Route::resource('expense-categories', \App\Http\Controllers\Accounting\ExpenseCategoryController::class)->except(['create', 'edit', 'show']);
+        Route::resource('allocation-rules', \App\Http\Controllers\Accounting\AllocationRuleController::class)->except(['create', 'edit', 'show']);
         Route::resource('rules', \App\Http\Controllers\Accounting\RuleController::class)->except(['create', 'edit', 'show']);
+        
+        Route::resource('profit-participants', \App\Http\Controllers\Accounting\ProfitParticipantController::class)->except(['create', 'edit', 'show']);
+        Route::resource('profit-sharing-schemes', \App\Http\Controllers\Accounting\ProfitSharingSchemeController::class)->except(['create', 'edit', 'show']);
         
         Route::get('/closing', [\App\Http\Controllers\Accounting\ClosingController::class, 'index'])->name('closing.index');
         Route::post('/closing', [\App\Http\Controllers\Accounting\ClosingController::class, 'store'])->name('closing.store');
         Route::get('/closing/{closing}', [\App\Http\Controllers\Accounting\ClosingController::class, 'show'])->name('closing.show');
+        
+        Route::resource('period-closings', \App\Http\Controllers\Accounting\PeriodClosingController::class)->only(['index', 'store', 'show']);
+        
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     });
 });

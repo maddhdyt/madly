@@ -23,7 +23,11 @@ class StoreExpenseCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:255',
+            'type' => 'required|string|in:direct,shared,rule_based',
+            'description' => 'nullable|string',
+            'is_active' => 'boolean',
+            'sort_order' => 'integer',
         ];
     }
 }

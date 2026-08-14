@@ -130,7 +130,7 @@ export default function Show({ closing }) {
                             <User className="w-4 h-4 text-gray-400 mt-0.5" />
                             <div>
                                 <div className="text-[11px] uppercase tracking-wider text-gray-400 font-bold">{t('Closed By')}</div>
-                                <div className="font-bold text-gray-900 dark:text-white">{closing.closed_by_user?.name || closing.closed_by || '—'}</div>
+                                <div className="font-bold text-gray-900 dark:text-white">{closing.closed_by?.name || (typeof closing.closed_by === 'object' ? '—' : closing.closed_by) || '—'}</div>
                             </div>
                         </div>
                         <div>
@@ -139,7 +139,7 @@ export default function Show({ closing }) {
                         </div>
                         <div>
                             <div className="text-[11px] uppercase tracking-wider text-gray-400 font-bold mb-1">{t('Status')}</div>
-                            <div className="inline-flex px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400">
+                            <div className="inline-flex px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white">
                                 {closing.status}
                             </div>
                         </div>

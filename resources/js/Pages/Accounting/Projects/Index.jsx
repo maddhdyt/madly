@@ -55,17 +55,18 @@ export default function Index({ projects = [] }) {
         <AccountingLayout title={t('Projects')}>
             <Head title={t('Projects')} />
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
-                        {t('Projects')}
-                    </h1>
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {t('Manage accounting projects and their balances.')}
-                    </p>
-                </div>
-                
-                <div className="flex items-center gap-3">
+            <div className="flex flex-col h-full w-full bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden transition-colors duration-300 relative">
+                <div className="flex flex-col md:flex-row md:items-center justify-between px-8 py-8 border-b border-gray-100 dark:border-gray-800">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+                            {t('Projects')}
+                        </h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            {t('Manage accounting projects and their balances.')}
+                        </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 mt-4 sm:mt-0">
                     <div className="relative">
                         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                         <input
@@ -73,12 +74,12 @@ export default function Index({ projects = [] }) {
                             placeholder={t('Search projects...')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full md:w-64 pl-10 pr-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all dark:text-white"
+                            className="w-full md:w-64 pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-all dark:text-white"
                         />
                     </div>
                     <button
                         onClick={handleCreate}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition-all shadow-sm shadow-emerald-500/20 whitespace-nowrap"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-sm font-bold shadow-sm hover:bg-black dark:hover:bg-gray-200 transition-colors whitespace-nowrap"
                     >
                         <Plus className="w-4 h-4" />
                         <span className="hidden sm:inline">{t('New Project')}</span>
@@ -86,22 +87,23 @@ export default function Index({ projects = [] }) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="flex-1 overflow-y-auto bg-[#f8f9fa] dark:bg-black p-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProjects.map((project) => (
                     <div key={project.id} className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow relative group">
                         
                         <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => handleEdit(project)} className="p-1.5 text-gray-400 hover:text-emerald-500 bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                            <button onClick={() => handleEdit(project)} className="p-1.5 text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                                 <Edit2 className="w-4 h-4" />
                             </button>
-                            <button onClick={() => handleDelete(project)} className="p-1.5 text-gray-400 hover:text-rose-500 bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                            <button onClick={() => handleDelete(project)} className="p-1.5 text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                                 <Trash2 className="w-4 h-4" />
                             </button>
                         </div>
 
                         <div className="flex items-start gap-4 mb-4">
-                            <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center border border-emerald-100 dark:border-emerald-800/50 shrink-0">
-                                <FileText className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                            <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center border border-gray-200 dark:border-gray-700 shrink-0">
+                                <FileText className="w-6 h-6 text-gray-900 dark:text-white" />
                             </div>
                             <div>
                                 <h3 className="font-bold text-gray-900 dark:text-white text-lg leading-tight mb-1 pr-12">
@@ -109,9 +111,9 @@ export default function Index({ projects = [] }) {
                                 </h3>
                                 <div className="flex items-center gap-2">
                                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                                        project.status === 'active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400' :
-                                        project.status === 'completed' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400' :
-                                        'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400'
+                                        project.status === 'active' ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white' :
+                                        project.status === 'completed' ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white' :
+                                        'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white'
                                     }`}>
                                         {t(project.status)}
                                     </span>
@@ -153,6 +155,7 @@ export default function Index({ projects = [] }) {
                         <p className="text-gray-500 dark:text-gray-400">{t('Try adjusting your search or add a new project.')}</p>
                     </div>
                 )}
+                </div>
             </div>
 
             <ProjectFormSlideOver 
@@ -168,8 +171,9 @@ export default function Index({ projects = [] }) {
                 title={t('Delete Project')}
                 message={t('Are you sure you want to delete this project? This action cannot be undone.')}
                 confirmText={t('Delete')}
-                isDestructive={true}
+                type="danger"
             />
+        </div>
         </AccountingLayout>
     );
 }

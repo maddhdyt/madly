@@ -32,6 +32,8 @@ class ProjectController extends Controller
             'is_profit_sharing_enabled' => 'boolean',
         ]);
 
+        $validated['total_budget'] = $validated['total_budget'] ?? 0;
+
         AccountingProject::create($validated);
 
         return redirect()->back()->with('success', 'Project created successfully.');
@@ -48,6 +50,8 @@ class ProjectController extends Controller
             'status' => 'required|in:active,completed,on_hold',
             'is_profit_sharing_enabled' => 'boolean',
         ]);
+
+        $validated['total_budget'] = $validated['total_budget'] ?? 0;
 
         $project->update($validated);
 

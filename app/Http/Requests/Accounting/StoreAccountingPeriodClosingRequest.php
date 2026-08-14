@@ -23,7 +23,10 @@ class StoreAccountingPeriodClosingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'period_name' => 'required|string|max:255',
+            'period_start' => 'required|date',
+            'period_end' => 'required|date|after_or_equal:period_start',
+            'notes' => 'nullable|string',
         ];
     }
 }

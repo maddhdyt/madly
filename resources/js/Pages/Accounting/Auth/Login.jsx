@@ -23,7 +23,7 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-emerald-50/30 dark:bg-gray-900 flex flex-col justify-center items-center p-4 lg:p-8 font-sans transition-colors duration-300">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center items-center p-4 lg:p-8 font-sans transition-colors duration-300">
             <Head title={t("Accounting Login")} />
 
             <div className="max-w-6xl w-full p-8 lg:p-16 flex flex-col lg:flex-row gap-16 lg:gap-32 items-center">
@@ -38,17 +38,17 @@ export default function Login() {
                     {/* Welcome Text */}
                     <div>
                         <h1 className="text-4xl lg:text-[44px] font-black text-gray-900 dark:text-white tracking-tight leading-[1.1]">
-                            {t('Welcome to')}<br/><span className="font-display tracking-normal text-5xl lg:text-[52px] text-emerald-700 dark:text-emerald-500">Accounting</span>
+                            {t('Welcome to')}<br/><span className="font-display tracking-normal text-5xl lg:text-[52px]">Accounting</span>
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400 mt-5 text-[15px] font-medium max-w-md leading-relaxed">
+                        <p className="text-gray-500 dark:text-gray-400 mt-5 text-[15px] font-medium max-w-md leading-relaxed">
                             {t('Akses khusus untuk pencatatan keuangan, manajemen kas, tutup buku harian, dan pembagian keuntungan (profit sharing).')}
                         </p>
 
-                        <div className="mt-12 pt-10 border-t border-emerald-100 dark:border-gray-800">
+                        <div className="mt-12 pt-10 border-t border-gray-100 dark:border-gray-800">
                             <p className="text-[11px] font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">{t('Financial Integrity')}</p>
                             <div className="flex gap-1.5">
                                 {[1, 2, 3, 4, 5].map(star => (
-                                    <Star key={star} className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-current" />
+                                    <Star key={star} className="w-5 h-5 text-gray-900 dark:text-white fill-current" />
                                 ))}
                             </div>
                         </div>
@@ -56,7 +56,7 @@ export default function Login() {
                         <div className="mt-10 flex items-center gap-4">
                             <div className="flex -space-x-3">
                                 <div className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-900 bg-gray-100 overflow-hidden flex items-center justify-center">
-                                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Jack&backgroundColor=ECFDF5" alt="User 1" className="w-full h-full object-cover" />
+                                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Jack&backgroundColor=f3f4f6" alt="User 1" className="w-full h-full object-cover" />
                                 </div>
                             </div>
                             <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium leading-tight max-w-[120px]">
@@ -67,9 +67,9 @@ export default function Login() {
                 </div>
 
                 {/* Right Side (Login Form) */}
-                <div className="w-full lg:w-115 shrink-0 bg-white dark:bg-gray-900 p-10 lg:p-12 rounded-[32px] shadow-[0_8px_30px_rgb(5,150,105,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-emerald-50 dark:border-gray-800 transition-colors">
+                <div className="w-full lg:w-115 shrink-0 bg-white dark:bg-gray-900 p-10 lg:p-12 rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-transparent dark:border-gray-800 transition-colors">
                     <div className="mb-10 text-left">
-                        <Link href={route('login')} className="inline-flex items-center gap-1.5 text-[11px] font-bold text-gray-400 dark:text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors mb-6 group">
+                        <Link href={route('login')} className="inline-flex items-center gap-1.5 text-[11px] font-bold text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors mb-6 group">
                             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> {t('Back to Module Selection')}
                         </Link>
                         <h2 className="text-[26px] font-black text-gray-900 dark:text-white tracking-tight">{t('Log In')}</h2>
@@ -83,7 +83,7 @@ export default function Login() {
                                 type="email"
                                 value={data.email}
                                 onChange={e => setData('email', e.target.value)}
-                                className={`w-full px-5 py-3.5 rounded-[16px] bg-emerald-50/50 dark:bg-gray-800/50 border border-emerald-100 dark:border-gray-700 text-[14px] font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 transition-all ${errors.email ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                className={`w-full px-5 py-3.5 rounded-[16px] bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-[14px] font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white transition-all ${errors.email ? 'border-red-500 focus:ring-red-500' : ''}`}
                                 placeholder="Ex: accounting@zeasy.com"
                             />
                             {errors.email && <p className="text-[12px] text-red-500 mt-2 font-medium">{errors.email}</p>}
@@ -92,19 +92,20 @@ export default function Login() {
                         <div>
                             <div className="flex justify-between items-center mb-2">
                                 <label className="block text-[12px] font-bold text-gray-700 dark:text-gray-300">{t('Password')}</label>
+                                <a href="#" onClick={e => e.preventDefault()} className="text-[11px] font-bold text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">{t('Forgot password?')}</a>
                             </div>
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     value={data.password}
                                     onChange={e => setData('password', e.target.value)}
-                                    className={`w-full px-5 py-3.5 pr-12 rounded-[16px] bg-emerald-50/50 dark:bg-gray-800/50 border border-emerald-100 dark:border-gray-700 text-[14px] font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 transition-all ${errors.password ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                    className={`w-full px-5 py-3.5 pr-12 rounded-[16px] bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-[14px] font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white transition-all ${errors.password ? 'border-red-500 focus:ring-red-500' : ''}`}
                                     placeholder="••••••••"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-400 hover:text-emerald-600 dark:hover:text-gray-300 transition-colors"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                                 >
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
@@ -123,22 +124,22 @@ export default function Login() {
                                     />
                                     <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center transition-all duration-200 ${
                                         data.remember 
-                                        ? 'bg-emerald-600 border-emerald-600 dark:bg-emerald-500 dark:border-emerald-500' 
-                                        : 'bg-transparent border-emerald-200 dark:border-gray-600 group-hover:border-emerald-400'
+                                        ? 'bg-gray-900 border-gray-900 dark:bg-white dark:border-white' 
+                                        : 'bg-transparent border-gray-300 dark:border-gray-600 group-hover:border-gray-400 dark:group-hover:border-gray-500'
                                     }`}>
                                         <Check className={`w-3.5 h-3.5 text-white dark:text-gray-900 transition-transform duration-300 ${
                                             data.remember ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
                                         }`} strokeWidth={3} />
                                     </div>
                                 </div>
-                                <span className="text-[13px] font-bold text-gray-600 dark:text-gray-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">{t('Keep me logged in')}</span>
+                                <span className="text-[13px] font-bold text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">{t('Keep me logged in')}</span>
                             </label>
                         </div>
 
                         <button
                             type="submit"
                             disabled={processing}
-                            className="w-full mt-4 bg-emerald-600 dark:bg-emerald-500 text-white dark:text-black py-4 px-6 rounded-[16px] font-bold text-[14px] hover:bg-emerald-700 dark:hover:bg-emerald-400 transition-colors shadow-lg shadow-emerald-600/20 dark:shadow-emerald-500/20 disabled:opacity-50"
+                            className="w-full mt-4 bg-black dark:bg-white text-white dark:text-black py-4 px-6 rounded-[16px] font-bold text-[14px] hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors shadow-lg shadow-black/10 dark:shadow-white/10 disabled:opacity-50"
                         >
                             {processing ? t('Signing in...') : t('Log In')}
                         </button>
